@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+{# 显式使用with context引入宏函数文件 #}
+{% from 'macros/_macro.html' import static_file, current_location with context %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{%block title %}IT资产管理系统{% endblock %}</title>
+    {# 导入静态文件 #}
+    {% block static %}
+    {{static_file('icon', 'images/icon/sys.ico')}}
+    {{static_file('css', 'css/bootstrap.min.css')}}
+    {{static_file('css', 'css/bootstrap-icons.css')}}
+    {{static_file('css', 'css/jquery-confirm.min.css')}}
+    {{static_file('css', 'css/all.min.css')}}
+    {{static_file('js', 'js/jquery-3.6.0.min.js')}}
+    {#static_file('js', 'js/popper.min.js')#}
+    {#static_file('js', 'js/bootstrap.min.js')#}
+    {{static_file('js', 'js/bootstrap.bundle.min.js')}}
+    {{static_file('js', 'js/jquery-confirm.min.js')}}
+    {% endblock %}
+    <!-- 生成执行时间渲染函数 -->
+    {# moment.include_moment(local_js=url_for('static',filename='js/moment/moment-with-locales.js')) #}
+    <!-- 设置自动识别显示语言 -->
+    {# moment.locale(auto_detect=True) #}
+    {# --------- 引入子页面自己的css文件 --------- #}
+    {% block link %}{% endblock %}
+    {# --------- 引入子页面自己的JavaScript文件 --------- #}
+    {% block scripts %}{% endblock %}
+    {# --------- 编写子页面自己的css样式 --------- #}
+    {% block style %}{% endblock %}
+</head>
+<body>
+<header>{% block header %}{% include '_header.html' %}{% endblock %}</header><br>
+<main>
+{% block main %}
+<div class="container-fluid">
+{% block content%}{% endblock %}
+</div>
+{% endblock %}
+</main>
+<footer>{% block footer %}{% include '_footer.html' %}{% endblock %}</footer>
+<script>
+{% block script %}
+var csrf_token = "{{ csrf_token() }}"                   //CSRF令牌
+$(function(){
+    //ajax设置统一添加csrf验证
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader('X-CSRFToken', csrf_token);
+            }
+        }
+    })
+})
+function init_date(id){
+    $('#'+id).datepicker({
+        weekStart: 1,
+        autoclose: true,
+        daysOfWeekHighlighted: "0,6",
+        format: "yyyy-mm-dd",
+        language: "zh-CN"
+    })
+}
+{% endblock %}
+</script>
+</body>
+</html>

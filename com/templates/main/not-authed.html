@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container-fluid" style="margin-top:200px;">
+    <div class="row">
+        <div class="col">
+            {% if get_flashed_messages() %}
+                {% for message in get_flashed_messages() %}
+                    <h2 class="text-center text-danger"><i class="bi bi-exclamation-circle"></i>&nbsp;&nbsp;{{ message }}</h2>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

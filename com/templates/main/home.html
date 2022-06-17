@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content%}
+{{show_alert()}}
+<div class="clearfix text-left">
+    <small>最近使用</small>
+</div><hr>
+<div class="row">
+    {% if used_menus %}
+    {% for menu in used_menus %}
+        <div class="col-2" style="padding:10px;">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text text-center"><i class="{{menu.icon}}" style="font-size:6rem;"></i></p>
+                    <form class="form-inline" action="{{url_for('main.to_function')}}" method="post">
+                        <div class="col">
+                            <input type="hidden" value="{{csrf_token()}}" id="csrf_token" name="csrf_token">
+                            <input type="hidden" name="menu_code" value="{{menu.code}}">
+                            <button type = "submit" class="btn btn-primary btn-block">{{menu.name}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

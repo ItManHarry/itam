@@ -1,0 +1,15 @@
+{% set active_module = session.get('active_module') %}
+{% set active_menu = session.get('active_menu') %}
+{% set module_menus = current_user.authed_menus %}
+{% set menus = module_menus[active_module] %}
+{% if menus %}
+<div class="list-group list-group-flush">
+    {% for menu in menus%}
+        <a href="{{url_for('main.redirect_uri', menu_id=menu.id)}}" class="list-group-item list-group-item-action"  {% if session.get('active_menu') == menu.id%}style="font-size: 1.1rem; color: cornflowerblue;"{% endif %}>
+            <small><i class="{{menu.icon}}"></i>&nbsp;&nbsp;{{menu.name}}</small>
+        </a>
+    {% endfor %}
+</div>
+{% else %}
+<h3>There are no menus!!!</h3>
+{% endif %}
