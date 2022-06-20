@@ -366,6 +366,17 @@ class BizAssetBuy(BaseModel, db.Model):
     application = db.relationship('BizAssetApply')                                  # 资产申请单
     assets = db.relationship('BizAssetMaster', back_populates='buy_bill')           # 购买资产明细
 '''
+入库登记表
+'''
+class BizStockIn(BaseModel, db.Model):
+    in_no = db.Column(db.String(32))                                        # 入库登记号:系统自动生成(规则:IN20220616+随机四位整数)
+    in_date = db.Column(db.Date())                                          # 入库日期
+    charger_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))     # 入库人员(用户ID)
+    state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))       # 单据审批状态(字典代码:D004已提交/审批中/审批完成)
+    charger = db.relationship('SysUser', back_populates='in_chargers')      # 入库人员
+    state = db.relationship('SysEnum', back_populates='in_state', lazy=True, foreign_keys=[state_id])  # 审批状态
+    assets = db.relationship('BizAssetMaster', back_populates='in_bill')   # 入库资产明细
+'''
 资产类型层级关系(仅限三级)
 '''
 class RelAssetClass(BaseModel, db.Model):
@@ -442,6 +453,7 @@ class BizAssetMaster(BaseModel, db.Model):
     status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(字典代码:D003枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
     is_out = db.Column(db.Boolean, default=False)                               # 是否出库:默认未出库
     buy_bill = db.relationship('BizAssetBuy', back_populates='assets')          # 资产购买单
+    in_bill = db.relationship('BizStockIn', back_populates='assets')            # 资产入库单
     class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类(资产/耗材?)
     class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类
     class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类
@@ -536,13 +548,3 @@ class BizAssetMaint(BaseModel, db.Model):
     vendor = db.relationship('BizVendorMaster', back_populates='maintains')             # 供应商
     master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))          # 资产主数据ID
     master = db.relationship('BizAssetMaster', back_populates='maintains')              # 主资产
-'''
-入库登记表
-'''
-class BizStockIn(BaseModel, db.Model):
-    in_no = db.Column(db.String(32))                                        # 入库登记号:系统自动生成(规则:IN20220616+随机四位整数)
-    in_date = db.Column(db.Date())                                          # 入库日期
-    charger_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))     # 入库人员(用户ID)
-    state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))       # 单据审批状态(字典代码:D004已提交/审批中/审批完成)
-    charger = db.relationship('SysUser', back_populates='in_chargers')      # 入库人员
-    state = db.relationship('SysEnum', back_populates='in_state', lazy=True, foreign_keys=[state_id])  # 审批状态
