@@ -135,11 +135,12 @@ class SysDict(BaseModel, db.Model):
 下拉字典枚举值
 '''
 class SysEnum(BaseModel, db.Model):
-    item = db.Column(db.String(8))                                                              # 枚举value(对应<option>标签中的value属性)
-    display = db.Column(db.String(128))                                                         # 枚举view(对应<option>?</option>的显示值)
-    order_by = db.Column(db.Integer)                                                            # 排序
-    dict_id = db.Column(db.String(32), db.ForeignKey('sys_dict.id'))                            # 所属字典ID
-    dictionary = db.relationship('SysDict', back_populates='enums')                             # 所属字典
+    item = db.Column(db.String(8))                                           # 枚举value(对应<option>标签中的value属性)
+    display = db.Column(db.String(128))                                      # 枚举view(对应<option>?</option>的显示值)
+    order_by = db.Column(db.Integer)                                         # 排序
+    dict_id = db.Column(db.String(32), db.ForeignKey('sys_dict.id'))         # 所属字典ID
+    dictionary = db.relationship('SysDict', back_populates='enums')          # 所属字典
+    asset_status = db.relationship('BizAssetMaster', back_populates='status', lazy=True, primaryjoin='BizAssetMaster.status_id == SysEnum.id')  # 资产状态
 '''
 系统操作日志
 '''
@@ -189,6 +190,7 @@ class BizCompany(BaseModel, db.Model):
     brands = db.relationship('BizBrandMaster', back_populates='bg')             # 品牌
     applications = db.relationship('BizAssetApply', back_populates='company', lazy=True, primaryjoin='BizAssetApply.company_id == BizCompany.id')   # 业务别物料申请单
     apply_bills = db.relationship('BizAssetApply', back_populates='bg', lazy=True, primaryjoin='BizAssetApply.bg_id == BizCompany.id')              # 单据别物料申请单
+    asset_classes = db.relationship('BizAssetClass', back_populates='bg')       # 资产类别
     # 初始化法人
     @staticmethod
     def init_companies():
@@ -279,6 +281,9 @@ class BizEmployee(BaseModel, db.Model):
     department_id = db.Column(db.String(32), db.ForeignKey('biz_department.id'))    # 所属部门ID
     department = db.relationship('BizDepartment', back_populates='employees')       # 所属部门
     applications = db.relationship('BizAssetApply', back_populates='applicant')     # 物料申请单
+    managed_assets = db.relationship('BizAssetMaster', back_populates='manager', lazy=True, primaryjoin='BizAssetMaster.manager_id == BizEmployee.id')  # 管理资产
+    used_assets = db.relationship('BizAssetMaster', back_populates='user', lazy=True, primaryjoin='BizAssetMaster.user_id == BizEmployee.id')           # 使用资产
+
 '''
 存放位置-仓库表
 '''
@@ -286,8 +291,9 @@ class BizStoreMaster(BaseModel, db.Model):
     code = db.Column(db.String(16))     # 仓库代码
     name = db.Column(db.String(64))     # 仓库名称
     place = db.Column(db.String(256))   # 仓库地点
-    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))  # 所属法人ID
-    bg = db.relationship('BizCompany', back_populates='stores')        # 所属法人
+    assets = db.relationship('BizAssetMaster', back_populates='store')  # 存放资产
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))   # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='stores')         # 所属法人
 '''
 供应商信息表
 '''
@@ -296,15 +302,18 @@ class BizVendorMaster(BaseModel, db.Model):
     name = db.Column(db.String(64))             # 供应商名称
     contact_person = db.Column(db.String(32))   # 联系人
     contact_phone = db.Column(db.String(24))    # 联系人电话
-    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))      # 所属法人ID
-    bg = db.relationship('BizCompany', back_populates='vendors')           # 所属法人
+    assets = db.relationship('BizAssetMaster', back_populates='vendor')     # 资产供应商
+    maintains = db.relationship('BizAssetMaint', back_populates='vendor')   # 维保供应商
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='vendors')            # 所属法人
 '''
 品牌信息表
 '''
 class BizBrandMaster(BaseModel, db.Model):
     code = db.Column(db.String(24), unique=True)    # 品牌代码
     name = db.Column(db.String(64), unique=True)    # 品牌名称
-    models = db.relationship('BizBrandModel', back_populates='brand', cascade='all')
+    models = db.relationship('BizBrandModel', back_populates='brand', cascade='all') # 型号
+    assets = db.relationship('BizAssetMaster', back_populates='brand')  # 资产
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))   # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='brands')         # 所属法人
 '''
@@ -315,6 +324,7 @@ class BizBrandModel(BaseModel, db.Model):
     name = db.Column(db.String(128))                                              # 型号名称
     brand_id = db.Column(db.String(32), db.ForeignKey('biz_brand_master.id'))     # 所属品牌ID
     brand = db.relationship('BizBrandMaster', back_populates='models')            # 所属品牌
+    assets = db.relationship('BizAssetMaster', back_populates='model')            # 资产
 '''
 定时邮件配置表
 '''
@@ -336,7 +346,7 @@ class BizAssetApply(BaseModel, db.Model):
     department = db.relationship('BizDepartment', back_populates='applications')                                    # 申请部门
     applicant_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))                                       # 申请人ID
     applicant = db.relationship('BizEmployee', back_populates='applications')                                       # 申请人
-    summary = db.Column(db.Text())                                                                                  # 申请概要
+    summary = db.Column(db.Text)                                                                                    # 申请概要
     amount = db.Column(db.Integer)                                                                                  # 申请数量
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 单据所属法人ID
     bg = db.relationship('BizCompany', back_populates='apply_bills', lazy=True, foreign_keys=[bg_id])               # 单据所属法人
@@ -352,3 +362,175 @@ class BizAssetBuy(BaseModel, db.Model):
     receive_due_date = db.Column(db.Date()) # 预计到货日期
     application_id = db.Column(db.String(32), db.ForeignKey('biz_asset_apply.id'))  # 资产申请单ID
     application = db.relationship('BizAssetApply')                                  # 资产申请单
+    assets = db.relationship('BizAssetMaster', back_populates='buy_bill')           # 购买资产明细
+'''
+资产类型层级关系(仅限三级)
+'''
+class RelAssetClass(BaseModel, db.Model):
+    parent_class_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))
+    parent_class = db.relationship('BizAssetClass', foreign_keys=[parent_class_id], back_populates='parent_class', lazy='joined')     # 父类型
+    child_class_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))
+    child_class = db.relationship('BizAssetClass', foreign_keys=[child_class_id], back_populates='child_class', lazy='joined')        # 子类型
+'''
+资产类型
+'''
+class BizAssetClass(BaseModel, db.Model):
+    code = db.Column(db.String(32))                                         # 资产类型代码
+    name = db.Column(db.Text)                                               # 资产类型名称
+    grade = db.Column(db.Integer)                                           # 级别(仅限三级)
+    unit = db.Column(db.String(12))                                         # 计量单位:只有第三级维护该栏位信息
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='asset_classes')      # 所属法人
+    class1_assets = db.relationship('BizAssetMaster', back_populates='class1', lazy=True, primaryjoin='BizAssetMaster.class1_id == BizAssetClass.id')  # 一级分类资产
+    class2_assets = db.relationship('BizAssetMaster', back_populates='class2', lazy=True, primaryjoin='BizAssetMaster.class2_id == BizAssetClass.id')  # 二级分类资产
+    class3_assets = db.relationship('BizAssetMaster', back_populates='class3', lazy=True, primaryjoin='BizAssetMaster.class3_id == BizAssetClass.id')  # 三级分类资产
+    parent_class = db.relationship('RelAssetClass', foreign_keys=[RelAssetClass.parent_class_id], back_populates='parent_class', lazy='dynamic', cascade='all')  # 父类型
+    child_class = db.relationship('RelAssetClass', foreign_keys=[RelAssetClass.child_class_id], back_populates='child_class', lazy='dynamic', cascade='all')     # 子类型
+    # 设置父类型
+    def set_parent_class(self, clazz):
+        '''
+        逻辑：首先判断是否已经维护父类型，如果存在则执行删除后新增
+        :param clazz:
+        :return:
+        '''
+        ref = RelAssetClass.query.filter_by(child_class_id=self.id).first()
+        if ref:
+            db.session.delete(ref)
+            db.session.commit()
+        parent = RelAssetClass(id=uuid.uuid4().hex, child_class=self, parent_class=clazz)
+        db.session.add(parent)
+        db.session.commit()
+    @property
+    def get_parent_class(self):
+        clazz = RelAssetClass.query.filter_by(child_class_id=self.id).first()
+        return clazz.parent_class if clazz else None
+    # 设置子类型
+    def set_child_class(self, clazz):
+        '''
+        逻辑：首先解除子类型原有的类型关系，然后再添加到当前类型下
+        :param clazz:
+        :return:
+        '''
+        ref = RelAssetClass.query.filter_by(child_class_id=clazz.id).first()
+        if ref:
+            db.session.delete(ref)
+            db.session.commit()
+        child = RelAssetClass(id=uuid.uuid4().hex, child_class=clazz, parent_class=self)
+        db.session.add(child)
+        db.session.commit()
+    @property
+    def get_child_class(self):
+        return RelAssetClass.query.filter_by(parent_class_id=self.id).order_by(RelAssetClass.createtime_loc.desc()).all()
+'''
+资产附属关系:某个资产附属于另一个资产;应用场景->为了某个资产而购买的资产/耗材,比如笔记本电脑购买内存条
+'''
+class RelAssetMaster(BaseModel, db.Model):
+    parent_asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))
+    parent_asset = db.relationship('BizAssetMaster', foreign_keys=[parent_asset_id], back_populates='parent_asset', lazy='joined') # 主资产
+    child_asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))
+    child_asset = db.relationship('BizAssetMaster', foreign_keys=[child_asset_id], back_populates='child_asset', lazy='joined')    # 附资产
+class BizAssetMaster(BaseModel, db.Model):
+    buy_bill_id = db.Column(db.String(32), db.ForeignKey('biz_asset_buy.id')) # 购买订单
+    code = db.Column(db.String(32))                 # 资产编码(编码规则:AS20220617+随机四位整数)
+    sap_code = db.Column(db.String(32))             # SAP资产编码(只有资产有,耗材无)
+    name = db.Column(db.String(128))                # 资产名称
+    is_new = db.Column(db.Boolean, default=True)    # 是否新的(一手or二手);资产返还/变更资产使用者时置为False
+    reg_date = db.Column(db.Date())                 # 登记日期
+    reg_amount = db.Column(db.Integer)              # 登记数量
+    status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
+    is_out = db.Column(db.Boolean, default=False)                               # 是否出库:默认未出库
+    buy_bill = db.relationship('BizAssetBuy', back_populates='assets')          # 资产购买单
+    class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类(资产/耗材?)
+    class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类
+    class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类
+    brand_id = db.Column(db.String(32), db.ForeignKey('biz_brand_master.id'))   # 品牌ID
+    model_id = db.Column(db.String(32), db.ForeignKey('biz_brand_model.id'))    # 型号ID
+    manager_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))     # 管理担当ID
+    user_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))        # 使用者ID
+    vendor_id = db.Column(db.String(32), db.ForeignKey('biz_vendor_master.id')) # 供应商ID
+    store_id = db.Column(db.String(32), db.ForeignKey('biz_store_master.id'))   # 存放仓库ID
+    maintain_expired = db.Column(db.Boolean, default=False)                     # 是否出保:默认未出保，开发一定时任务根据维保信息更新该栏位，一天一次两次执行
+    class1 = db.relationship('BizAssetClass', back_populates='class1_assets', lazy=True, foreign_keys=[class1_id])  # 一级分类
+    class2 = db.relationship('BizAssetClass', back_populates='class2_assets', lazy=True, foreign_keys=[class2_id])  # 二级分类
+    class3 = db.relationship('BizAssetClass', back_populates='class3_assets', lazy=True, foreign_keys=[class3_id])  # 三级分类
+    brand = db.relationship('BizBrandMaster', back_populates='assets')          # 品牌
+    model = db.relationship('BizBrandModel', back_populates='assets')           # 型号
+    manager = db.relationship('BizEmployee', back_populates='managed_assets', lazy=True, foreign_keys=[manager_id]) # 管理担当
+    user = db.relationship('BizEmployee', back_populates='used_assets', lazy=True, foreign_keys=[user_id])          # 使用者
+    vendor = db.relationship('BizVendorMaster', back_populates='assets')                                            # 供应商
+    store = db.relationship('BizStoreMaster', back_populates='assets')                                              # 存放仓库
+    properties = db.relationship('BizAssetProperty', uselist=False)                                                 # 资产属性(耗材无)
+    maintains = db.relationship('BizAssetMaint', back_populates='master')                                           # 资产保修信息
+    status = db.relationship('SysEnum', back_populates='asset_status', lazy=True, foreign_keys=[status_id])         # 资产状态
+    parent_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.parent_asset_id], back_populates='parent_asset', lazy='dynamic', cascade='all')   # 主资产
+    child_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.child_asset_id], back_populates='child_asset', lazy='dynamic', cascade='all')      # 附资产
+    # 设置主资产
+    def set_parent_asset(self, asset):
+        '''
+        逻辑：首先判断是否已经维护主资产，如果存在则执行删除后新增
+        :param asset:
+        :return:
+        '''
+        ref = RelAssetMaster.query.filter_by(child_asset_id=self.id).first()
+        if ref:
+            db.session.delete(ref)
+            db.session.commit()
+        parent = RelAssetMaster(id=uuid.uuid4().hex, child_asset=self, parent_asset=asset)
+        db.session.add(parent)
+        db.session.commit()
+
+    @property
+    def get_parent_asset(self):
+        rel = RelAssetMaster.query.filter_by(child_asset_id=self.id).first()
+        return rel.parent_asset if rel else None
+
+    # 设置附资产
+    def set_child_asset(self, asset):
+        '''
+        逻辑：首先解除附资产原有的资产关系，然后再添加到当前资产下
+        :param asset:
+        :return:
+        '''
+        ref = RelAssetMaster.query.filter_by(child_asset_id=asset.id).first()
+        if ref:
+            db.session.delete(ref)
+            db.session.commit()
+        child = RelAssetMaster(id=uuid.uuid4().hex, child_asset=asset, parent_asset=self)
+        db.session.add(child)
+        db.session.commit()
+
+    @property
+    def get_child_asset(self):
+        return RelAssetMaster.query.filter_by(parent_asset_id=self.id).order_by(RelAssetMaster.createtime_loc.desc()).all()
+'''
+资产属性表(资产主数据1:1)
+'''
+class BizAssetProperty(BaseModel, db.Model):
+    cpu = db.Column(db.String(32))              # CPU
+    memory = db.Column(db.String(32))           # 内存
+    disk = db.Column(db.String(32))             # 硬盘
+    screen_ratio = db.Column(db.String(32))     # 显示器分辨率
+    screen_size = db.Column(db.String(32))      # 显示器尺寸
+    inf = db.Column(db.String(32))              # 接口
+    system_os = db.Column(db.String(32))        # 操作系统
+    serial_no = db.Column(db.String(32))        # 序列号
+    mac = db.Column(db.String(32))              # MAC地址
+    battery = db.Column(db.String(32))          # 电池
+    power = db.Column(db.String(32))            # 功率
+    remark = db.Column(db.String(32))           # 备注
+    asset_master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产主数据ID
+    asset_master = db.relationship('BizAssetMaster')                                   # 资产主数据
+'''
+维保信息
+'''
+class BizAssetMaint(BaseModel, db.Model):
+    start_date = db.Column(db.Date())               # 维保开始日期
+    expire_date = db.Column(db.Date())              # 维保结束日期
+    content = db.Column(db.Text)                    # 维保内容:只在续保时维护，新增时为空
+    free = db.Column(db.Boolean, default=False)     # 是否免费维保:新增时为True，其他为False
+    draft_no = db.Column(db.String(32))             # 续保draft号:只在续保时维护，新增时为空
+    price = db.Column(db.Float)                     # 续保费:只在续保时维护，新增时为0
+    vendor_id = db.Column(db.String(32), db.ForeignKey('biz_vendor_master.id'))         # 供应商ID
+    vendor = db.relationship('BizVendorMaster', back_populates='maintains')             # 供应商
+    master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))          # 资产主数据ID
+    master = db.relationship('BizAssetMaster', back_populates='maintains')              # 主资产
