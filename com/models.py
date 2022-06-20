@@ -31,6 +31,7 @@ class SysUser(BaseModel, db.Model, UserMixin):
     company_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                  # 所属法人ID
     company = db.relationship('BizCompany', back_populates='users')                                 # 所属法人
     used_menus = db.relationship('SysMenu', secondary='rel_user_menu', back_populates='users')      # 使用过的菜单项(用于主页显示)
+    in_chargers = db.relationship('BizStockIn', back_populates='charger')                           # 资产入库
     logs = db.relationship('SysLog', back_populates='user')                                         # 操作日志
 
     def set_password(self, password):
@@ -141,6 +142,7 @@ class SysEnum(BaseModel, db.Model):
     dict_id = db.Column(db.String(32), db.ForeignKey('sys_dict.id'))         # 所属字典ID
     dictionary = db.relationship('SysDict', back_populates='enums')          # 所属字典
     asset_status = db.relationship('BizAssetMaster', back_populates='status', lazy=True, primaryjoin='BizAssetMaster.status_id == SysEnum.id')  # 资产状态
+    in_state = db.relationship('BizStockIn', back_populates='state', lazy=True, primaryjoin='BizStockIn.state_id == SysEnum.id')                # 审批状态
 '''
 系统操作日志
 '''
@@ -437,7 +439,7 @@ class BizAssetMaster(BaseModel, db.Model):
     is_new = db.Column(db.Boolean, default=True)    # 是否新的(一手or二手);资产返还/变更资产使用者时置为False
     reg_date = db.Column(db.Date())                 # 登记日期
     reg_amount = db.Column(db.Integer)              # 登记数量
-    status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
+    status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(字典代码:D003枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
     is_out = db.Column(db.Boolean, default=False)                               # 是否出库:默认未出库
     buy_bill = db.relationship('BizAssetBuy', back_populates='assets')          # 资产购买单
     class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类(资产/耗材?)
@@ -534,3 +536,13 @@ class BizAssetMaint(BaseModel, db.Model):
     vendor = db.relationship('BizVendorMaster', back_populates='maintains')             # 供应商
     master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))          # 资产主数据ID
     master = db.relationship('BizAssetMaster', back_populates='maintains')              # 主资产
+'''
+入库登记表
+'''
+class BizStockIn(BaseModel, db.Model):
+    in_no = db.Column(db.String(32))                                        # 入库登记号:系统自动生成(规则:IN20220616+随机四位整数)
+    in_date = db.Column(db.Date())                                          # 入库日期
+    charger_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))     # 入库人员(用户ID)
+    state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))       # 单据审批状态(字典代码:D004已提交/审批中/审批完成)
+    charger = db.relationship('SysUser', back_populates='in_chargers')      # 入库人员
+    state = db.relationship('SysEnum', back_populates='in_state', lazy=True, foreign_keys=[state_id])  # 审批状态
