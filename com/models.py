@@ -31,7 +31,8 @@ class SysUser(BaseModel, db.Model, UserMixin):
     company_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                  # 所属法人ID
     company = db.relationship('BizCompany', back_populates='users')                                 # 所属法人
     used_menus = db.relationship('SysMenu', secondary='rel_user_menu', back_populates='users')      # 使用过的菜单项(用于主页显示)
-    in_chargers = db.relationship('BizStockIn', back_populates='charger')                           # 资产入库
+    in_charger = db.relationship('BizStockIn', back_populates='charger')                            # 资产入库操作人员
+    out_charger = db.relationship('BizStockOut', back_populates='charger')                          # 资产出库操作人员
     logs = db.relationship('SysLog', back_populates='user')                                         # 操作日志
 
     def set_password(self, password):
@@ -142,7 +143,15 @@ class SysEnum(BaseModel, db.Model):
     dict_id = db.Column(db.String(32), db.ForeignKey('sys_dict.id'))         # 所属字典ID
     dictionary = db.relationship('SysDict', back_populates='enums')          # 所属字典
     asset_status = db.relationship('BizAssetMaster', back_populates='status', lazy=True, primaryjoin='BizAssetMaster.status_id == SysEnum.id')  # 资产状态
-    in_state = db.relationship('BizStockIn', back_populates='state', lazy=True, primaryjoin='BizStockIn.state_id == SysEnum.id')                # 审批状态
+    in_state = db.relationship('BizStockIn', back_populates='state', lazy=True, primaryjoin='BizStockIn.state_id == SysEnum.id')                # 入库登记审批状态
+    out_state = db.relationship('BizStockOut', back_populates='state', lazy=True, primaryjoin='BizStockOut.state_id == SysEnum.id')             # 出库登记审批状态
+    out_type = db.relationship('BizStockOut', back_populates='out_type', lazy=True, primaryjoin='BizStockOut.out_type_id == SysEnum.id')        # 出库类型
+    repair_type = db.relationship('BizAssetRepair', back_populates='repair_type', lazy=True, primaryjoin='BizAssetRepair.repair_type_id == SysEnum.id')     # 故障维修类型
+    repair_state = db.relationship('BizAssetRepair', back_populates='repair_state', lazy=True, primaryjoin='BizAssetRepair.repair_state_id == SysEnum.id')  # 故障维修状态
+    scrap_reason = db.relationship('BizAssetScrap', back_populates='scrap_reason', lazy=True, primaryjoin='BizAssetScrap.scrap_reason_id == SysEnum.id')    # 报废原因
+    scrap_state = db.relationship('BizAssetScrap', back_populates='scrap_state', lazy=True, primaryjoin='BizAssetScrap.scrap_state_id == SysEnum.id')       # 报废状态
+
+
 '''
 系统操作日志
 '''
@@ -192,7 +201,13 @@ class BizCompany(BaseModel, db.Model):
     brands = db.relationship('BizBrandMaster', back_populates='bg')             # 品牌
     applications = db.relationship('BizAssetApply', back_populates='company', lazy=True, primaryjoin='BizAssetApply.company_id == BizCompany.id')   # 业务别物料申请单
     apply_bills = db.relationship('BizAssetApply', back_populates='bg', lazy=True, primaryjoin='BizAssetApply.bg_id == BizCompany.id')              # 单据别物料申请单
+    buy_bills = db.relationship('BizAssetBuy', back_populates='bg')             # 单据别物料购买单
+    in_bills = db.relationship('BizStockIn', back_populates='bg')               # 入库单
+    out_bills = db.relationship('BizStockOut', back_populates='bg')             # 出库单
     asset_classes = db.relationship('BizAssetClass', back_populates='bg')       # 资产类别
+    assets = db.relationship('BizAssetMaster', back_populates='bg')             # 资产
+    stock_history = db.relationship('BizStockHistory', back_populates='bg')     # 资产出入库履历
+    stock_amount = db.relationship('BizStockAmount', back_populates='bg')       # 资产库存余额
     # 初始化法人
     @staticmethod
     def init_companies():
@@ -365,6 +380,8 @@ class BizAssetBuy(BaseModel, db.Model):
     application_id = db.Column(db.String(32), db.ForeignKey('biz_asset_apply.id'))  # 资产申请单ID
     application = db.relationship('BizAssetApply')                                  # 资产申请单
     assets = db.relationship('BizAssetMaster', back_populates='buy_bill')           # 购买资产明细
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))               # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='buy_bills')                  # 所属法人
 '''
 入库登记表
 '''
@@ -373,9 +390,33 @@ class BizStockIn(BaseModel, db.Model):
     in_date = db.Column(db.Date())                                          # 入库日期
     charger_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))     # 入库人员(用户ID)
     state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))       # 单据审批状态(字典代码:D004已提交/审批中/审批完成)
-    charger = db.relationship('SysUser', back_populates='in_chargers')      # 入库人员
+    charger = db.relationship('SysUser', back_populates='in_charger')       # 入库人员
     state = db.relationship('SysEnum', back_populates='in_state', lazy=True, foreign_keys=[state_id])  # 审批状态
-    assets = db.relationship('BizAssetMaster', back_populates='in_bill')   # 入库资产明细
+    assets = db.relationship('BizAssetMaster', back_populates='in_bill')    # 入库资产明细
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='in_bills')           # 所属法人
+'''
+出库明细清单表
+'''
+class RelAssetOutItem(BaseModel, db.Model):
+    out_bill_id = db.Column(db.String(32), db.ForeignKey('biz_stock_out.id'))       # 出库单ID
+    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))       # 资产ID
+    back_date = db.Column(db.Date())                                                # 返还日期
+'''
+出库登记表
+'''
+class BizStockOut(BaseModel, db.Model):
+    out_no = db.Column(db.String(32))                                       # 出库登记号:系统自动生成(规则:OUT20220616+随机四位整数)
+    out_date = db.Column(db.Date())                                         # 出库日期
+    out_type_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))    # 出库类型(字典:D005 领用发放/借用发放)
+    charger_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))     # 出库人员(用户ID)
+    state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))       # 单据审批状态(字典代码:D004已提交/审批中/审批完成)
+    charger = db.relationship('SysUser', back_populates='out_charger')      # 出库人员
+    out_type = db.relationship('SysEnum', back_populates='out_type', lazy=True, foreign_keys=[out_type_id])   # 出库类型
+    state = db.relationship('SysEnum', back_populates='out_state', lazy=True, foreign_keys=[state_id])        # 审批状态
+    assets = db.relationship('BizAssetMaster', secondary='rel_asset_out_item', back_populates='out_bills')
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='out_bills')          # 所属法人
 '''
 资产类型层级关系(仅限三级)
 '''
@@ -394,9 +435,15 @@ class BizAssetClass(BaseModel, db.Model):
     unit = db.Column(db.String(12))                                         # 计量单位:只有第三级维护该栏位信息
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='asset_classes')      # 所属法人
-    class1_assets = db.relationship('BizAssetMaster', back_populates='class1', lazy=True, primaryjoin='BizAssetMaster.class1_id == BizAssetClass.id')  # 一级分类资产
-    class2_assets = db.relationship('BizAssetMaster', back_populates='class2', lazy=True, primaryjoin='BizAssetMaster.class2_id == BizAssetClass.id')  # 二级分类资产
-    class3_assets = db.relationship('BizAssetMaster', back_populates='class3', lazy=True, primaryjoin='BizAssetMaster.class3_id == BizAssetClass.id')  # 三级分类资产
+    class1_assets = db.relationship('BizAssetMaster', back_populates='class1', lazy=True, primaryjoin='BizAssetMaster.class1_id == BizAssetClass.id')       # 一级分类资产
+    class2_assets = db.relationship('BizAssetMaster', back_populates='class2', lazy=True, primaryjoin='BizAssetMaster.class2_id == BizAssetClass.id')       # 二级分类资产
+    class3_assets = db.relationship('BizAssetMaster', back_populates='class3', lazy=True, primaryjoin='BizAssetMaster.class3_id == BizAssetClass.id')       # 三级分类资产
+    class1_history = db.relationship('BizStockHistory', back_populates='class1', lazy=True, primaryjoin='BizStockHistory.class1_id == BizAssetClass.id')    # 一级分类资产出入库履历
+    class2_history = db.relationship('BizStockHistory', back_populates='class2', lazy=True, primaryjoin='BizStockHistory.class2_id == BizAssetClass.id')    # 二级分类资产出入库履历
+    class3_history = db.relationship('BizStockHistory', back_populates='class3', lazy=True, primaryjoin='BizStockHistory.class3_id == BizAssetClass.id')    # 三级分类资产出入库履历
+    class1_amount = db.relationship('BizStockAmount', back_populates='class1', lazy=True, primaryjoin='BizStockAmount.class1_id == BizAssetClass.id')       # 一级分类资产库存
+    class2_amount = db.relationship('BizStockAmount', back_populates='class2', lazy=True, primaryjoin='BizStockAmount.class2_id == BizAssetClass.id')       # 二级分类资产库存
+    class3_amount = db.relationship('BizStockAmount', back_populates='class3', lazy=True, primaryjoin='BizStockAmount.class3_id == BizAssetClass.id')       # 三级分类资产库存
     parent_class = db.relationship('RelAssetClass', foreign_keys=[RelAssetClass.parent_class_id], back_populates='parent_class', lazy='dynamic', cascade='all')  # 父类型
     child_class = db.relationship('RelAssetClass', foreign_keys=[RelAssetClass.child_class_id], back_populates='child_class', lazy='dynamic', cascade='all')     # 子类型
     # 设置父类型
@@ -443,7 +490,8 @@ class RelAssetMaster(BaseModel, db.Model):
     child_asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))
     child_asset = db.relationship('BizAssetMaster', foreign_keys=[child_asset_id], back_populates='child_asset', lazy='joined')    # 附资产
 class BizAssetMaster(BaseModel, db.Model):
-    buy_bill_id = db.Column(db.String(32), db.ForeignKey('biz_asset_buy.id')) # 购买订单
+    buy_bill_id = db.Column(db.String(32), db.ForeignKey('biz_asset_buy.id'))   # 购买订单
+    in_bill_id = db.Column(db.String(32), db.ForeignKey('biz_stock_in.id'))     # 入库订单
     code = db.Column(db.String(32))                 # 资产编码(编码规则:AS20220617+随机四位整数)
     sap_code = db.Column(db.String(32))             # SAP资产编码(只有资产有,耗材无)
     name = db.Column(db.String(128))                # 资产名称
@@ -476,6 +524,11 @@ class BizAssetMaster(BaseModel, db.Model):
     properties = db.relationship('BizAssetProperty', uselist=False)                                                 # 资产属性(耗材无)
     maintains = db.relationship('BizAssetMaint', back_populates='master')                                           # 资产保修信息
     status = db.relationship('SysEnum', back_populates='asset_status', lazy=True, foreign_keys=[status_id])         # 资产状态
+    out_bills = db.relationship('BizStockOut', secondary='rel_asset_out_item', back_populates='assets')
+    repair_history = db.relationship('BizAssetRepair', back_populates='asset')  # 维修履历
+    scrap = db.relationship('BizAssetScrap', uselist=False)                     # 报废记录
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='assets')                 # 所属法人
     parent_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.parent_asset_id], back_populates='parent_asset', lazy='dynamic', cascade='all')   # 主资产
     child_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.child_asset_id], back_populates='child_asset', lazy='dynamic', cascade='all')      # 附资产
     # 设置主资产
@@ -548,3 +601,59 @@ class BizAssetMaint(BaseModel, db.Model):
     vendor = db.relationship('BizVendorMaster', back_populates='maintains')             # 供应商
     master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))          # 资产主数据ID
     master = db.relationship('BizAssetMaster', back_populates='maintains')              # 主资产
+'''
+出入库履历
+'''
+class BizStockHistory(BaseModel, db.Model):
+    class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类
+    class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类
+    class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类
+    io_type = db.Column(db.Integer)                                             # 出入库类型(1:入库; 0:出库)
+    amount = db.Column(db.Integer)                                              # 出/入库数量
+    class1 = db.relationship('BizAssetClass', back_populates='class1_history', lazy=True, foreign_keys=[class1_id])  # 一级分类
+    class2 = db.relationship('BizAssetClass', back_populates='class2_history', lazy=True, foreign_keys=[class2_id])  # 二级分类
+    class3 = db.relationship('BizAssetClass', back_populates='class3_history', lazy=True, foreign_keys=[class3_id])  # 三级分类
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='stock_history')          # 所属法人
+
+
+'''
+库存余额
+'''
+class BizStockAmount(BaseModel, db.Model):
+    class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类
+    class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类
+    class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类
+    amount = db.Column(db.Integer)                                              # 库存数量
+    class1 = db.relationship('BizAssetClass', back_populates='class1_amount', lazy=True, foreign_keys=[class1_id])  # 一级分类
+    class2 = db.relationship('BizAssetClass', back_populates='class2_amount', lazy=True, foreign_keys=[class2_id])  # 二级分类
+    class3 = db.relationship('BizAssetClass', back_populates='class3_amount', lazy=True, foreign_keys=[class3_id])  # 三级分类
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))  # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='stock_amount')  # 所属法人
+'''
+维修履历表 - 只有资产有维修履历，耗材无
+'''
+class BizAssetRepair(BaseModel, db.Model):
+    repair_type_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))     # 故障维修类型(字典:D006)
+    repair_state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))    # 故障维修状态(字典:D007)
+    pre_finish_date = db.Column(db.Date())                                      # 预计维修完成日期
+    rel_finish_date = db.Column(db.Date())                                      # 实际维修完成日期
+    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产ID
+    asset = db.relationship('BizAssetMaster', back_populates='repair_history')  # 资产
+    repair_type = db.relationship('SysEnum', back_populates='repair_type', lazy=True, foreign_keys=[repair_type_id])    # 故障维修类型
+    repair_state = db.relationship('SysEnum', back_populates='repair_state', lazy=True, foreign_keys=[repair_state_id]) # 故障维修状态
+'''
+资产报废表-资产报废，耗材无法报废，和master -> 1:1
+'''
+class BizAssetScrap(BaseModel, db.Model):
+    scrap_date = db.Column(db.Date())                                           # 报废判定日期
+    scraper_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))         # 报废判定人
+    scrap_reason_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))    # 报废原因(字典:D008)
+    scrap_state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))     # 报废状态(字典:D009)
+    scrap_draft = db.Column(db.String(40))                                      # 报废Draft号
+    finish_date = db.Column(db.Date())                                          # 报废完成日期
+    sap_scrap = db.Column(db.Boolean, default=False)                            # SAP是否报废,默认否
+    scrap_reason = db.relationship('SysEnum', back_populates='scrap_reason', lazy=True, foreign_keys=[scrap_reason_id]) # 报废原因
+    scrap_state = db.relationship('SysEnum', back_populates='scrap_state', lazy=True, foreign_keys=[scrap_state_id])    # 报废状态
+    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产ID
+    asset = db.relationship('BizAssetMaster')                                   # 资产
