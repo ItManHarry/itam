@@ -208,6 +208,8 @@ class BizCompany(BaseModel, db.Model):
     assets = db.relationship('BizAssetMaster', back_populates='bg')             # 资产
     stock_history = db.relationship('BizStockHistory', back_populates='bg')     # 资产出入库履历
     stock_amount = db.relationship('BizStockAmount', back_populates='bg')       # 资产库存余额
+    asset_repair = db.relationship('BizAssetRepair', back_populates='bg')       # 资产维修履历
+    asset_scrap = db.relationship('BizAssetScrap', back_populates='bg')         # 资产报废清单
     # 初始化法人
     @staticmethod
     def init_companies():
@@ -642,6 +644,8 @@ class BizAssetRepair(BaseModel, db.Model):
     asset = db.relationship('BizAssetMaster', back_populates='repair_history')  # 资产
     repair_type = db.relationship('SysEnum', back_populates='repair_type', lazy=True, foreign_keys=[repair_type_id])    # 故障维修类型
     repair_state = db.relationship('SysEnum', back_populates='repair_state', lazy=True, foreign_keys=[repair_state_id]) # 故障维修状态
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='asset_repair')           # 所属法人
 '''
 资产报废表-资产报废，耗材无法报废，和master -> 1:1
 '''
@@ -657,3 +661,5 @@ class BizAssetScrap(BaseModel, db.Model):
     scrap_state = db.relationship('SysEnum', back_populates='scrap_state', lazy=True, foreign_keys=[scrap_state_id])    # 报废状态
     asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产ID
     asset = db.relationship('BizAssetMaster')                                   # 资产
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='asset_scrap')            # 所属法人
