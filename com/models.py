@@ -35,6 +35,7 @@ class SysUser(BaseModel, db.Model, UserMixin):
     out_charger = db.relationship('BizStockOut', back_populates='charger')                          # 资产出库操作人员
     asset_scraper = db.relationship('BizAssetScrap', back_populates='scraper')                      # 报废判定人员
     audit_roles = db.relationship('AuditRole', secondary='rel_audit_role_user', back_populates='auditors')  # 审批角色
+    audit_list = db.relationship('AuditHistory', back_populates='user')
     logs = db.relationship('SysLog', back_populates='user')                                                 # 操作日志
 
     def set_password(self, password):
@@ -212,6 +213,7 @@ class BizCompany(BaseModel, db.Model):
     asset_repair = db.relationship('BizAssetRepair', back_populates='bg')       # 资产维修履历
     asset_scrap = db.relationship('BizAssetScrap', back_populates='bg')         # 资产报废清单
     asset_check = db.relationship('BizAssetCheck', back_populates='bg')         # 资产盘点单
+    audit_codes = db.relationship('AuditBizCode', back_populates='bg')          # 审批业务
     audit_lines = db.relationship('AuditLine', back_populates='bg')             # 审批线
     audit_roles = db.relationship('AuditRole', back_populates='bg')             # 审批角色
     audit_items = db.relationship('AuditItem', back_populates='bg')             # 审批单据
@@ -510,6 +512,8 @@ class BizAssetMaster(BaseModel, db.Model):
     reg_amount = db.Column(db.Integer)              # 登记数量
     status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(字典代码:D003枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
     is_out = db.Column(db.Boolean, default=False)                               # 是否出库:默认未出库
+    bar_path = db.Column(db.String(64))                                         # 条形码路径
+    qr_path = db.Column(db.String(64))                                          # 二维码路径
     buy_bill = db.relationship('BizAssetBuy', back_populates='assets')          # 资产购买单
     in_bill = db.relationship('BizStockIn', back_populates='assets')            # 资产入库单
     class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类(资产/耗材?)
@@ -693,6 +697,15 @@ rel_asset_check = db.Table('rel_asset_check',
     db.Column('asset_id', db.String(32), db.ForeignKey('biz_asset_master.id'))
 )
 '''
+审批业务代码
+'''
+class AuditBizCode(BaseModel, db.Model):
+    code = db.Column(db.String(24))  # 业务代码
+    name = db.Column(db.String(40))  # 业务名称
+    audit_lines = db.relationship('AuditLine', back_populates='biz_code')  # 业务审批线
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))   # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='audit_codes')    # 所属法人
+'''
 审批线&审批角色关联表(N:N)
 '''
 class RelAuditLineRole(BaseModel, db.Model):
@@ -705,8 +718,9 @@ class RelAuditLineRole(BaseModel, db.Model):
 class AuditLine(BaseModel, db.Model):
     code = db.Column(db.String(24))             # 审批线代码
     name = db.Column(db.String(40))             # 审批线名称
-    biz_name = db.Column(db.String(64))         # 审批业务名称
-    remark = db.Column(db.Text)                 # 备注
+    remark = db.Column(db.Text)  # 备注
+    biz_code_id = db.Column(db.String(32), db.ForeignKey('audit_biz_code.id'))  # 审批业务代码ID
+    biz_code = db.relationship('AuditBizCode', back_populates='audit_lines')    # 审批业务代码
     audit_roles = db.relationship('AuditRole', secondary='rel_audit_line_role', back_populates='audit_lines')  # 审批人
     audit_items = db.relationship('AuditItem', back_populates='audit_line')     # 审批单据
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
@@ -729,21 +743,26 @@ class AuditRole(BaseModel, db.Model):
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))  # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='audit_roles')   # 所属法人
 '''
-审批表
+审批表:写入待审批时，同时写入审批履历表一条记录供审批WorkToDo画面查询即可
 '''
 class AuditItem(BaseModel, db.Model):
     audit_line_id = db.Column(db.String(32), db.ForeignKey('audit_line.id'))        # 审批线ID
     bill_no = db.Column(db.String(32))                                              # 审批单号
     audit_level = db.Column(db.Integer)                                             # 审批等级
-    audit_finish = db.Column(db.Boolean, default=False)                             # 是否审批完成(默认False)
+    audit_finish = db.Column(db.Boolean, default=False)                             # 审批完成(默认False)
+    resubmit = db.Column(db.Boolean, default=False)                                 # 重新提交(默认False),审批过程任意几点Reject后,置为True,相应单据修改后重新修改提交后置为False
     audit_line = db.relationship('AuditLine', back_populates='audit_items')         # 审批线
-    audit_histories = db.relationship('AuditHistory', back_populates='audit_item')  # 审批履历
-    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))   # 所属法人ID
-    bg = db.relationship('BizCompany', back_populates='audit_items')    # 所属法人
+    audit_histories = db.relationship('AuditHistory', back_populates='audit_item')  # 审批履历=待办事项
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))               # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='audit_items')                # 所属法人
 '''
 审批履历
 '''
 class AuditHistory(BaseModel, db.Model):
     audit_item_id = db.Column(db.String(32), db.ForeignKey('audit_item.id'))    # 审批单据ID
+    finished = db.Column(db.Boolean, default=False)                             # 审批完成(默认False)-只要审批了就置为True
+    approved = db.Column(db.Boolean, default=True)                              # 审批通过(默认True)
     remark = db.Column(db.Text)                                                 # 审批意见
     audit_item = db.relationship('AuditItem', back_populates='audit_histories') # 审批单据
+    user_id = db.Column(db.String(32), db.ForeignKey('sys_user.id'))            # 用户ID
+    user = db.relationship('SysUser', back_populates='audit_list')              # 用户
