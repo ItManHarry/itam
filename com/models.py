@@ -508,7 +508,7 @@ class BizAssetMaster(BaseModel, db.Model):
     name = db.Column(db.String(128))                # 资产名称
     is_new = db.Column(db.Boolean, default=True)    # 是否新的(一手or二手);资产返还/变更资产使用者时置为False
     reg_date = db.Column(db.Date())                 # 登记日期
-    reg_amount = db.Column(db.Integer)              # 登记数量
+    reg_amount = db.Column(db.Integer)              # 登记数量(登记资产只能是1;耗材>=1)
     status_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))          # 资产状态(字典代码:D003枚举维护:在库/接收待确认/已发放/借用中/待维修/维修中/维修完成/待报废/已报废/盘亏)
     is_out = db.Column(db.Boolean, default=False)                               # 是否出库:默认未出库
     bar_path = db.Column(db.String(64))                                         # 条形码路径
