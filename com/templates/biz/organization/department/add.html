@@ -45,9 +45,9 @@
     </div><br>
     <div class="row">
         <div class="col-md-6">
-            <div class="custom-control custom-switch">
-              {{form.has_parent(class='custom-control-input')}}
-              {{form.has_parent.label(class='custom-control-label')}}
+            <div class="form-check form-switch">
+                {{form.has_parent(class='form-check-input')}}
+                {{form.has_parent.label(class='form-check-label')}}
             </div><br>
             <div class="input-group mb-2 mr-sm-2">
             {{form.parent(class='form-control', readonly=True)}}
