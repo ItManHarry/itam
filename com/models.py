@@ -524,7 +524,7 @@ class BizAssetMaster(BaseModel, db.Model):
     user_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))        # 使用者ID
     vendor_id = db.Column(db.String(32), db.ForeignKey('biz_vendor_master.id')) # 供应商ID
     store_id = db.Column(db.String(32), db.ForeignKey('biz_store_master.id'))   # 存放仓库ID
-    maintain_expired = db.Column(db.Boolean, default=False)                     # 是否出保:默认未出保，开发一定时任务根据维保信息更新该栏位，一天一次两次执行
+    maintain_expired = db.Column(db.Boolean, default=False)                     # 是否出保:默认未出保，开发一定时任务根据维保信息更新该栏位，一天凌晨执行一次
     class1 = db.relationship('BizAssetClass', back_populates='class1_assets', lazy=True, foreign_keys=[class1_id])  # 一级分类
     class2 = db.relationship('BizAssetClass', back_populates='class2_assets', lazy=True, foreign_keys=[class2_id])  # 二级分类
     class3 = db.relationship('BizAssetClass', back_populates='class3_assets', lazy=True, foreign_keys=[class3_id])  # 三级分类
