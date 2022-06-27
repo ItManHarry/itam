@@ -152,8 +152,6 @@ class SysEnum(BaseModel, db.Model):
     repair_state = db.relationship('BizAssetRepair', back_populates='repair_state', lazy=True, primaryjoin='BizAssetRepair.repair_state_id == SysEnum.id')  # 故障维修状态
     scrap_reason = db.relationship('BizAssetScrap', back_populates='scrap_reason', lazy=True, primaryjoin='BizAssetScrap.scrap_reason_id == SysEnum.id')    # 报废原因
     scrap_state = db.relationship('BizAssetScrap', back_populates='scrap_state', lazy=True, primaryjoin='BizAssetScrap.scrap_state_id == SysEnum.id')       # 报废状态
-
-
 '''
 系统操作日志
 '''
@@ -376,18 +374,19 @@ class BizAssetApply(BaseModel, db.Model):
     amount = db.Column(db.Integer)                                                                                  # 申请数量
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 单据所属法人ID
     bg = db.relationship('BizCompany', back_populates='apply_bills', lazy=True, foreign_keys=[bg_id])               # 单据所属法人
-    buy_bill = db.relationship('BizAssetBuy', uselist=False)                                                        # 购买订单
+    buy_bill = db.relationship('BizAssetBuy', uselist=False, back_populates='application')                          # 购买订单
 '''
 资产购买登记(和资产申请登记1:1)
 '''
 class BizAssetBuy(BaseModel, db.Model):
-    buy_no = db.Column(db.String(32))       # 购买号:系统自动生成(规则:BY20220616+随机四位整数)
-    draft_no = db.Column(db.String(32))     # 草案号(DooDream)
-    bill_date = db.Column(db.Date())        # 订单日期
-    total_price = db.Column(db.Float)       # 购买总价
-    receive_due_date = db.Column(db.Date()) # 预计到货日期
+    buy_no = db.Column(db.String(32))           # 购买号:系统自动生成(规则:BY20220616+随机四位整数)
+    draft_no = db.Column(db.String(32))         # 草案号(DooDream)
+    bill_date = db.Column(db.Date())            # 订单日期
+    total_price = db.Column(db.Float)           # 购买总价
+    receive_due_date = db.Column(db.Date())     # 预计到货日期
+    application_no = db.Column(db.String(32))   # 申请单号
     application_id = db.Column(db.String(32), db.ForeignKey('biz_asset_apply.id'))  # 资产申请单ID
-    application = db.relationship('BizAssetApply')                                  # 资产申请单
+    application = db.relationship('BizAssetApply', back_populates='buy_bill')       # 资产申请单
     assets = db.relationship('BizAssetMaster', back_populates='buy_bill')           # 购买资产明细
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))               # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='buy_bills')                  # 所属法人
@@ -535,12 +534,12 @@ class BizAssetMaster(BaseModel, db.Model):
     user = db.relationship('BizEmployee', back_populates='used_assets', lazy=True, foreign_keys=[user_id])          # 使用者
     vendor = db.relationship('BizVendorMaster', back_populates='assets')                                            # 供应商
     store = db.relationship('BizStoreMaster', back_populates='assets')                                              # 存放仓库
-    properties = db.relationship('BizAssetProperty', uselist=False)                                                 # 资产属性(耗材无)
+    properties = db.relationship('BizAssetProperty', uselist=False, back_populates='asset_master')                  # 资产属性(耗材无)
     maintains = db.relationship('BizAssetMaint', back_populates='master')                                           # 资产保修信息
     status = db.relationship('SysEnum', back_populates='asset_status', lazy=True, foreign_keys=[status_id])         # 资产状态
     out_bills = db.relationship('BizStockOut', secondary='rel_asset_out_item', back_populates='assets')             # 出库单
     repair_history = db.relationship('BizAssetRepair', back_populates='asset')                                      # 维修履历
-    scrap = db.relationship('BizAssetScrap', uselist=False)                                                         # 报废记录
+    scrap = db.relationship('BizAssetScrap', uselist=False, back_populates='asset')                                 # 报废记录
     check_bills = db.relationship('BizAssetCheck', secondary='rel_asset_check', back_populates='assets')            # 资产盘点单
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='assets')                                                     # 所属法人
@@ -601,7 +600,7 @@ class BizAssetProperty(BaseModel, db.Model):
     power = db.Column(db.String(32))            # 功率
     remark = db.Column(db.String(32))           # 备注
     asset_master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产主数据ID
-    asset_master = db.relationship('BizAssetMaster')                                   # 资产主数据
+    asset_master = db.relationship('BizAssetMaster', back_populates='properties')      # 资产主数据
 '''
 维保信息
 '''
@@ -672,7 +671,7 @@ class BizAssetScrap(BaseModel, db.Model):
     scrap_reason = db.relationship('SysEnum', back_populates='scrap_reason', lazy=True, foreign_keys=[scrap_reason_id]) # 报废原因
     scrap_state = db.relationship('SysEnum', back_populates='scrap_state', lazy=True, foreign_keys=[scrap_state_id])    # 报废状态
     asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产ID
-    asset = db.relationship('BizAssetMaster')                                   # 资产
+    asset = db.relationship('BizAssetMaster', back_populates='scrap')           # 资产
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='asset_scrap')            # 所属法人
 '''
@@ -718,7 +717,7 @@ class RelAuditLineRole(BaseModel, db.Model):
 class AuditLine(BaseModel, db.Model):
     code = db.Column(db.String(24))             # 审批线代码
     name = db.Column(db.String(40))             # 审批线名称
-    remark = db.Column(db.Text)  # 备注
+    remark = db.Column(db.Text)                 # 备注
     biz_code_id = db.Column(db.String(32), db.ForeignKey('audit_biz_code.id'))  # 审批业务代码ID
     biz_code = db.relationship('AuditBizCode', back_populates='audit_lines')    # 审批业务代码
     audit_roles = db.relationship('AuditRole', secondary='rel_audit_line_role', back_populates='audit_lines')  # 审批人
