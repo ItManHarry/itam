@@ -5,7 +5,7 @@ from flask import request, redirect, url_for
 from urllib.parse import urlparse, urljoin
 from com.plugins import db
 from com.models import SysUser, SysModule, SysMenu
-import time, datetime, os, uuid
+import time, datetime, os, uuid, random
 def utc_to_locale(utc_date):
     '''
     utc时间转本地
@@ -173,3 +173,12 @@ def gen_qrcode(file, data):
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     img.save(file)
+def gen_bill_no(prefix):
+    '''
+    生成单号
+    :param prefix:
+    :return:
+    '''
+    date_str = time.strftime('%Y%m%d')
+    random_num = random.randint(1000, 10000)
+    return prefix+date_str+str(random_num)
