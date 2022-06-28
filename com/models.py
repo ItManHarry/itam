@@ -502,6 +502,7 @@ class RelAssetMaster(BaseModel, db.Model):
 '''
 class BizAssetMaster(BaseModel, db.Model):
     buy_bill_id = db.Column(db.String(32), db.ForeignKey('biz_asset_buy.id'))   # 购买订单
+    buy_date = db.Column(db.Date())                                             # 购买日期
     in_bill_id = db.Column(db.String(32), db.ForeignKey('biz_stock_in.id'))     # 入库订单
     code = db.Column(db.String(32))                 # 资产编码(编码规则:AS20220617+随机四位整数)
     sap_code = db.Column(db.String(32))             # SAP资产编码(只有资产有,耗材无)
