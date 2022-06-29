@@ -310,6 +310,9 @@ class BizEmployee(BaseModel, db.Model):
     managed_assets = db.relationship('BizAssetMaster', back_populates='manager', lazy=True, primaryjoin='BizAssetMaster.manager_id == BizEmployee.id')  # 管理资产
     used_assets = db.relationship('BizAssetMaster', back_populates='user', lazy=True, primaryjoin='BizAssetMaster.user_id == BizEmployee.id')           # 使用资产
     asset_checker = db.relationship('BizAssetCheck', back_populates='checker')      # 盘点担当
+    asset_give_by = db.relationship('RelAssetOutItem', back_populates='give_by', lazy=True, primaryjoin='RelAssetOutItem.give_by_id == BizEmployee.id')         # 资产发放人
+    asset_take_by = db.relationship('RelAssetOutItem', back_populates='take_by', lazy=True, primaryjoin='RelAssetOutItem.take_by_id == BizEmployee.id')         # 资产领用人
+    asset_return_by = db.relationship('RelAssetOutItem', back_populates='return_by', lazy=True, primaryjoin='RelAssetOutItem.return_by_id == BizEmployee.id')   # 资产返回人
 '''
 存放位置-仓库表
 '''
@@ -411,6 +414,12 @@ class BizStockIn(BaseModel, db.Model):
 class RelAssetOutItem(BaseModel, db.Model):
     out_bill_id = db.Column(db.String(32), db.ForeignKey('biz_stock_out.id'))       # 出库单ID
     asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))       # 资产ID
+    give_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))         # 发放人ID
+    take_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))         # 领用人ID
+    return_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))       # 返回人ID
+    give_by = db.relationship('BizEmployee', back_populates='asset_give_by', lazy=True, foreign_keys=[give_by_id])          # 发放人
+    take_by = db.relationship('BizEmployee', back_populates='asset_take_by', lazy=True, foreign_keys=[take_by_id])          # 领用人
+    return_by = db.relationship('BizEmployee', back_populates='asset_return_by', lazy=True, foreign_keys=[return_by_id])    # 返还人
     back_date = db.Column(db.Date())                                                # 返还日期
 '''
 出库登记表
