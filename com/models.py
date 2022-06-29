@@ -422,6 +422,7 @@ class RelAssetOutItem(BaseModel, db.Model):
     take_by = db.relationship('BizEmployee', back_populates='asset_take_by', lazy=True, foreign_keys=[take_by_id])          # 领用人
     return_by = db.relationship('BizEmployee', back_populates='asset_return_by', lazy=True, foreign_keys=[return_by_id])    # 返还人
     back_date = db.Column(db.Date())                                                # 返还日期
+    back_reason = db.Column(db.Text())                                              # 返还原因
 '''
 出库登记表
 '''
