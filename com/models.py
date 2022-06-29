@@ -560,7 +560,7 @@ class BizAssetMaster(BaseModel, db.Model):
     out_bills = db.relationship('BizStockOut', secondary='rel_asset_out_item', back_populates='assets')             # 出库单
     repair_history = db.relationship('BizAssetRepair', back_populates='asset')                                      # 维修履历
     scrap = db.relationship('BizAssetScrap', uselist=False, back_populates='asset')                                 # 报废记录
-    check_bills = db.relationship('BizAssetCheck', secondary='rel_asset_check', back_populates='assets')            # 资产盘点单
+    check_bills = db.relationship('BizAssetCheck', secondary='rel_asset_check_item', back_populates='assets')       # 资产盘点单
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='sys_assets', lazy=True, foreign_keys=[bg_id])                # 所属法人
     parent_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.parent_asset_id], back_populates='parent_asset', lazy='dynamic', cascade='all')   # 主资产
@@ -700,6 +700,15 @@ class BizAssetScrap(BaseModel, db.Model):
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='asset_scrap')            # 所属法人
 '''
+资产盘点明细表-盘点单&资产Master(N:N)
+'''
+class RelAssetCheckItem(BaseModel, db.Model):
+    check_id = db.Column(db.String(32), db.ForeignKey('biz_asset_check.id'))    # 盘点单ID
+    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_check.id'))    # 资产ID
+    passed_biz = db.Column(db.Boolean)                                          # 自盘点是否通过
+    passed_it = db.Column(db.Boolean)                                           # IT盘点是否通过
+    remark = db.Column(db.Text)                                                 # 盘点备注
+'''
 资产盘点单
 '''
 class BizAssetCheck(BaseModel, db.Model):
@@ -712,14 +721,7 @@ class BizAssetCheck(BaseModel, db.Model):
     checker = db.relationship('BizEmployee', back_populates='asset_checker')# 盘点担当
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))       # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='asset_check')        # 所属法人
-    assets = db.relationship('BizAssetMaster', secondary='rel_asset_check', back_populates='check_bills')  # 盘点资产明细
-'''
-资产盘点明细表-盘点单&资产Master(N:N)
-'''
-rel_asset_check = db.Table('rel_asset_check',
-    db.Column('check_id', db.String(32), db.ForeignKey('biz_asset_check.id')),
-    db.Column('asset_id', db.String(32), db.ForeignKey('biz_asset_master.id'))
-)
+    assets = db.relationship('BizAssetMaster', secondary='rel_asset_check_item', back_populates='check_bills')  # 盘点资产明细
 '''
 审批业务代码
 '''
