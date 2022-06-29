@@ -205,7 +205,8 @@ class BizCompany(BaseModel, db.Model):
     in_bills = db.relationship('BizStockIn', back_populates='bg')               # 入库单
     out_bills = db.relationship('BizStockOut', back_populates='bg')             # 出库单
     asset_classes = db.relationship('BizAssetClass', back_populates='bg')       # 资产类别
-    assets = db.relationship('BizAssetMaster', back_populates='bg')             # 资产
+    biz_assets = db.relationship('BizAssetMaster', back_populates='company', lazy=True, primaryjoin='BizAssetMaster.company_id == BizCompany.id')   # 业务层物料清单
+    sys_assets = db.relationship('BizAssetMaster', back_populates='bg', lazy=True, primaryjoin='BizAssetMaster.bg_id == BizCompany.id')             # 数据层物料清单
     stock_history = db.relationship('BizStockHistory', back_populates='bg')     # 资产出入库履历
     stock_amount = db.relationship('BizStockAmount', back_populates='bg')       # 资产库存余额
     asset_repair = db.relationship('BizAssetRepair', back_populates='bg')       # 资产维修履历
@@ -257,6 +258,7 @@ class BizDepartment(BaseModel, db.Model):
     parent_department = db.relationship('RelDepartment', foreign_keys=[RelDepartment.parent_department_id], back_populates='parent_department', lazy='dynamic', cascade='all')  # 父部门
     child_department = db.relationship('RelDepartment', foreign_keys=[RelDepartment.child_department_id], back_populates='child_department', lazy='dynamic', cascade='all')     # 子部门
     applications = db.relationship('BizAssetApply', back_populates='department')    # 物料申请单
+    assets = db.relationship('BizAssetMaster', back_populates='department')         # 资产清单
     # 设置父部门
     def set_parent_department(self, department):
         '''
@@ -523,6 +525,8 @@ class BizAssetMaster(BaseModel, db.Model):
     model_id = db.Column(db.String(32), db.ForeignKey('biz_brand_model.id'))    # 型号ID
     manager_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))     # 管理担当ID
     user_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))        # 使用者ID
+    department_id = db.Column(db.String(32), db.ForeignKey('biz_department.id'))# 使用者部门ID
+    company_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))      # 使用者法人ID
     vendor_id = db.Column(db.String(32), db.ForeignKey('biz_vendor_master.id')) # 供应商ID
     store_id = db.Column(db.String(32), db.ForeignKey('biz_store_master.id'))   # 存放仓库ID
     maintain_expired = db.Column(db.Boolean, default=False)                     # 是否出保:默认未出保，开发一定时任务根据维保信息更新该栏位，一天凌晨执行一次
@@ -533,6 +537,8 @@ class BizAssetMaster(BaseModel, db.Model):
     model = db.relationship('BizBrandModel', back_populates='assets')           # 型号
     manager = db.relationship('BizEmployee', back_populates='managed_assets', lazy=True, foreign_keys=[manager_id]) # 管理担当
     user = db.relationship('BizEmployee', back_populates='used_assets', lazy=True, foreign_keys=[user_id])          # 使用者
+    department = db.relationship('BizDepartment', back_populates='assets')                                          # 使用者所属部门
+    company = db.relationship('BizCompany', back_populates='biz_assets', lazy=True, foreign_keys=[company_id])      # 使用者所属法人
     vendor = db.relationship('BizVendorMaster', back_populates='assets')                                            # 供应商
     store = db.relationship('BizStoreMaster', back_populates='assets')                                              # 存放仓库
     properties = db.relationship('BizAssetProperty', uselist=False, back_populates='asset_master')                  # 资产属性(耗材无)
@@ -543,7 +549,7 @@ class BizAssetMaster(BaseModel, db.Model):
     scrap = db.relationship('BizAssetScrap', uselist=False, back_populates='asset')                                 # 报废记录
     check_bills = db.relationship('BizAssetCheck', secondary='rel_asset_check', back_populates='assets')            # 资产盘点单
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 所属法人ID
-    bg = db.relationship('BizCompany', back_populates='assets')                                                     # 所属法人
+    bg = db.relationship('BizCompany', back_populates='sys_assets', lazy=True, foreign_keys=[bg_id])                # 所属法人
     parent_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.parent_asset_id], back_populates='parent_asset', lazy='dynamic', cascade='all')   # 主资产
     child_asset = db.relationship('RelAssetMaster', foreign_keys=[RelAssetMaster.child_asset_id], back_populates='child_asset', lazy='dynamic', cascade='all')      # 附资产
     # 设置主资产
