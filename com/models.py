@@ -414,6 +414,7 @@ class BizStockIn(BaseModel, db.Model):
 class RelAssetOutItem(BaseModel, db.Model):
     out_bill_id = db.Column(db.String(32), db.ForeignKey('biz_stock_out.id'))       # 出库单ID
     asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))       # 资产ID
+    amount = db.Column(db.Integer)                                                  # 出库数量
     give_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))         # 发放人ID
     take_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))         # 领用人ID
     return_by_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))       # 返回人ID
