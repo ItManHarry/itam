@@ -342,9 +342,10 @@ class BizBrandMaster(BaseModel, db.Model):
     code = db.Column(db.String(24), unique=True)    # 品牌代码
     name = db.Column(db.String(64), unique=True)    # 品牌名称
     models = db.relationship('BizBrandModel', back_populates='brand', cascade='all') # 型号
-    assets = db.relationship('BizAssetMaster', back_populates='brand')  # 资产
-    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))   # 所属法人ID
-    bg = db.relationship('BizCompany', back_populates='brands')         # 所属法人
+    assets = db.relationship('BizAssetMaster', back_populates='brand')          # 资产
+    brand_amount = db.relationship('BizStockAmount', back_populates='brand')    # 品牌库存数量
+    bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))           # 所属法人ID
+    bg = db.relationship('BizCompany', back_populates='brands')                 # 所属法人
 '''
 品牌型号表
 '''
@@ -354,6 +355,7 @@ class BizBrandModel(BaseModel, db.Model):
     brand_id = db.Column(db.String(32), db.ForeignKey('biz_brand_master.id'))     # 所属品牌ID
     brand = db.relationship('BizBrandMaster', back_populates='models')            # 所属品牌
     assets = db.relationship('BizAssetMaster', back_populates='model')            # 资产
+    model_amount = db.relationship('BizStockAmount', back_populates='model')      # 品牌库存数量
 '''
 定时邮件配置表
 '''
@@ -651,13 +653,17 @@ class BizStockHistory(BaseModel, db.Model):
 库存余额
 '''
 class BizStockAmount(BaseModel, db.Model):
-    class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类
-    class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类
-    class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类
+    class1_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 一级分类ID
+    class2_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 二级分类ID
+    class3_id = db.Column(db.String(32), db.ForeignKey('biz_asset_class.id'))   # 三级分类ID
+    brand_id = db.Column(db.String(32), db.ForeignKey('biz_brand_master.id'))   # 品牌ID
+    model_id = db.Column(db.String(32), db.ForeignKey('biz_brand_model.id'))    # 型号ID
     amount = db.Column(db.Integer)                                              # 库存数量
     class1 = db.relationship('BizAssetClass', back_populates='class1_amount', lazy=True, foreign_keys=[class1_id])  # 一级分类
     class2 = db.relationship('BizAssetClass', back_populates='class2_amount', lazy=True, foreign_keys=[class2_id])  # 二级分类
     class3 = db.relationship('BizAssetClass', back_populates='class3_amount', lazy=True, foreign_keys=[class3_id])  # 三级分类
+    brand = db.relationship('BizBrandMaster', back_populates='brand_amount')    # 品牌
+    model = db.relationship('BizBrandModel', back_populates='model_amount')     # 型号
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))  # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='stock_amount')  # 所属法人
 '''
