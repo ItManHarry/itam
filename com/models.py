@@ -674,6 +674,7 @@ class BizAssetRepair(BaseModel, db.Model):
     repair_state_id = db.Column(db.String(32), db.ForeignKey('sys_enum.id'))    # 故障维修状态(字典:D007)
     pre_finish_date = db.Column(db.Date())                                      # 预计维修完成日期
     rel_finish_date = db.Column(db.Date())                                      # 实际维修完成日期
+    fee = db.Column(db.Float)                                                   # 维修费用
     asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产ID
     asset = db.relationship('BizAssetMaster', back_populates='repair_history')  # 资产
     repair_type = db.relationship('SysEnum', back_populates='repair_type', lazy=True, foreign_keys=[repair_type_id])    # 故障维修类型
