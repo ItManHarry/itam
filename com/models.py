@@ -704,7 +704,7 @@ class BizAssetScrap(BaseModel, db.Model):
 '''
 class RelAssetCheckItem(BaseModel, db.Model):
     check_id = db.Column(db.String(32), db.ForeignKey('biz_asset_check.id'))    # 盘点单ID
-    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_check.id'))    # 资产ID
+    asset_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))    # 资产ID
     passed_biz = db.Column(db.Boolean)                                          # 自盘点是否通过
     passed_it = db.Column(db.Boolean)                                           # IT盘点是否通过
     remark = db.Column(db.Text)                                                 # 盘点备注
