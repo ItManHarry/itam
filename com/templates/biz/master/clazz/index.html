@@ -7,14 +7,14 @@
   <div class="row">
     <div class="col-3 offset-3 text-end">
         {{form.csrf_token}}
-        {{form.code(class='form-control', placeholder='部门代码')}}
+        {{form.code(class='form-control', placeholder='类别代码')}}
     </div>
     <div class="col-3 text-end">
-        {{form.name(class='form-control', placeholder='部门名称')}}
+        {{form.name(class='form-control', placeholder='类别名称')}}
     </div>
     <div class="col-3 text-end">
         <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
-        <a class="btn btn-outline-primary" href="{{url_for('department.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('clazz.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
     </div>
   </div>
 </form>
@@ -22,35 +22,31 @@
 <table class="table table-hover table-sm">
   <thead>
     <tr>
-        <th scope="col" width="10%">法人</th>
-        <th scope="col" width="15%">部门代码</th>
-        <th scope="col" width="20%">部门名称</th>
-        <th scope="col" width="15%">上级部门代码</th>
-        <th scope="col" width="20%">上级部门名称</th>
-        <th scope="col" width="5%">状态</th>
-        <th scope="col" class="text-center" width="15%">Action</th>
+        <th scope="col" width="20%">类别代码</th>
+        <th scope="col" width="20%">类别名称</th>
+        <th scope="col" width="10%">类别等级</th>
+        <th scope="col" width="20%">上级类别</th>
+        <th scope="col" width="10%">状态</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
     </tr>
   </thead>
   <tbody>
-    {% if departments %}
-        {% for department in departments %}
+    {% if clazzes %}
+        {% for clazz in clazzes %}
             <tr>
-                <td>{{department.company.name}}</td>
-                <td>{{department.code}}</td>
-                <td>{{department.name}}</td>
-                <td>{{department.get_parent_department.code if department.get_parent_department else '/'}}</td>
-                <td>{{department.get_parent_department.name if department.get_parent_department else '/'}}</td>
-                <td>{%if department.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td>{{clazz.code}}</td>
+                <td>{{clazz.name}}</td>
+                <td>{{clazz.grade}}</td>
+                <td>&nbsp;</td>
+                <td>{%if clazz.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
                 <td class="text-center">
-                    <a href="{{url_for('department.edit', id=department.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                    <button class="btn btn-link text-danger {%if not department.active%}disabled{%endif%}" title="停用" onclick="status('{{department.id}}', 0)"><i class="bi bi-x-circle"></i></button>&nbsp;
-                    <button class="btn btn-link text-success {%if department.active%}disabled{%endif%}" title="启用" onclick="status('{{department.id}}', 1)"><i class="bi bi-check-circle"></i></button>
+                    <a href="{{url_for('clazz.edit', id=clazz.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
                 </td>
             </tr>
         {%endfor%}
     {% else %}
         <tr>
-            <td colspan="7" class="text-center"><small>没有记录!!!</small></td>
+            <td colspan="6" class="text-center"><small>没有记录!!!</small></td>
         </tr>
     {% endif %}
   </tbody>
@@ -59,26 +55,7 @@
 {% endblock %}
 {% block script %}
     {{ super() }}
-    function status(id, status){
-        $.ajax({
-            type:'post',
-            url:'/department/status/'+id+'/'+status,
-            //data:JSON.stringify({code:$.trim($("#code").val()), name:$.trim($("#name").val()), password:$.trim($("#password").val())}),
-            contentType:'application/json;charset=UTF-8',
-            success:function(data){
-                if(data.code == 1)
-                    location.reload()
-            },
-            error:function(){
-                $.alert({
-                   type:'red',
-                   title:'系统提示',
-                   content: '系统错误,请联系管理员',
-                   onClose:function(){
-
-                   }
-               })
-            }
-        })
+    function load_companies(){
+        $('form').submit()
     }
 {% endblock %}

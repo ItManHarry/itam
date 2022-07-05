@@ -75,7 +75,7 @@ def enums(dict_id):
     enums = []
     for enum in dictionary.enums:
         enums.append((enum.id, enum.display, enum.item if enum.item else ''))
-    return jsonify(enums=enums)
+    return jsonify(enums=sorted(enums, key=lambda e: e[2]))
 @bp_dict.route('/enum_add', methods=['POST'])
 @login_required
 @log_record('修改字典枚举信息')

@@ -93,6 +93,8 @@ def edit(id):
     roles, companies = get_user_selects()
     form.role.choices = roles
     form.company.choices = companies
+    if current_user.company:
+        form.company.data = current_user.company.id
     if request.method == 'GET':
         form.id.data = user.id
         form.code.data = user.user_id

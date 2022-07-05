@@ -25,6 +25,7 @@
   {# write page's css styles #}
   {%block style%}{%endblock%}
 </head>
+{%block body%}
 <body>
 <header>{% block header %}{% include '_header.html' %}{% endblock %}</header>
 <main>
@@ -68,4 +69,5 @@ function init_date(id){
 {% endblock %}
 </script>
 </body>
+{%endblock%}
 </html>
