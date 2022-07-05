@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('添加')}}
+<form method="post">
+    {{form.csrf_token}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.code.label}}
+            {{form.code(class='form-control')}}
+            {% for message in form.code.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.name.label}}
+            {{form.name(class='form-control')}}
+            {% for message in form.name.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.contact_person.label}}
+            {{form.contact_person(class='form-control')}}
+            {% for message in form.contact_person.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.contact_phone.label}}
+            {{form.contact_phone(class='form-control')}}
+            {% for message in form.contact_phone.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('vendor.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+{% endblock %}
