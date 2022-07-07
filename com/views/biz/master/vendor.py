@@ -40,10 +40,11 @@ def add():
     form = VendorForm()
     if form.validate_on_submit():
         vendor = BizVendorMaster(id=uuid.uuid4().hex,
-                                 code=form.code.data.upper,
+                                 code=form.code.data.upper(),
                                  name=form.name.data,
                                  contact_person=form.contact_person.data,
                                  contact_phone=form.contact_phone.data,
+                                 bg_id=current_user.company_id,
                                  create_id=current_user.id)
         db.session.add(vendor)
         db.session.commit()

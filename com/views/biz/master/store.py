@@ -25,7 +25,7 @@ def add():
                                code=form.code.data.upper(),
                                name=form.name.data,
                                place=form.place.data,
-                               company_id=current_user.company_id,
+                               bg_id=current_user.company_id,
                                create_id=current_user.id
                                )
         db.session.add(store)
