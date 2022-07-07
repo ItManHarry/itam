@@ -35,7 +35,7 @@
                 <td>{{brand.name}}</td>
                 <td class="text-center">
                     <a href="{{url_for('brand.edit', id=brand.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                    <button class="btn btn-link text-success" title="枚举清单" onclick="get_enums('{{brand.id}}')"><i class="bi bi-list-task"></i></button>
+                    <button class="btn btn-link text-success" title="型号" onclick="get_models('{{brand.id}}')"><i class="bi bi-list-task"></i></button>
                 </td>
             </tr>
         {%endfor%}
@@ -48,15 +48,15 @@
 </table>
 {{render_pagination(pagination, align='right')}}
 <!-- Modal -->
-<div class="modal fade" id="enumModal" tabindex="-1" role="dialog" aria-labelledby="enumModalLabel" aria-hidden="true">
+<div class="modal fade" id="modelModal" tabindex="-1" role="dialog" aria-labelledby="enumModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel"><button class="btn btn-link" onclick="add_enum()"><i class="bi bi-plus-lg"></i></button></h5>
+        <h5 class="modal-title" id="staticBackdropLabel"><button class="btn btn-link" onclick="add_model()"><i class="bi bi-plus-lg"></i></button></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <ul class="list-group" id="enums"></ul>
+        <ul class="list-group" id="models"></ul>
       </div>
       <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -69,36 +69,36 @@
 {% endblock %}
 {% block script %}
     {{ super() }}
-    var dict_id = ''    //字典ID
-    var enum_id = 0     //新增枚举的ID(移除标识)
-    var enums = []      //存储枚举ID,用于保存
+    var brand_id = ''    //字典ID
+    var model_id = 0    //新增型号的ID(移除标识)
+    var models = []     //存储型号ID,用于保存
     var removed = []    //移除的枚举值
-    //获取对应的枚举值
-    function get_enums(id){
-        enum_id = 0
-        dict_id = id
+    //获取对应的型号值
+    function get_models(id){
+        model_id = 0
+        brand_id = id
         $.ajax({
             type:'post',
-            url:'/brand/enums/'+id,
+            url:'/brand/models/'+id,
             contentType:'application/json;charset=UTF-8',
             success:function(data){
-                $('#enums').empty()
-                $('#enums').append(
+                $('#models').empty()
+                $('#models').append(
                 "<li class='list-group-item list-group-item-action'>"+
-                "<div class='row'><div class='col-5'><small>枚举Key</small></div><div class='col-5'><small>枚举值</small></div>"+
+                "<div class='row'><div class='col-5'><small>型号代码</small></div><div class='col-5'><small>型号名称</small></div>"+
                 "</div></li>")
-                if(data.enums.length != 0){
-                    for(var i = 0; i < data.enums.length; i++){
-                        //alert('Enum id is : ' + data.enums[i][0])
-                        enums.push(data.enums[i][0])
-                        $('#enums').append(
-                        "<li class='list-group-item list-group-item-action' id='"+data.enums[i][0]+"'>"+
-                        //"<div class='row'><div class='col-5'><input type='text' class='form-control' id='key"+data.enums[i][0]+"i' value='"+data.enums[i][2]+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='display"+data.enums[i][0]+"i' value='"+data.enums[i][1]+"' style='width:150px'></div><div class='col-2'><button class='btn btn-link text-danger' onclick='del_enum(\""+data.enums[i][0]+"\")'><i class='bi bi-dash-circle'></i></button></div></div>"
-                        "<div class='row'><div class='col-5'><input type='text' class='form-control' id='key"+data.enums[i][0]+"' value='"+data.enums[i][2]+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='display"+data.enums[i][0]+"' value='"+data.enums[i][1]+"' style='width:150px'></div><div class='col-2'>&nbsp;</div></div>"+
+                if(data.models.length != 0){
+                    for(var i = 0; i < data.models.length; i++){
+                        //alert('Enum id is : ' + data.models[i][0])
+                        models.push(data.models[i][0])
+                        $('#models').append(
+                        "<li class='list-group-item list-group-item-action' id='"+data.models[i][0]+"'>"+
+                        //"<div class='row'><div class='col-5'><input type='text' class='form-control' id='code"+data.models[i][0]+"i' value='"+data.models[i][2]+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='name"+data.models[i][0]+"i' value='"+data.models[i][1]+"' style='width:150px'></div><div class='col-2'><button class='btn btn-link text-danger' onclick='del_model(\""+data.models[i][0]+"\")'><i class='bi bi-dash-circle'></i></button></div></div>"
+                        "<div class='row'><div class='col-5'><input type='text' class='form-control' id='code"+data.models[i][0]+"' value='"+data.models[i][2]+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='name"+data.models[i][0]+"' value='"+data.models[i][1]+"' style='width:150px'></div><div class='col-2'>&nbsp;</div></div>"+
                         "</div></li>")
                     }
                 }
-                $('#enumModal').modal('show')
+                $('#modelModal').modal('show')
             },
             error:function(){
                 $.alert({
@@ -114,46 +114,46 @@
     }
     //执行保存
     function do_save(id){
-        if(enums.length == 0){
+        if(models.length == 0){
             $.alert({
                type:'red',
                title:'系统提示',
-               content: '请添加枚举值！',
+               content: '请添加型号信息！',
                onClose:function(){
 
                }
            })
         }else{
-            var p_enums = []
-            //检查枚举值是否为空
-            for(var i = 0; i < enums.length; i++){
-                //alert('Enum id : '+enums[i])
-                //alert($.trim($('#key'+enums[i]).val()))
-                if($.trim($('#key'+enums[i]).val()) == ''){
+            var p_models = []
+            //检查型号值是否为空
+            for(var i = 0; i < models.length; i++){
+                //alert('Model id : '+models[i])
+                //alert($.trim($('#code'+models[i]).val()))
+                if($.trim($('#code'+models[i]).val()) == ''){
                     $.alert({
                        type:'red',
                        title:'系统提示',
-                       content: '请填写枚举Key！',
+                       content: '请填写型号代码！',
                        onClose:function(){}
                     })
                     return
                 }
-                if($.trim($('#display'+enums[i]).val()) == ''){
+                if($.trim($('#name'+models[i]).val()) == ''){
                     $.alert({
                        type:'red',
                        title:'系统提示',
-                       content: '请填写枚举值！',
+                       content: '请填写型号名称！',
                        onClose:function(){}
                     })
                     return
                 }
-                p_enums.push({'id':enums[i],'key':$.trim($('#key'+enums[i]).val()),'display':$.trim($('#display'+enums[i]).val())})
+                p_models.push({'id':models[i],'code':$.trim($('#code'+models[i]).val()),'name':$.trim($('#name'+models[i]).val())})
             }
-            //alert(p_enums)
+            //alert(p_models)
             $.ajax({
                 type:'post',
-                url:'/brand/enum_add',
-                data:JSON.stringify({dict_id:dict_id, p_enums:p_enums,removed:removed}),
+                url:'/brand/model_add',
+                data:JSON.stringify({brand_id:brand_id, p_models:p_models,removed:removed}),
                 contentType:'application/json;charset=UTF-8',
                 success:function(data){
                     if(data.code == 1)
@@ -162,8 +162,8 @@
                            title:'系统提示',
                            content: data.message,
                            onClose:function(){
-                                $('#enumModal').modal('hide')
-                                enums = []
+                                $('#modelModal').modal('hide')
+                                models = []
                                 removed = []
                            }
                        })
@@ -182,21 +182,21 @@
             })
         }
     }
-    //新增枚举
-    function add_enum(){
-        enum_id += 1
-        var id = enum_id + ''
-        enums.push(id)
-        $('#enums').append(
+    //新增型号
+    function add_model(){
+        model_id += 1
+        var id = model_id + ''
+        models.push(id)
+        $('#models').append(
         "<li class='list-group-item list-group-item-action' id='"+id+"'>"+
-        "<div class='row'><div class='col-5'><input type='text' class='form-control' id='key"+id+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='display"+id+"' style='width:150px'></div><div class='col-2'><button class='btn btn-link text-danger' onclick='del_enum("+id+")'><i class='bi bi-dash-circle'></i></button></div></div>"+
+        "<div class='row'><div class='col-5'><input type='text' class='form-control' id='code"+id+"' style='width:150px'></div><div class='col-5'><input type='text' class='form-control' id='name"+id+"' style='width:150px'></div><div class='col-2'><button class='btn btn-link text-danger' onclick='del_model("+id+")'><i class='bi bi-dash-circle'></i></button></div></div>"+
         "</div></li>")
     }
-    //移除枚举
-    function del_enum(id){
-        enums.forEach(function(item, index, enums){
+    //移除型号
+    function del_model(id){
+        models.forEach(function(item, index, models){
             if(item == id)
-                enums.splice(index, 1)
+                models.splice(index, 1)
         })
         removed.push(id)
         $('#'+id).remove()
