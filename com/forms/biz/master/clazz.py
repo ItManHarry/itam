@@ -7,10 +7,10 @@ class ClazzSearchForm(FlaskForm):
     name = StringField('类别名称', [validators.optional()])
 class ClazzForm(FlaskForm):
     id = HiddenField()
-    code = StringField('类别代码', validators=[DataRequired('请输入类别代码！')])
-    name = StringField('类别名称', validators=[DataRequired('请输入类别名称！')])
-    unit = StringField('计量单位', [validators.optional()])
-    parent = SelectField('上级类别', choices=[])
+    code = StringField('类别代码', validators=[DataRequired('请输入资产大类代码！')])
+    name = StringField('类别名称', validators=[DataRequired('请输入资产大类名称！')])
+    unit = StringField('计量单位(个/米/箱...)')
+    parent = SelectField('上级类别', [validators.optional()], choices=[])
     has_parent = BooleanField('上级类别')  # 默认为True
 
     def validate_code(self, field):
@@ -34,7 +34,7 @@ class ClazzForm(FlaskForm):
                 raise ValidationError('类别名称已存在!')
 
     def validate_unit(self, field):
-        if self.has_parent and self.parent.data:
+        if self.has_parent.data and self.parent.data:
             parent_class = BizAssetClass.query.get(self.parent.data)
             if parent_class.grade == 2 and (field.data is None or field.data.strip() == ''):
-                raise ValidationError('请填写计量单位!')
+                raise ValidationError('请填写资产类别计量单位!')

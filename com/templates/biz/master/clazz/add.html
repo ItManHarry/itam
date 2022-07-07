@@ -3,7 +3,6 @@
 {{current_location('添加')}}
 <form method="post">
     {{form.csrf_token}}
-    {{form.parent_id}}
     <div class="row">
         <div class="col-md-6">
             {{form.code.label}}
@@ -33,10 +32,10 @@
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-2">
             <br>
             {{form.unit.label}}
-            {{form.unit(class='form-control')}}
+            {{form.unit(class='form-control', readonly=True)}}
             {% for message in form.unit.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
@@ -52,3 +51,50 @@
      </div>
 </form>
 {% endblock %}
+{%block script%}
+    {{super()}}
+    $(function(){
+        if($('#has_parent').is(':checked'))
+            $('#parent').removeClass('disabled')
+        if($('#parent').val() != '' && $('#parent').val() != null)
+            check_grade($('#parent').val())
+        $('#has_parent').change(function(){
+            if($(this).is(':checked')){
+                $('#parent').removeAttr('disabled')
+            }else{
+                $('#unit').attr('readonly', true)
+                $('#parent').attr('disabled', true)
+                $('#parent').val('')
+            }
+        })
+        $('#parent').change(function(){
+            var id = $(this).val()
+            check_grade(id)
+        })
+    })
+    function check_grade(id){
+        $.ajax({
+            type:'post',
+            url:'/clazz/grade/'+id,
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.grade == 2){
+                    $('#unit').removeAttr('readonly')
+                }else{
+                    $('#unit').val('')
+                    $('#unit').attr('readonly', true)
+                }
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+{%endblock%}

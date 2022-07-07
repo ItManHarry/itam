@@ -22,10 +22,11 @@
 <table class="table table-hover table-sm">
   <thead>
     <tr>
-        <th scope="col" width="20%">类别代码</th>
-        <th scope="col" width="20%">类别名称</th>
+        <th scope="col" width="15%">类别代码</th>
+        <th scope="col" width="15%">类别名称</th>
         <th scope="col" width="10%">类别等级</th>
         <th scope="col" width="20%">上级类别</th>
+        <th scope="col" width="10%">计量单位</th>
         <th scope="col" width="10%">状态</th>
         <th scope="col" class="text-center" width="20%">Action</th>
     </tr>
@@ -37,7 +38,8 @@
                 <td>{{clazz.code}}</td>
                 <td>{{clazz.name}}</td>
                 <td>{{clazz.grade}}</td>
-                <td>&nbsp;</td>
+                <td>{%if clazz.grade==1%}{{'-'}}{%elif clazz.grade==2%}{{clazz.get_parent_class.name}}{%else%}{{clazz.get_parent_class.get_parent_class.name+' / '+clazz.get_parent_class.name}}{%endif%}</td>
+                <td>{{clazz.unit if clazz.unit else '-'}}</td>
                 <td>{%if clazz.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
                 <td class="text-center">
                     <a href="{{url_for('clazz.edit', id=clazz.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
@@ -55,7 +57,5 @@
 {% endblock %}
 {% block script %}
     {{ super() }}
-    function load_companies(){
-        $('form').submit()
-    }
+
 {% endblock %}
