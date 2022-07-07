@@ -29,7 +29,7 @@ def index():
         session['clazz_view_search_code'] = code
         session['clazz_view_search_name'] = name
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
-    pagination = BizAssetClass.query.filter(BizAssetClass.code.like('%' + code.upper() + '%'), BizAssetClass.name.like('%' + name + '%')).order_by(BizAssetClass.code).paginate(page, per_page)
+    pagination = BizAssetClass.query.filter(BizAssetClass.bg_id == current_user.company_id).filter(BizAssetClass.code.like('%' + code.upper() + '%'), BizAssetClass.name.like('%' + name + '%')).order_by(BizAssetClass.code).paginate(page, per_page)
     clazzes = pagination.items
     return render_template('biz/master/clazz/index.html', form=form, clazzes=clazzes, pagination=pagination)
 @bp_clazz.route('/add', methods=['GET', 'POST'])
