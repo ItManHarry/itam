@@ -29,7 +29,7 @@ def index():
         session['vendor_view_search_code'] = code
         session['vendor_view_search_name'] = name
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
-    pagination = BizVendorMaster.query.filter(BizVendorMaster.code.like('%'+code+'%'), BizVendorMaster.name.like('%'+name+'%')).order_by(BizVendorMaster.code).paginate(page, per_page)
+    pagination = BizVendorMaster.query.filter(BizVendorMaster.bg_id==current_user.company_id).filter(BizVendorMaster.code.like('%'+code+'%'), BizVendorMaster.name.like('%'+name+'%')).order_by(BizVendorMaster.code).paginate(page, per_page)
     vendors = pagination.items
 
     return render_template('biz/master/vendor/index.html',pagination=pagination,form=form,vendors=vendors)

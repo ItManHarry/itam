@@ -19,6 +19,11 @@ def reg_web_views(app):
     from com.views.biz.master.vendor import bp_vendor                  # 基准管理-供应商信息
     from com.views.biz.master.brand import bp_brand                    # 基准管理-品牌信息
     from com.views.biz.master.store import bp_store                    # 基准管理-仓库信息
+    from com.views.biz.master.email import bp_email                    # 基准管理-邮件通知配置
+    from com.views.biz.audit.bizcode import bp_bizcode                 # 业务审批-审批业务代码管理
+    from com.views.biz.audit.performer import bp_performer             # 业务审批-审批角色管理
+    from com.views.biz.asset.apply import bp_apply                     # 资产登记-资产申请
+
     app.register_blueprint(bp_auth, url_prefix='/auth')
     app.register_blueprint(bp_main, url_prefix='/main')
     app.register_blueprint(bp_module, url_prefix='/module')
@@ -34,3 +39,7 @@ def reg_web_views(app):
     app.register_blueprint(bp_vendor, url_prefix='/vendor')
     app.register_blueprint(bp_brand, url_prefix='/brand')
     app.register_blueprint(bp_store, url_prefix='/store')
+    app.register_blueprint(bp_email, url_prefix='/email')
+    app.register_blueprint(bp_bizcode, url_prefix='/bizcode')
+    app.register_blueprint(bp_performer, url_prefix='/performer')
+    app.register_blueprint(bp_apply,url_prefix='/apply')

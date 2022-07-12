@@ -11,10 +11,8 @@ bp_store = Blueprint('store', __name__)
 @login_required
 @log_record('查看仓库信息')
 def index():
-    stores = BizStoreMaster.query.all()
-
+    stores = BizStoreMaster.query.filter(BizStoreMaster.bg_id == current_user.company_id).all()
     return render_template('biz/master/store/index.html',stores=stores)
-
 @bp_store.route('/add', methods=['GET', 'POST'])
 @login_required
 @log_record('新增仓库信息')

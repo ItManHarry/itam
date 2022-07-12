@@ -85,7 +85,7 @@ def model_add():
     # 先移除已关联的型号值
     for model in brand.models:
         brand.models.remove(model)
-        db.session.commit()
+    db.session.commit()
     # 移除的型号信息执行删除
     removed = data['removed']
     print('Removed : ', removed)
@@ -93,7 +93,7 @@ def model_add():
         model = BizBrandModel.query.get(model_id)
         if model:
             db.session.delete(model)
-            db.session.commit()
+    db.session.commit()
     # 关联型号信息
     models = data['p_models']
     for model in models:
