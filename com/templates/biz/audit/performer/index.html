@@ -37,7 +37,7 @@
                 <td>{%if perfomer.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
                 <td class="text-center">
                     <a href="{{url_for('performer.edit', id=perfomer.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                    <a href="{{url_for('performer.edit', id=perfomer.id)}}" class="btn btn-link text-success" title="People"><i class="bi bi-people"></i></a>&nbsp;
+                    <a href="{{url_for('performer.edit', id=perfomer.id)}}" class="btn btn-link text-success" title="审批人"><i class="bi bi-people"></i></a>&nbsp;
                 </td>
             </tr>
         {%endfor%}
