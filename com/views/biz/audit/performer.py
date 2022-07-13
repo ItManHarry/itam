@@ -30,8 +30,8 @@ def index():
         session['performer_view_search_name'] = name
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
     pagination = AuditRole.query.filter(AuditRole.bg_id == current_user.company_id).filter(AuditRole.code.like('%'+code+'%'), AuditRole.name.like('%'+name+'%')).order_by(AuditRole.code).paginate(page, per_page)
-    perfomers = pagination.items
-    return render_template('biz/audit/performer/index.html', pagination=pagination, perfomers=perfomers, form=form)
+    performers = pagination.items
+    return render_template('biz/audit/performer/index.html', pagination=pagination, performers=performers, form=form)
 @bp_performer.route('/add', methods=['GET', 'POST'])
 @login_required
 @log_record('新增审批角色信息')
