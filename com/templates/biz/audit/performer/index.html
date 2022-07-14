@@ -59,23 +59,14 @@
       <div class="modal-body">
           <div class="row align-items-center justify-content-center">
               <div class="col">
-                  <label for="forselect">待选</label>
-                  <select id="forselect" class="form-select" multiple>
-                      <option selected>Open this select menu</option>
-                      <option value="1">One</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                      <option value="4">Four</option>
-                      <option value="5">Five</option>
-                      <option value="6">Six</option>
-                      <option value="7">Seven</option>
-                  </select>
+                  <label for="for_select">待选</label>
+                  <select id="for_select" class="form-select" multiple></select>
               </div>
               <div class="col-2">
                   <br>
                   <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-secondary"><i class="bi bi-arrow-right"></i></button>
-                    <button type="button" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(1)"><i class="bi bi-arrow-right"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(0)"><i class="bi bi-arrow-left"></i></button>
                   </div>
               </div>
               <div class="col-5">
@@ -95,8 +86,57 @@
 {% endblock %}
 {% block script %}
     {{ super() }}
+    var performer_id = ''
     function set_performers(title, id){
+        performer_id = id
         $('#modalTitle').text(title)
-        $('#performerModal').modal('show')
+        $.ajax({
+            type:'post',
+            url:'/performer/people/'+id,
+            data:{},
+            success:function(data){
+                $('#for_select').empty()
+                $('#selected').empty()
+                var for_select = data.for_select, selected = data.selected
+                for(var i = 0; i < for_select.length; i++){
+                    $('#for_select').append("<option value='"+for_select[i][0]+"'>"+for_select[i][1]+"</option>")
+                }
+                for(var i = 0; i < selected.length; i++){
+                    $('#selected').append("<option value='"+selected[i][0]+"'>"+selected[i][1]+"</option>")
+                }
+                $('#performerModal').modal('show')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function do_move(action){
+        var option = null
+        if(action == 1){    //若为1执行增加审批人
+            $('#for_select option').each(function(){
+                if($(this).is(':checked')){
+                    $('#selected').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
+                    $(this).remove()
+                }
+            })
+        }else{              //若为0执行移除审批人
+            $('#selected option').each(function(){
+                if($(this).is(':checked')){
+                    $('#for_select').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
+                    $(this).remove()
+                }
+            })
+        }
+    }
+    function do_save(){
+
     }
 {% endblock %}

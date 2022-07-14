@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session, current_app, jsonify
 from flask_login import login_required, current_user
-from com.models import AuditRole
+from com.models import AuditRole, SysUser
 from com.plugins import db
 from com.decorators import log_record
 from com.forms.biz.audit.performer import PerformerSearchForm, PerformerForm
@@ -64,52 +64,19 @@ def edit(id):
         flash('审批角色更新成功！')
         return redirect(url_for('.index'))
     return render_template('biz/audit/performer/edit.html', form=form)
+@bp_performer.route('/people/<performer_id>', methods=['POST'])
+@login_required
+@log_record('获取角色人员信息')
+def models(performer_id):
+    performer = AuditRole.query.get_or_404(performer_id)
+    selected = [(user.id, user.name) for user in performer.auditors]
+    selected_ids = [user.id for user in performer.auditors]
+    for_select = [(user.id, user.user_name) for user in SysUser.query.filter(~SysUser.id.in_(selected_ids)).filter(SysUser.user_id != 'admin').all()]
+    return jsonify(for_select=sorted(for_select, key=lambda e: e[1]), selected=sorted(selected, key=lambda e: e[1]))
+@bp_performer.route('/model_add', methods=['POST'])
+@login_required
+@log_record('维护品牌型号信息')
+def model_add():
+    data = request.get_json()
 
-# @bp_performer.route('/models/<brand_id>', methods=['POST'])
-# @login_required
-# @log_record('获取品牌型号信息')
-# def models(brand_id):
-#     performer = AuditRole.query.get_or_404(brand_id)
-#     models = [(model.id, model.name, model.code if model.code else '') for model in performer.models]
-#     '''
-#     for model in performer.models:
-#         models.append((model.id, model.code, model.name if model.name else ''))
-#     '''
-#     return jsonify(models=sorted(models, key=lambda e: e[2]))
-# @bp_performer.route('/model_add', methods=['POST'])
-# @login_required
-# @log_record('维护品牌型号信息')
-# def model_add():
-#     data = request.get_json()
-#     brand_id = data['brand_id']
-#     performer = AuditRole.query.get_or_404(brand_id)
-#     # 先移除已关联的型号值
-#     for model in performer.models:
-#         performer.models.remove(model)
-#     db.session.commit()
-#     # 移除的型号信息执行删除
-#     removed = data['removed']
-#     print('Removed : ', removed)
-#     for model_id in removed:
-#         model = BizBrandModel.query.get(model_id)
-#         if model:
-#             db.session.delete(model)
-#     db.session.commit()
-#     # 关联型号信息
-#     models = data['p_models']
-#     for model in models:
-#         print('Model id : ', model['id'], ', code : ', model['code'], ', display : ', model['name'])
-#         model_entity = BizBrandModel.query.get(str(model['id']))
-#         if model_entity:
-#             model_entity.code = model['code']
-#             model_entity.name = model['name']
-#             model_entity.update_id = current_user.id
-#             model_entity.updatetime_utc = datetime.utcfromtimestamp(time.time())
-#             model_entity.updatetime_loc = datetime.fromtimestamp(time.time())
-#             db.session.commit()
-#         else:
-#             model_entity = BizBrandModel(id=uuid.uuid4().hex, code=model['code'], name=model['name'], create_id=current_user.id)
-#             db.session.add(model_entity)
-#         performer.models.append(model_entity)
-#     db.session.commit()
-#     return jsonify(code=1, message='型号信息维护成功!')
+    return jsonify(code=1, message='审批人员维护成功!')
