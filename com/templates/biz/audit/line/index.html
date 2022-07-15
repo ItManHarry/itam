@@ -51,7 +51,7 @@
   </tbody>
 </table>
 <!-- Modal -->
-<div class="modal fade" id="performerModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+<div class="modal fade" id="lineModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -60,26 +60,49 @@
       </div>
       <div class="modal-body">
           <div class="row align-items-center justify-content-center">
-              <div class="col">
-                  <label for="for_select">待选</label>
-                  <select id="for_select" class="form-select" multiple></select>
-              </div>
               <div class="col-2">
-                  <br>
-                  <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(1)"><i class="bi bi-arrow-right"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(0)"><i class="bi bi-arrow-left"></i></button>
-                  </div>
+                <small class="text-secondary">审批角色</small>
               </div>
-              <div class="col-5">
-                  <label for="selected">已选</label>
-                  <select id="selected" class="form-select" multiple></select>
+              <div class="col-7">
+                  <select id="roles" class="form-select">
+                      {%for role in roles%}
+                      <option value="{{role.id}}">{{role.name}}</option>
+                      {%endfor%}
+                  </select>
+              </div>
+              <div class="col-3">
+                  <button class="btn btn-outline-success">添加到审批线</button>
+              </div>
+          </div><br>
+          <div class="row align-items-center justify-content-center">
+              <div class="col">
+                  <table class="table table-sm">
+  <thead class="table-dark">
+    <tr>
+      <th scope="col" width="40%">审批角色</th>
+      <th scope="col" width="40%">审批等级</th>
+      <th scope="col" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Mark</td>
+      <td>Otto</td>
+        <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+    </tr>
+    <tr>
+     <td>Jacob</td>
+      <td>Thornton</td>
+      <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+    </tr>
+    <tr>
+      <td colspan="2">Larry the Bird</td>
+      <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+    </tr>
+  </tbody>
+</table>
               </div>
           </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary" onclick="do_save()">保存</button>
       </div>
     </div>
   </div>
@@ -92,7 +115,8 @@
     function set_line(title, id){
         line_id = id
         $('#modalTitle').text(title)
-        $.ajax({
+        $('#lineModal').modal('show')
+        /*$.ajax({
             type:'post',
             url:'/line/people/'+id,
             data:{},
@@ -106,7 +130,7 @@
                 for(var i = 0; i < selected.length; i++){
                     $('#selected').append("<option value='"+selected[i][0]+"'>"+selected[i][1]+"</option>")
                 }
-                $('#performerModal').modal('show')
+                $('#lineModal').modal('show')
             },
             error:function(){
                 $.alert({
@@ -118,7 +142,7 @@
                    }
                })
             }
-        })
+        })*/
     }
     function do_move(action){
         var option = null
@@ -163,7 +187,7 @@
                            title:'系统提示',
                            content: data.message,
                            onClose:function(){
-                                $('#performerModal').modal('hide')
+                                $('#lineModal').modal('hide')
                            }
                        })
                 },

@@ -31,7 +31,8 @@ def index():
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
     pagination = AuditLine.query.filter(AuditLine.bg_id == current_user.company_id).filter(AuditLine.code.like('%'+code+'%'), AuditLine.name.like('%'+name+'%')).order_by(AuditLine.code).paginate(page, per_page)
     lines = pagination.items
-    return render_template('biz/audit/line/index.html', pagination=pagination, lines=lines, form=form)
+    roles = AuditBizCode.query.order_by(AuditBizCode.name).all()
+    return render_template('biz/audit/line/index.html', pagination=pagination, lines=lines, form=form, roles=roles)
 @bp_line.route('/add', methods=['GET', 'POST'])
 @login_required
 @log_record('新增审批模板信息')
