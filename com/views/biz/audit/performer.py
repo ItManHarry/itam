@@ -69,14 +69,27 @@ def edit(id):
 @log_record('获取角色人员信息')
 def models(performer_id):
     performer = AuditRole.query.get_or_404(performer_id)
-    selected = [(user.id, user.name) for user in performer.auditors]
+    selected = [(user.id, user.user_name) for user in performer.auditors]
     selected_ids = [user.id for user in performer.auditors]
     for_select = [(user.id, user.user_name) for user in SysUser.query.filter(~SysUser.id.in_(selected_ids)).filter(SysUser.user_id != 'admin').all()]
     return jsonify(for_select=sorted(for_select, key=lambda e: e[1]), selected=sorted(selected, key=lambda e: e[1]))
-@bp_performer.route('/model_add', methods=['POST'])
+@bp_performer.route('/people_add', methods=['POST'])
 @login_required
-@log_record('维护品牌型号信息')
-def model_add():
+@log_record('保存审批人员信息')
+def people_add():
     data = request.get_json()
-
+    performer_id, people = data['performer_id'], data['people']
+    # print('Performer ID : ', performer_id)
+    # print('People : ', people)
+    performer = AuditRole.query.get_or_404(performer_id)
+    # 先移除已添加的人员再追加新指定的人员
+    for auditor in performer.auditors:
+        performer.auditors.remove(auditor)
+        db.session.commit()
+    # 保存最新的审批人
+    for auditor_id in people:
+        auditor = SysUser.query.get(auditor_id)
+        # print('User name : ', auditor.user_name)
+        performer.auditors.append(auditor)
+        db.session.commit()
     return jsonify(code=1, message='审批人员维护成功!')

@@ -77,7 +77,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary" onclick="do_auth()">保存</button>
+        <button type="button" class="btn btn-primary" onclick="do_save()">保存</button>
       </div>
     </div>
   </div>
@@ -137,6 +137,44 @@
         }
     }
     function do_save(){
+        var people = []
+        $('#selected option').each(function(){
+            people.push($(this).val())
+        })
+        if(people.length == 0)
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '请添加审批人员！',
+               onClose:function(){}
+            })
+        else
+            $.ajax({
+                type:'post',
+                url:'/performer/people_add',
+                data:JSON.stringify({performer_id:performer_id, people:people}),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#performerModal').modal('hide')
+                           }
+                       })
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
 
+                       }
+                   })
+                }
+            })
     }
 {% endblock %}
