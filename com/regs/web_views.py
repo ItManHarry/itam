@@ -22,6 +22,7 @@ def reg_web_views(app):
     from com.views.biz.master.email import bp_email                    # 基准管理-邮件通知配置
     from com.views.biz.audit.bizcode import bp_bizcode                 # 业务审批-审批业务代码管理
     from com.views.biz.audit.performer import bp_performer             # 业务审批-审批角色管理
+    from com.views.biz.audit.line import bp_line                       # 业务审批-审批模板(审批线)
     from com.views.biz.asset.apply import bp_apply                     # 资产登记-资产申请
 
     app.register_blueprint(bp_auth, url_prefix='/auth')
@@ -42,4 +43,5 @@ def reg_web_views(app):
     app.register_blueprint(bp_email, url_prefix='/email')
     app.register_blueprint(bp_bizcode, url_prefix='/bizcode')
     app.register_blueprint(bp_performer, url_prefix='/performer')
-    app.register_blueprint(bp_apply,url_prefix='/apply')
+    app.register_blueprint(bp_line, url_prefix='/line')
+    app.register_blueprint(bp_apply, url_prefix='/apply')

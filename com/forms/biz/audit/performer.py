@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, ValidationError, BooleanField, SelectField, validators
+from wtforms import StringField, HiddenField, ValidationError, validators
 from wtforms.validators import DataRequired
 from com.models import AuditRole
 class PerformerSearchForm(FlaskForm):

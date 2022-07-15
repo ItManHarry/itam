@@ -67,7 +67,7 @@ def edit(id):
 @bp_performer.route('/people/<performer_id>', methods=['POST'])
 @login_required
 @log_record('获取角色人员信息')
-def models(performer_id):
+def people(performer_id):
     performer = AuditRole.query.get_or_404(performer_id)
     selected = [(user.id, user.user_name) for user in performer.auditors]
     selected_ids = [user.id for user in performer.auditors]
