@@ -15,8 +15,8 @@ def index():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
         try:
-            code = session['performer_view_search_code'] if session['performer_view_search_code'] else ''  # 字典代码
-            name = session['performer_view_search_name'] if session['performer_view_search_name'] else ''  # 字典名称
+            code = session['performer_view_search_code'] if session['performer_view_search_code'] else ''  # 角色代码
+            name = session['performer_view_search_name'] if session['performer_view_search_name'] else ''  # 角色名称
         except KeyError:
             code = ''
             name = ''

@@ -21,11 +21,29 @@
         </div>
     </div><br>
     <div class="row">
+        <div class="col-md-6">
+            {{form.biz_code.label}}
+            {{form.biz_code(class='form-control')}}
+            {% for message in form.biz_code.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-12">
+            {{form.remark.label}}
+            {{form.remark(class='form-control')}}
+            {% for message in form.remark.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
         <div class="col">
             <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
         </div>
         <div class="col text-end">
-            <a class="btn btn-outline-secondary" href="{{url_for('performer.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+            <a class="btn btn-outline-secondary" href="{{url_for('line.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
         </div>
      </div>
 </form>
