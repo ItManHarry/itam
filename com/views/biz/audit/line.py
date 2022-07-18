@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session, current_app, jsonify
 from flask_login import login_required, current_user
-from com.models import AuditLine, AuditBizCode
+from com.models import AuditLine, AuditBizCode, RelAuditLineRole, AuditRole
 from com.plugins import db
 from com.decorators import log_record
 from com.forms.biz.audit.line import LineSearchForm, LineForm
@@ -31,7 +31,7 @@ def index():
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
     pagination = AuditLine.query.filter(AuditLine.bg_id == current_user.company_id).filter(AuditLine.code.like('%'+code+'%'), AuditLine.name.like('%'+name+'%')).order_by(AuditLine.code).paginate(page, per_page)
     lines = pagination.items
-    roles = AuditBizCode.query.order_by(AuditBizCode.name).all()
+    roles = AuditRole.query.order_by(AuditRole.name).all()
     return render_template('biz/audit/line/index.html', pagination=pagination, lines=lines, form=form, roles=roles)
 @bp_line.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -81,29 +81,32 @@ def edit(id):
 @login_required
 @log_record('获取模板审批线信息')
 def audit_nodes(line_id):
-    pass
-    # line = AuditLine.query.get_or_404(line_id)
-    # selected = [(user.id, user.user_name) for user in line.auditors]
-    # selected_ids = [user.id for user in line.auditors]
-    # for_select = [(user.id, user.user_name) for user in SysUser.query.filter(~SysUser.id.in_(selected_ids)).filter(SysUser.user_id != 'admin').all()]
-    # return jsonify(for_select=sorted(for_select, key=lambda e: e[1]), selected=sorted(selected, key=lambda e: e[1]))
+    rels = RelAuditLineRole.query.filter_by(audit_line_id=line_id).order_by(RelAuditLineRole.audit_grade).all()
+    nodes = []
+    for rel in rels:
+        role = AuditRole.query.get(rel.audit_role_id)
+        nodes.append(dict(role=role.name, grade=rel.audit_grade, people=','.join([user.user_name for user in role.auditors]), rel_id=rel.id))
+    return jsonify(nodes=nodes)
 @bp_line.route('/node_add', methods=['POST'])
 @login_required
 @log_record('保存模板审批线信息')
 def node_add():
     data = request.get_json()
-    # line_id, audit_nodes = data['line_id'], data['audit_nodes']
-    # # print('Performer ID : ', line_id)
-    # # print('People : ', audit_nodes)
-    # line = AuditLine.query.get_or_404(line_id)
-    # # 先移除已添加的人员再追加新指定的人员
-    # for auditor in line.auditors:
-    #     line.auditors.remove(auditor)
-    #     db.session.commit()
-    # # 保存最新的审批人
-    # for auditor_id in audit_nodes:
-    #     auditor = SysUser.query.get(auditor_id)
-    #     # print('User name : ', auditor.user_name)
-    #     line.auditors.append(auditor)
-    #     db.session.commit()
-    return jsonify(code=1, message='审批线维护成功!')
+    line_id, role_id = data['line_id'], data['role_id']
+    print('Line id is {}, role id is {}'.format(line_id, role_id))
+    grade = RelAuditLineRole.query.filter_by(audit_line_id=line_id).count() + 1
+    rel = RelAuditLineRole(id=uuid.uuid4().hex, audit_line_id=line_id, audit_role_id=role_id, audit_grade=grade, create_id=current_user.id)
+    db.session.add(rel)
+    db.session.commit()
+    return jsonify(code=1, message='审批角色添加成功!')
+@bp_line.route('/node_remove', methods=['POST'])
+@login_required
+@log_record('移除审批角色')
+def node_remove():
+    data = request.get_json()
+    rel_id = data['rel_id']
+    print('Rel id is {}.'.format(rel_id))
+    rel = RelAuditLineRole.query.get(rel_id)
+    db.session.delete(rel)
+    db.session.commit()
+    return jsonify(code=1, message='审批角色移除成功!')

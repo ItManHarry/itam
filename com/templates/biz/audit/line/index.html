@@ -39,7 +39,7 @@
                 <td>{%if line.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
                 <td class="text-center">
                     <a href="{{url_for('line.edit', id=line.id)}}" class="btn btn-link text-info" title="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                    <button class="btn btn-link text-success" onclick="set_line('{{line.name}}', '{{line.id}}')" title="审批线"><i class="bi bi-bezier"></i></button>&nbsp;
+                    <button class="btn btn-link text-success" onclick="show_line('{{line.name}}', '{{line.id}}')" title="审批线"><i class="bi bi-bezier"></i></button>&nbsp;
                 </td>
             </tr>
         {%endfor%}
@@ -71,36 +71,29 @@
                   </select>
               </div>
               <div class="col-3">
-                  <button class="btn btn-outline-success">添加到审批线</button>
+                  <button class="btn btn-outline-success" onclick="add_role()">添加到审批线</button>
               </div>
           </div><br>
           <div class="row align-items-center justify-content-center">
               <div class="col">
                   <table class="table table-sm">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col" width="40%">审批角色</th>
-      <th scope="col" width="40%">审批等级</th>
-      <th scope="col" width="20%">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Mark</td>
-      <td>Otto</td>
-        <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
-    </tr>
-    <tr>
-     <td>Jacob</td>
-      <td>Thornton</td>
-      <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
-    </tr>
-    <tr>
-      <td colspan="2">Larry the Bird</td>
-      <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
-    </tr>
-  </tbody>
-</table>
+                  <thead class="table-dark">
+                    <tr>
+                        <th scope="col" width="20%">审批角色</th>
+                        <th scope="col" width="40%">审批人员</th>
+                        <th scope="col" width="20%">审批等级</th>
+                        <th scope="col" width="20%">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="nodes">
+                    <tr>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>Jack,Harry,Tom</td>
+                        <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
           </div>
       </div>
@@ -112,25 +105,31 @@
 {% block script %}
     {{ super() }}
     var line_id = ''
-    function set_line(title, id){
+    //打开审批线
+    function show_line(title, id){
         line_id = id
         $('#modalTitle').text(title)
-        $('#lineModal').modal('show')
-        /*$.ajax({
+        get_nodes('init')
+    }
+    //添加审批角色(审批节点)
+    function add_role(){
+        var role_id = $('#roles').val()
+        $.ajax({
             type:'post',
-            url:'/line/people/'+id,
-            data:{},
+            url:'/line/node_add',
+            data:JSON.stringify({line_id:line_id, role_id:role_id}),
+            contentType:'application/json;charset=UTF-8',
             success:function(data){
-                $('#for_select').empty()
-                $('#selected').empty()
-                var for_select = data.for_select, selected = data.selected
-                for(var i = 0; i < for_select.length; i++){
-                    $('#for_select').append("<option value='"+for_select[i][0]+"'>"+for_select[i][1]+"</option>")
-                }
-                for(var i = 0; i < selected.length; i++){
-                    $('#selected').append("<option value='"+selected[i][0]+"'>"+selected[i][1]+"</option>")
-                }
-                $('#lineModal').modal('show')
+                if(data.code == 1)
+                    $.alert({
+                       type:'green',
+                       title:'系统提示',
+                       content: data.message,
+                       onClose:function(){
+                            //refresh audit nodes
+                            get_nodes('refresh')
+                       }
+                   })
             },
             error:function(){
                 $.alert({
@@ -142,65 +141,82 @@
                    }
                })
             }
-        })*/
-    }
-    function do_move(action){
-        var option = null
-        if(action == 1){    //若为1执行增加审批人
-            $('#for_select option').each(function(){
-                if($(this).is(':checked')){
-                    $('#selected').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
-                    $(this).remove()
-                }
-            })
-        }else{              //若为0执行移除审批人
-            $('#selected option').each(function(){
-                if($(this).is(':checked')){
-                    $('#for_select').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
-                    $(this).remove()
-                }
-            })
-        }
-    }
-    function do_save(){
-        var people = []
-        $('#selected option').each(function(){
-            people.push($(this).val())
         })
-        if(people.length == 0)
-            $.alert({
-               type:'red',
-               title:'系统提示',
-               content: '请添加审批人员！',
-               onClose:function(){}
-            })
-        else
-            $.ajax({
-                type:'post',
-                url:'/line/people_add',
-                data:JSON.stringify({line_id:line_id, people:people}),
-                contentType:'application/json;charset=UTF-8',
-                success:function(data){
-                    if(data.code == 1)
-                        $.alert({
-                           type:'green',
-                           title:'系统提示',
-                           content: data.message,
-                           onClose:function(){
-                                $('#lineModal').modal('hide')
-                           }
-                       })
-                },
-                error:function(){
-                    $.alert({
-                       type:'red',
-                       title:'系统提示',
-                       content: '系统错误,请联系管理员',
-                       onClose:function(){
-
-                       }
-                   })
+    }
+    //异步获取审批节点
+    function get_nodes(action){
+        $.ajax({
+            type:'post',
+            url:'/line/audit_nodes/'+line_id,
+            data:{},
+            success:function(data){
+                $('#nodes').empty()
+                var nodes = data.nodes
+                for(var i = 0; i < nodes.length; i++){
+                    $('#nodes').append("<tr>"+
+                            "<td>"+nodes[i].role+"</td>"+
+                            "<td>"+nodes[i].people+"</td>"+
+                            "<td>"+nodes[i].grade+"</td>"+
+                            "<td><button onclick='remove_role(\""+nodes[i].rel_id+"\")' class='btn btn-link text-danger "+(i!=nodes.length-1?"disabled":"")+"'><i class='bi bi-x-lg'></i></button></td>"+
+                    "</tr>")
                 }
-            })
+                if(action == 'init')
+                    $('#lineModal').modal('show')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    //移除审批角色(审批节点)
+    function remove_role(rel_id){
+        //alert('remove : '+rel_id)
+        $.confirm({
+            type:'red',
+            title: '确认将该审批角色移除?',
+            content: '移除前请务必确认对应审批单据均已审批完成!',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/line/node_remove',
+                        data:JSON.stringify({rel_id:rel_id}),
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){
+                                       //refresh audit nodes
+                                        get_nodes('refresh')
+                                   }
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
     }
 {% endblock %}
