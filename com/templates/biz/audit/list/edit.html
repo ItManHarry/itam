@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('审批')}}
+{#  此处添加form.id用于获取form表单上的值页面上看不见  #}
+{{form.id}}
+{{form.class1}}
+{{form.bill_type}}
+ <div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">单据信息</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-6">
+        {%if form.bill_type.data  == 'SI' %}
+        {{form.in_no.label}}
+        {{form.in_no(class='form-control' , disabled=True)}}
+        {% for message in form.in_no.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%elif form.bill_type.data  == 'SO' %}
+        {{form.out_no.label}}
+        {{form.out_no(class='form-control' , disabled=True)}}
+        {% for message in form.out_no.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%endif%}
+    </div>
+    <div class="col-md-6">
+        {%if form.bill_type.data  == 'SI' %}
+        {{form.in_date.label}}
+        {{form.in_date(class='form-control' , disabled=True)}}
+        {% for message in form.in_date.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%elif form.bill_type.data  == 'SO' %}
+        {{form.out_date.label}}
+        {{form.out_date(class='form-control' , disabled=True)}}
+        {% for message in form.out_date.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%endif%}
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-6">
+        {%if form.bill_type.data == 'SI'%}
+        {{form.charger_id.label}}
+        {{form.charger_id(class='form-control' , disabled=True)}}
+        {% for message in form.charger_id.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%elif form.bill_type.data == 'SO' %}
+        {{form.outcharger_id.label}}
+        {{form.outcharger_id(class='form-control' , disabled=True)}}
+        {% for message in form.outcharger_id.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+        {%endif%}
+    </div>
+    <div class="col-md-6">
+        {%if form.bill_type.data == 'SI' %}
+            {{form.state_id.label}}
+            {{form.state_id(class='form-control' , disabled=True)}}
+            {% for message in form.state_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        {%elif form.bill_type.data == 'SO' %}
+            {{form.outstate_id.label}}
+            {{form.outstate_id(class='form-control' , disabled=True)}}
+            {% for message in form.outstate_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        {%endif%}
+    </div>
+</div><br>
+{%if form.bill_type.data == 'SO' %}
+    <div class="row">
+        <div class="col-md-12">
+            {{form.summary.label}}
+            {{form.summary(class='form-control', rows='3')}}
+            {% for message in form.summary.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+{%endif%}
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">资产信息</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+        <th scope="col" width="7%">资产名称</th>
+        <th scope="col" width="7%">资产编号</th>
+        <th scope="col" width="7%">SAP资产编号</th>
+        <th scope="col" width="7%">品牌</th>
+        <th scope="col" width="7%">型号</th>
+        <th scope="col" width="6%">购买价格</th>
+        <th scope="col" width="7%">申请人</th>
+        <th scope="col" width="7%">申请法人</th>
+        <th scope="col" width="25%">申请部门</th>
+        <th scope="col" width="20%">申请概要</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                 <td>{{asset.class3.name}}</td>
+                <td>{{asset.code}}</td>
+                <td>{{asset.sap_code if asset.sap_code else '-'}}</td>
+                <td>{{asset.brand.name}}</td>
+                <td>{{asset.model.name}}</td>
+                <td>{{asset.buy_fee if asset.buy_fee else '-'}}</td>
+                <td>{{asset.buy_bill.application.applicant.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.company.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.department.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.summary if asset.buy_bill.application else '-'}}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="10" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">审批意见</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-12">
+        {{form.remark(class='form-control', rows='2')}}
+        {% for message in form.remark.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+    </div>
+</div>
+
+<br>
+<br>
+<div class="row">
+    <div class="col-md-12 text-end">
+
+        <button width="20"  class="btn btn-outline-success" onclick="approve()">
+           <i class="bi bi-arrow-90deg-right"></i>&nbsp;&nbsp;
+               通过
+        </button>&nbsp
+        <button width="20"  class="btn btn-outline-danger" onclick="reject()">
+           <i class="bi bi-arrow-return-left"></i>&nbsp;&nbsp;
+               否决
+        </button>&nbsp;&nbsp;
+
+        <a class="btn btn-outline-secondary" href="{{url_for('list.index',class1=1)}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+    </div>
+ </div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    //否决函数
+    function reject(){
+        var billtype = $('#bill_type').val()
+        var remark = $('#remark').val()
+<!--        用于防止空值报错-->
+        if(remark == '')
+        {
+         remark = '01'
+        }
+        if(billtype == 'SI')
+        {
+          var no = $('#in_no').val()
+        }
+        else if(billtype == 'SO')
+        {
+          var no = $('#out_no').val()
+        }
+        $.confirm({
+            type:'red',
+            title: '否决',
+            content: '确认审批退回?',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/list/reject/'+no+'/'+remark,
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){
+                                    //返回上一级
+                                    self.location=document.referrer
+<!--                                     window.history.back(-1)-->
+<!--                                     window.location.reload()-->
+
+                                    }
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
+    }
+    function approve(){
+        var billtype = $('#bill_type').val()
+        var remark = $('#remark').val()
+        if(remark == '')
+        {
+         remark = '01'
+        }
+        if(billtype == 'SI')
+        {
+          var no = $('#in_no').val()
+        }
+        else if(billtype == 'SO')
+        {
+          var no = $('#out_no').val()
+        }
+        $.confirm({
+            type:'red',
+            title: '审批',
+            content: '确认审批通过?',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/list/approve/'+no+'/'+remark,
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){
+                                    //返回上一级
+                                    self.location=document.referrer
+                                    }
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
+    }
+
+{% endblock %}

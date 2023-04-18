@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+<div class="row">
+    <div class="col-md-9">
+        <form method="post" id="search-form">
+          <div class="row">
+            <div class="col-2">
+                {{form.csrf_token}}
+                {{form.class1(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.class2(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.class3(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.brands(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.models(class='form-control', onchange='reload_data()')}}
+            </div>
+          </div>
+        </form>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('stock_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('stock_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+</div>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产分类</th>
+        <th scope="col" width="15%">二级分类</th>
+        <th scope="col" width="15%">三级分类</th>
+        <th scope="col" width="20%">品牌</th>
+        <th scope="col" width="10%">型号</th>
+        <th scope="col" width="10%">库存数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if stocks %}
+        {% for stock in stocks %}
+            <tr>
+                <td class="align-middle">{{stock.class1.name}}</td>
+                <td class="align-middle">{{stock.class2.name}}</td>
+                <td class="align-middle">{{stock.class3.name}}</td>
+                <td class="align-middle">{{stock.brand.name}}</td>
+                <td class="align-middle">{{stock.model.name}}</td>
+                <td class="align-middle">{{stock.amount}}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="8" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function reload_data(){
+        $('#search-form').submit()
+    }
+{% endblock %}

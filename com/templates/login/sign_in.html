@@ -1,0 +1,55 @@
+{% extends 'base.html'%}
+{%block title%}System Login Page{%endblock%}
+{%block style%}
+<style>
+    .bg{
+        background:url("{{url_for('static', filename='images/bg/1.jpg')}}") no-repeat center;
+        background-position: center 0;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        -webkit-background-size: cover;
+        -o-background-size: cover;
+        -moz-background-size: cover;
+        -ms-background-size: cover;
+    }
+</style>
+{%endblock%}
+{%block body%}
+<!--body class="bg"-->
+<body  class="bg-success p-2 text-dark bg-opacity-10">
+<form method="post" style="margin-top:100px;">
+    {{form.csrf_token}}
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <div class="form-floating">
+            {{form.user_id(class='form-control', placeholder='User ID')}}
+            {{form.user_id.label}}
+        </div>
+      </div>
+    </div><br>
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <div class="form-floating">
+            {{form.user_pwd(class='form-control', placeholder='User Password')}}
+            {{form.user_pwd.label}}
+        </div>
+      </div>
+    </div><br>
+    <div class="text-center text-danger">
+        {% if get_flashed_messages() %}
+            {% for message in get_flashed_messages() %}
+                <i class="bi bi-exclamation-triangle"></i>&nbsp;<small>{{ message }}</small>
+            {% endfor %}
+        {% endif %}
+    </div><br>
+    <div class="row justify-content-center">
+        <div class="col-4">
+            <div class="d-grid">
+                {{form.submit(class='btn btn-primary')}}
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+{%endblock%}

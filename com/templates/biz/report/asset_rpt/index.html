@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+    {{load_static_file('js','js/echarts.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+<div class="row">
+    <div class="col">
+        <form method="post" id="search-form">
+            <div class="row">
+                <div class="col-2">
+                    {{form.csrf_token}}
+                    {{form.class2.label}}
+                    {{form.class2(class='form-control', onchange='reload_data()')}}
+                </div>
+                <div class="col-2">
+                    {{form.class3.label}}
+                    {{form.class3(class='form-control', onchange='reload_data()')}}
+                </div>
+                <div class="col-1">
+                    {{form.brands.label}}
+                    {{form.brands(class='form-control', onchange='reload_data()')}}
+                </div>
+                <div class="col-1">
+                    {{form.models.label}}
+                    {{form.models(class='form-control', onchange='reload_data()')}}
+                </div>
+                <div class="col-1">
+                    {{form.code.label}}
+                    {{form.code(class='form-control', placeholder='资产编号')}}
+                </div>
+                <div class="col-1">
+                    {{form.sap_code.label}}
+                    {{form.sap_code(class='form-control', placeholder='SAP资产编号')}}
+                </div>
+                <div class="col-2">
+                    {{form.log_s.label}}
+                    <div class="input-group">
+                        {{form.log_s(class='form-control', readonly=True)}}
+                        <div class="input-group-prepend">
+                            <div class="btn-group" role="group">
+                              <button type="button" id="clear_start" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    {{form.log_e.label}}
+                    <div class="input-group">
+                        {{form.log_e(class='form-control', readonly=True)}}
+                        <div class="input-group-prepend">
+                            <div class="btn-group" role="group">
+                              <button type="button" id="clear_end" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col">
+        <div class="col text-end">
+            <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+              </button>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=1)}}" target="_blank">当前页</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">资产明细</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+{{render_pagination(pagination, align='right')}}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产名称</th>
+        <th scope="col" width="10%">资产编号</th>
+        <th scope="col" width="10%">SAP资产编号</th>
+        <th scope="col" width="10%">品牌</th>
+        <th scope="col" width="10%">型号</th>
+        <th scope="col" width="15%">供应商</th>
+        <th scope="col" width="5%">使用者</th>
+        <th scope="col" width="10%">资产状态</th>
+        <th scope="col" width="5%">库存状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                <td class="align-middle">{{asset.class3.name}}</td>
+                <td class="align-middle">{{asset.code}}</td>
+                <td class="align-middle">{{asset.sap_code}}</td>
+                <td class="align-middle">{{asset.brand.name}}</td>
+                <td class="align-middle">{{asset.model.name}}</td>
+                <td class="align-middle">{{asset.vendor.name}}</td>
+                <td class="align-middle">{{asset.user.name}}</td>
+                <td class="align-middle">{{asset.status.display}}</td>
+                <td class="align-middle">{%if asset.is_out%}<span class="text-secondary">已出库</span>{%else%}<span class="text-success">在库</span>{%endif%}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="9" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">统计图表</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="card">
+    <div class="card-body">
+        <div id="bar"></div>
+    </div>
+</div><br>
+ <div class="card">
+    <div class="card-body">
+        <div id="pie"></div>
+    </div>
+</div>
+<input type="hidden" id="asset_bar" value="{{asset_bar}}">
+<input type="hidden" id="asset_pie" value="{{asset_pie}}">
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date('log_s')
+        init_date('log_e')
+        $('#clear_start').click(function(){
+            $('#log_s').val('')
+        })
+        $('#clear_end').click(function(){
+            $('#log_e').val('')
+        })
+        var asset_bar = $('#asset_bar').val()
+        var asset_pie = $('#asset_pie').val()
+        var json = $.parseJSON(asset_bar)
+        var x = []
+        var y = []
+        for(var i = 0; i < json.length; i++){
+            for(var key in json[i]){
+                //alert(key+':'+json[i][key])
+                x.push(key)
+                y.push(json[i][key])
+            }
+        }
+        $("#bar").height($(document).height() * 0.4);
+        //初始化Echarts图表
+        var bar = echarts.init(document.getElementById('bar'))
+        //选项设置
+        var option = {
+            color: ['#3398DB'],
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            toolbox:{
+                show:true,
+                feature:{
+                    saveAsImage:{
+                        show:true
+                    }
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        interval:0,
+                        rotate: 45  //倾斜的程度
+                    },
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '数量',
+                    type: 'bar',
+                    barWidth: '60%',
+                    data: y,
+                    itemStyle: {
+                      normal: {
+                        label: {
+                          show: true,           //开启显示数值
+                          position: 'top',      //数值在上方显示
+                          textStyle: {          //数值样式
+                            color: '#000',      //字体颜色
+                            fontSize: 14        //字体大小
+                          }
+                        }
+                      }
+                    }
+                }
+            ]
+        }
+        //设置选项
+        bar.setOption(option)
+        var json = $.parseJSON(asset_pie)
+        var xs = [], data = []
+        for(var i = 0; i < json.length; i++){
+            for(var key in json[i]){
+                //alert(key+':'+json[i][key])
+                xs.push(key)
+                data.push({'name': key, 'value': json[i][key]})
+            }
+        }
+        $("#pie").height($(document).height() * 0.4);
+        //初始化Echarts图表
+        var pie = echarts.init(document.getElementById('pie'));
+        //选项设置
+        var option = {
+            tooltip: {
+                trigger:"item",	//不设置默认为item
+                formatter:"{a} <br>{b} : {c} ({d}%)" //a:系列名称 b:数据项名称 c:数值 d:(饼图：百分比 | 雷达图：指标名称)
+            },
+            legend: {
+                orient:"vertical",
+                left:"left",
+                data: xs
+            },
+            toolbox:{
+                show:true,
+                feature:{
+                    saveAsImage:{
+                        show:true
+                    }
+                }
+            },
+            calculable:true,
+            series: [{
+                name:"资产数量",
+                type:"pie",
+                radius:"70%", //半径：支持绝对值（px）和百分比， 百分比计算比：min(width,height) / 2 * 75%,传数组实现环形图[内半径，外半径]
+                center:["50%","60%"], //圆心坐标：支持绝对值（px）和百分比， 百分比计算比：min(width,height) * 50%
+                itemStyle:{
+                    normal:{
+                        label:{
+                            show:true,
+                            formatter:"{b}: {c} ({d}%)"
+                        }
+                    }
+                },
+                data:data
+            }]
+        };
+        //设置选项
+        pie.setOption(option);
+    })
+    function reload_data(){
+        $('#search-form').submit()
+    }
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+<div class="row">
+    <div class="col-md-9">
+        <form method="post" id="search-form">
+          <div class="row">
+            <div class="col-2">
+                {{form.csrf_token}}
+                {{form.companies(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-5">
+                {{form.departments(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.employees(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.sap_code(class='form-control', placeholder='SAP资产编号')}}
+            </div>
+          </div>
+        </form>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('asset_sap_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('asset_sap_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+</div>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="5%">所属法人</th>
+        <th scope="col" width="15%">所属部门</th>
+        <th scope="col" width="15%">资产名称</th>
+        <th scope="col" width="5%">资产编号</th>
+        <th scope="col" width="7%">主资产编号</th>
+        <th scope="col" width="10%">SAP资产编号</th>
+        <th scope="col" width="5%">品牌</th>
+        <th scope="col" width="5%">型号</th>
+        <th scope="col" width="10%">供应商</th>
+        <th scope="col" width="5%">使用者</th>
+        <th scope="col" width="8%">登记日期</th>
+        <th scope="col" width="5%">资产状态</th>
+        <th scope="col" width="5%">库存状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                <td class="align-middle">{{asset.company.name}}</td>
+                <td class="align-middle">{{asset.department.name}}</td>
+                <td class="align-middle">{{asset.class3.name}}</td>
+                <td class="align-middle">{{asset.code}}</td>
+                <td class="align-middle">{{asset.get_parent_asset.code if asset.get_parent_asset else ''}}</td>
+                <td class="align-middle">{{asset.sap_code}}</td>
+                <td class="align-middle">{{asset.brand.name}}</td>
+                <td class="align-middle">{{asset.model.name}}</td>
+                <td class="align-middle">{{asset.vendor.name}}</td>
+                <td class="align-middle">{{asset.user.name}}</td>
+                <td class="align-middle">{{asset.reg_date}}</td>
+                <td class="align-middle">{{asset.status.display}}</td>
+                <td class="align-middle">{%if asset.is_out%}<span class="text-secondary">已出库</span>{%else%}<span class="text-success">在库</span>{%endif%}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="13" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function reload_data(){
+        $('#search-form').submit()
+    }
+{% endblock %}

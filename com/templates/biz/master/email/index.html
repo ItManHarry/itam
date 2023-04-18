@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+
+<div class="row">
+    <div class="col text-end">
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('email.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+</div>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="10%">邮件配置代码</th>
+        <th scope="col" width="10%">邮件配置名称</th>
+        <th scope="col" width="35%">邮件收件人</th>
+        <th scope="col" width="35%">邮件参照人</th>
+        <th scope="col" width="5%">状态</th>
+        <th scope="col" class="text-center" width="5%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if emails %}
+        {% for email in emails %}
+            <tr>
+                <td class="align-middle">{{email.code}}</td>
+                <td class="align-middle">{{email.name}}</td>
+                <td class="align-middle">{{email.email_to}}</td>
+                <td class="align-middle">{{email.email_cc}}</td>
+                <td class="align-middle">{%if email.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('email.edit', id=email.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="6" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function load_companies(){
+        $('form').submit()
+    }
+{% endblock %}

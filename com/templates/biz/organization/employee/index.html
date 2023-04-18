@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-2 text-end">
+        {{form.csrf_token}}
+        {{form.code(class='form-control', placeholder='职号')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.name(class='form-control', placeholder='姓名')}}
+    </div>
+    <div class="col-4 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('employee.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('employee.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('employee.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="5%">法人</th>
+        <th scope="col" width="10%">职号</th>
+        <th scope="col" width="10%">姓名</th>
+        <th scope="col" width="20%">部门</th>
+        <th scope="col" width="20%">邮箱</th>
+        <th scope="col" width="15%">电话</th>
+        <th scope="col" width="5%">状态</th>
+        <th scope="col" class="text-center" width="15%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if employees %}
+        {% for employee in employees %}
+            <tr>
+                <td class="align-middle">{{employee.company.name}}</td>
+                <td class="align-middle">{{employee.code}}</td>
+                <td class="align-middle">{{employee.name}}</td>
+                <td class="align-middle">{{employee.department.name}}</td>
+                <td class="align-middle">{{employee.email if employee.email else '-'}}</td>
+                <td class="align-middle">{{employee.phone if employee.phone else '-'}}</td>
+                <td class="align-middle">{%if employee.active%}<span class="text-success">在职</span>{%else%}<span class="text-danger">离职</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('employee.edit', id=employee.id)}}" class="btn btn-link text-info {%if current_user.is_admin%}disabled{%endif%}"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="停用" class="btn btn-link text-danger {%if not employee.active or current_user.is_admin%}disabled{%endif%}" onclick="status('{{employee.id}}', 0)"><i class="bi bi-x-circle"></i></button>&nbsp;
+                    <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="启用" class="btn btn-link text-success {%if employee.active or current_user.is_admin%}disabled{%endif%}" onclick="status('{{employee.id}}', 1)"><i class="bi bi-check-circle"></i></button>
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="8" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function status(id, status){
+        $.ajax({
+            type:'post',
+            url:'/employee/status/'+id+'/'+status,
+            //data:JSON.stringify({code:$.trim($("#code").val()), name:$.trim($("#name").val()), password:$.trim($("#password").val())}),
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.code == 1)
+                    location.reload()
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+{% endblock %}

@@ -1,0 +1,78 @@
+<!-- 条码打印窗体 -->
+<div class="modal fade" id="barModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="barModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="barModalTitle">资产条码</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td style="background-color:#eee;">资产代码(SAP)</td>
+              <td id="asset_sap_code">&nbsp;</td>
+              <td style="background-color:#eee;">采购日期</td>
+              <td id="asset_buy_date">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="background-color:#eee;">资产名称</td>
+              <td id="asset_name">&nbsp;</td>
+              <td style="background-color:#eee;">资产编号</td>
+              <td id="asset_code">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="background-color:#eee;">型号</td>
+              <td colspan="3" id="asset_model">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="background-color:#eee;">管理部门</td>
+              <td>DICI IT/PI</td>
+              <td style="background-color:#eee;">数量</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="text-center">
+                <img id="asset_bar" src="">
+              </td>
+            </tr>
+            {#<tr>
+              <td colspan="4" class="text-center">
+                ※&nbsp;&nbsp;本装备由斗山(中国)投资有限公司所有移动及销毁请事先取得主管部门的许可&nbsp;&nbsp;※
+              </td>
+            </tr>#}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;关闭</button>
+        <button id="print_btn" class="btn btn-outline-primary"><i class="bi bi-printer"></i>&nbsp;&nbsp;打印</button>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="hidden" id="print_asset_id">
+<script>
+    $(function(){
+      $('#print_btn').click(function(){
+        $.post('/master/card_print/'+$('#print_asset_id').val(), function(data){
+            if(data.code == 0){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: data.message,
+                   onClose:function(){}
+                })
+            }else{
+                $.alert({
+                   type:'green',
+                   title:'系统提示',
+                   content: data.message,
+                   onClose:function(){}
+                })
+                $('#barModal').modal('hide')
+            }
+        }, 'json')
+      })
+    })
+</script>

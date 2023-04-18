@@ -1,0 +1,11 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, validators
+class SearchForm(FlaskForm):
+    class1 = SelectField('资产大类', [validators.optional()], choices=[])
+    class2 = SelectField('资产分类', [validators.optional()], choices=[])
+    class3 = SelectField('资产名称', [validators.optional()], choices=[])
+    brands = SelectField('品牌', [validators.optional()], choices=[])
+    models = SelectField('型号', [validators.optional()], choices=[])
+    code = StringField('资产编号', [validators.optional()])
+    sap_code = StringField('SAP资产编号', [validators.optional()])
+    io_class = SelectField('出入库类型', [validators.optional()], choices=[])

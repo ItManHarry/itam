@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{%if form.class1.data==1%}
+{{current_location('资产登记')}}
+{%else%}
+{{current_location('耗材登记')}}
+{%endif%}
+<form method="post">
+    {{form.csrf_token}}
+    {{form.class1}}
+    {{form.class3_id}}
+    {{form.model_id}}
+    {{form.used_by_id}}
+    {{form.parent_asset_id}}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">主信息</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.class2.label}}
+            {{form.class2(class='form-control')}}
+            {% for message in form.class2.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            <label for="class3">资产名称</label>
+            <select id="class3" class="form-control"></select>
+            {% for message in form.class3_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.brands.label}}
+            {{form.brands(class='form-control')}}
+            {% for message in form.brands.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            <label for="models">型号</label>
+            <select id="models" class="form-control"></select>
+            {% for message in form.model_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.code.label}}
+            {{form.code(class='form-control', placeholder='系统自动生成......', readonly=True)}}
+        </div>
+        <div class="col-md-3">
+            {{form.sap_code.label}}
+            {%if form.class1.data==1%}
+            {{form.sap_code(class='form-control', placeholder='SAP资产号......')}}
+            {%else%}
+            {{form.sap_code(class='form-control', placeholder='SAP资产号......', disabled=True)}}
+            {%endif%}
+        </div>
+        <div class="col-md-3">
+            {{form.used_by.label}}
+            <div class="input-group">
+                {{form.used_by(class='form-control', readonly=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="select_employee()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            {% for message in form.used_by.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.parent_asset.label}}
+            <div class="input-group">
+                {{form.parent_asset(class='form-control', readonly=True)}}
+                <div class="input-group-prepend">
+                    <span class="btn btn-secondary" id="choose_parent" ><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.buy_no.label}}
+            {{form.buy_no(class='form-control', placeholder='购买单号......')}}
+            {% for message in form.buy_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.buy_date.label}}
+            {{form.buy_date(class='form-control', placeholder='购买日期......', readonly=True)}}
+            {% for message in form.buy_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.buy_fee.label}}
+            {{form.buy_fee(class='form-control', placeholder='购买金额......')}}
+            {% for message in form.buy_fee.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.store.label}}
+            {{form.store(class='form-control')}}
+        </div>
+    </div><br>
+    {%if form.class1.data==0%}
+    <div class="row">
+        <div class="col-md-1">
+            {{form.reg_amount.label}}
+            <div class="input-group">
+                {{form.reg_amount(class='form-control')}}
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="reg_unit">&nbsp;</span>
+                </div>
+            </div>
+            {% for message in form.reg_amount.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    {%endif%}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">维保信息</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.vendors.label}}
+            {{form.vendors(class='form-control')}}
+            {% for message in form.vendors.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.contact_person.label}}
+            {{form.contact_person(class='form-control', placeholder='联系人......', readonly=True)}}
+        </div>
+        <div class="col-md-3">
+            {{form.contact_phone.label}}
+            {{form.contact_phone(class='form-control', placeholder='联系电话......', readonly=True)}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.start_date.label}}
+            {{form.start_date(class='form-control', placeholder='维保开始日期......', readonly=True)}}
+            {% for message in form.start_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.expire_date.label}}
+            {{form.expire_date(class='form-control', placeholder='维保到期日期......', readonly=True)}}
+            {% for message in form.expire_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    {%if form.class1.data==1%}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">属性信息</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.system_os.label}}
+            {{form.system_os(class='form-control', placeholder='操作系统......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.cpu.label}}
+            {{form.cpu(class='form-control', placeholder='CPU......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.memory.label}}
+            {{form.memory(class='form-control', placeholder='内存......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.disk.label}}
+            {{form.disk(class='form-control', placeholder='硬盘......')}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.screen_ratio.label}}
+            {{form.screen_ratio(class='form-control', placeholder='显示器分辨率......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.screen_size.label}}
+            {{form.screen_size(class='form-control', placeholder='显示器尺寸......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.serial_no.label}}
+            {{form.serial_no(class='form-control', placeholder='序列号......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.inf.label}}
+            {{form.inf(class='form-control', placeholder='接口......')}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.mac.label}}
+            {{form.mac(class='form-control', placeholder='MAC地址......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.battery.label}}
+            {{form.battery(class='form-control', placeholder='电池......')}}
+        </div>
+        <div class="col-md-3">
+            {{form.power.label}}
+            {{form.power(class='form-control', placeholder='功率......')}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col">
+            {{form.remark.label}}
+            {{form.remark(class='form-control', placeholder='备注......', rows=3)}}
+        </div>
+    </div><br>
+    {%endif%}
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('master.index', class1=form.class1.data)}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+{# 选择使用者(雇员信息) #}
+{% include 'comm/_select_employee.html' %}
+{# 选择主资产,前提是选择了使用者 #}
+<div class="modal fade" id="parentAssetModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="parentModalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <ul class="list-group" id="assets"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date('buy_date')
+        init_date('start_date')
+        init_date('expire_date')
+        if($('#class2').val() != '0')
+            set_class3_options(0)
+        if($('#brands').val() != '0')
+            set_model_options(0)
+        //二级分类change事件响应
+        $('#class2').change(function(){
+            if($(this).val() == '0')
+                $('#class3').empty()
+            else
+                set_class3_options(1)
+        })
+        $('#class3').change(function(){
+            $('#class3_id').val($(this).val())
+            set_reg_unit()
+        })
+        $('#brands').change(function(){
+            if($(this).val() == '0')
+                $('#models').empty()
+            else
+                set_model_options(1)
+        })
+        $('#models').change(function(){
+            $('#model_id').val($(this).val())
+        })
+        $('#vendors').change(function(){
+            if($(this).val() == '0'){
+                $('#contact_person').val('')
+                $('#contact_phone').val('')
+            }else{
+                $.ajax({
+                    type:'post',
+                    url:'/vendor/get_vendor_info/'+$('#vendors').val(),
+                    data:{},
+                    success:function(data){
+                        $('#contact_person').val(data.contactor)
+                        $('#contact_phone').val(data.phone)
+                    },
+                    error:function(){
+                        $.alert({
+                           type:'red',
+                           title:'系统提示',
+                           content: '系统错误,请联系管理员',
+                           onClose:function(){
+
+                           }
+                       })
+                    }
+                })
+            }
+        })
+        $('#choose_parent').click(function(){
+            if($('#used_by').val() == ''){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '请选择使用人！',
+                   onClose:function(){
+
+                   }
+                })
+            }else{
+                $.ajax({
+                    type:'post',
+                    url:'/employee/get_assets/'+$('#used_by_id').val()+'/0',
+                    data:{},
+                    success:function(data){
+                        $('#assets').empty()
+                        var assets = data.assets
+                        if(assets.length > 0)
+                            for(var i = 0; i < assets.length; i++){
+                                //alert(assets[i][0])
+                                $('#assets').append("<button onclick='set_parent_asset(this)' id='"+assets[i][0]+"' class='list-group-item list-group-item-action'><span class='text-success'><i class='bi bi-check2-circle'></i>&nbsp;&nbsp;</span>"+assets[i][1]+"("+assets[i][2]+")</button>")
+                            }
+                        else
+                            $('#assets').html('<h5 class="text-danger text-center">当前使用者无资产可选！</h5>')
+                        $('#parentModalTitle').html($('#used_by').val()+'名下资产&nbsp;&nbsp;&gt;&gt;')
+                        $('#parentAssetModal').modal('show')
+                    },
+                    error:function(){
+                        $.alert({
+                           type:'red',
+                           title:'系统提示',
+                           content: '系统错误,请联系管理员',
+                           onClose:function(){
+
+                           }
+                       })
+                    }
+                })
+            }
+        })
+    })
+    function set_class3_options(trigger){
+        $.ajax({
+            type:'post',
+            url:'/clazz/get_class3_options/'+$('#class2').val(),
+            data:{},
+            success:function(data){
+                $('#class3').empty()
+                var options = data.options
+                for(var i = 0; i < options.length; i++){
+                    $('#class3').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                }
+                if(trigger==0)
+                    $('#class3').val($('#class3_id').val())
+                else
+                    if(options.length > 0)
+                        $('#class3_id').val($('#class3').val())
+                    else
+                        $('#class3_id').val('')
+                //耗材设置登记数量对应的单位
+                if($('#class1').val() == 0){
+                    if($('#class3').val() != null)
+                        set_reg_unit()
+                }
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function set_reg_unit(){
+        //alert('set register amount unit...'+$('#class3').val())
+        $.ajax({
+            type:'post',
+            url:'/clazz/get_class3_unit/'+$('#class3').val(),
+            data:{},
+            success:function(data){
+                $('#reg_unit').text(data.unit)
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function set_model_options(trigger){
+        $.ajax({
+            type:'post',
+            url:'/brand/get_model_options/'+$('#brands').val(),
+            data:{},
+            success:function(data){
+                $('#models').empty()
+                var options = data.options
+                for(var i = 0; i < options.length; i++){
+                    $('#models').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                }
+                if(trigger==0)
+                    $('#models').val($('#model_id').val())
+                else
+                    if(options.length > 0)
+                        $('#model_id').val($('#models').val())
+                    else
+                        $('#model_id').val('')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function select_employee(){
+        e_id = 'used_by_id'
+        e_all = 'used_by'
+        $('#employeeModal').modal('show')
+    }
+    function set_parent_asset(e){
+        $('#parent_asset_id').val($(e).attr('id'))
+        $('#parent_asset').val($(e).text())
+        $('#parentAssetModal').modal('hide')
+    }
+{% endblock %}

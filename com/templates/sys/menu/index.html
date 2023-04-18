@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-6 text-end">
+        {{form.csrf_token}}
+        {{form.name(class='form-control', placeholder='菜单名称')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary" href="{{url_for('menu.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="10%">所属模块</th>
+        <th scope="col" width="10%">菜单代码</th>
+        <th scope="col" width="10%">菜单名称</th>
+        <th scope="col" width="15%">菜单URL</th>
+        <th scope="col" width="30%">菜单说明</th>
+        <th scope="col" width="5%">排序</th>
+        <th scope="col" width="5%">状态</th>
+        <th scope="col" class="text-center" width="15%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if menus %}
+        {% for menu in menus %}
+            <tr>
+                <td class="align-middle">{{menu.module.name}}</td>
+                <td class="align-middle">{{menu.code}}</td>
+                <td class="align-middle">{{menu.name}}</td>
+                <td class="align-middle">{{menu.url}}</td>
+                <td class="align-middle">{{menu.remark|truncate(length=20 ,killwords=False,end='...')}}</td>
+                <td class="align-middle">{{menu.order_by}}</td>
+                <td class="align-middle">{%if menu.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('menu.edit', id=menu.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    {#
+                    <button class="btn btn-link text-danger {%if not menu.active%}disabled{%endif%}" title="停用" onclick="status('{{menu.id}}', 0)"><i class="bi bi-x-circle"></i></button>&nbsp;
+                    <button class="btn btn-link text-success {%if menu.active%}disabled{%endif%}" title="启用" onclick="status('{{menu.id}}', 1)"><i class="bi bi-check-circle"></i></button>
+                    #}
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="8" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function status(id, status){
+        $.ajax({
+            type:'post',
+            url:'/menu/status/'+id+'/'+status,
+            //data:JSON.stringify({code:$.trim($("#code").val()), name:$.trim($("#name").val()), password:$.trim($("#password").val())}),
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.code == 1)
+                    location.reload()
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+{% endblock %}

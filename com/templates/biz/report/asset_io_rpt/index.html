@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+<div class="row">
+    <div class="col-md-9">
+        <form method="post" id="search-form">
+          <div class="row">
+            <div class="col-2">
+                {{form.csrf_token}}
+                {{form.class2(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.class3(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-1">
+                {{form.brands(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-1">
+                {{form.models(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.code(class='form-control', placeholder='资产编号')}}
+            </div>
+            <div class="col-2">
+                {{form.sap_code(class='form-control', placeholder='SAP资产编号')}}
+            </div>
+            <div class="col-2">
+                {{form.io_class(class='form-control', onchange='reload_data()')}}
+            </div>
+          </div>
+        </form>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('asset_io_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('asset_io_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+</div>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产名称</th>
+        <th scope="col" width="10%">资产编号</th>
+        <th scope="col" width="10%">SAP资产编号</th>
+        <th scope="col" width="10%">品牌</th>
+        <th scope="col" width="10%">型号</th>
+        <th scope="col" width="15%">供应商</th>
+        <th scope="col" width="5%">使用者</th>
+        <th scope="col" width="10%">出入库类型</th>
+        <th scope="col" width="5%">出入库数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if histories %}
+        {% for history in histories %}
+            <tr>
+                <td class="align-middle">{{history.asset.class3.name}}</td>
+                <td class="align-middle">{{history.asset.code}}</td>
+                <td class="align-middle">{{history.asset.sap_code if history.asset.sap_code else ''}}</td>
+                <td class="align-middle">{{history.asset.brand.name}}</td>
+                <td class="align-middle">{{history.asset.model.name}}</td>
+                <td class="align-middle">{{history.asset.vendor.name}}</td>
+                <td class="align-middle">{{history.asset.user.name}}</td>
+                <td class="align-middle">{{history.io_class.display}}</td>
+                <td class="align-middle">{{history.amount}}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="9" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function reload_data(){
+        $('#search-form').submit()
+    }
+{% endblock %}

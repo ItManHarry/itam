@@ -1,0 +1,125 @@
+<!-- 资产变更使用者 -->
+<div class="modal fade" id="exuserModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exuserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exuserModalTitle">资产变更</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="pre_user" class="form-label">当前使用者</label>
+              <input type="text" class="form-control" id="pre_user" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="new_user" class="form-label">变更为</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="new_user" readonly>
+                <div class="input-group-prepend">
+                    <span onclick="select_new_user()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            </div>
+          </div><br>
+          <input type="hidden" id="pre_user_id">
+          <input type="hidden" id="new_user_id">
+          <input type="hidden" id="change_asset_id">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;关闭</button>
+        <button id="save_change" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        <table class="table table-hover caption-top">
+          <caption>变更履历</caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">当前使用者</th>
+              <th scope="col">上一使用者</th>
+              <th scope="col">变更时间</th>
+            </tr>
+          </thead>
+          <tbody id="change-history">
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>the Bird</td>
+              <td>@twitter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        $('#save_change').click(function(){
+          if($('#new_user').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '请选择新的使用者！',
+               onClose:function(){
+
+               }
+            })
+          }else{
+            var params = {
+              pre_user: $('#pre_user_id').val(),
+              new_user: $('#new_user_id').val(),
+              asset_id: $('#change_asset_id').val()
+            }
+            $.ajax({
+                type:'post',
+                url:'/master/change_user',
+                data:JSON.stringify(params),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#exuserModal').modal('hide')
+                                //刷新页面
+                                window.location.reload()
+                           }
+                       })
+
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                    })
+                }
+            })
+          }
+        })
+    })
+    function select_new_user(){
+        e_id = 'new_user_id'
+        e_all = 'new_user'
+        $('#employeeModal').modal('show')
+    }
+</script>

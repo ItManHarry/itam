@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" class="login-content" data-ng-app="materialAdmin">
+ <head>
+  <meta charset="UTF-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>ITAM Login</title> 
+  <!-- ICON -->
+  <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='images/icon/sys.ico')}}">
+  <!-- Vendor CSS -->
+  <link href="{{url_for('static', filename='login/css/material-design-iconic-font.min.css')}}" rel="stylesheet" type="text/css">
+  <!-- CSS -->
+  <link href="{{url_for('static', filename='login/css/app.min.1.css')}}" rel="stylesheet" type="text/css">
+ </head>
+ <body class="login-content" data-ng-controller="loginCtrl as lctrl">
+    <div class="lc-block" id="l-login" data-ng-class="{'toggled':lctrl.login === 1}">
+		<form method="post" action="{{url_for('auth.login')}}">
+			{{form.csrf_token}}
+			<h1 class="lean">ITAM</h1>
+			<div class="input-group m-b-20">
+				<span class="input-group-addon">
+					<i class="zmdi zmdi-account"></i>
+				</span>
+				<div class="fg-line">
+					{{form.user_id(class='form-control', placeholder='User ID')}}
+				</div>
+			</div>
+			<div class="input-group m-b-20">
+				<span class="input-group-addon">
+					<i class="zmdi zmdi-key"></i>
+				</span>
+				<div class="fg-line">
+					{{form.user_pwd(class='form-control', placeholder='User Password')}}
+				</div>
+			</div>
+			<div class="input-group m-b-20">
+				<div class="fg-line">
+					{%if get_flashed_messages()%}
+						{%for message in get_flashed_messages()%}
+							<small style="color:#dc3545;"><i class="zmdi zmdi-info-outline"></i>&nbsp;{{message}}</small>
+						{%endfor%}
+					{%endif%}
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<button class="btn btn-login btn-success btn-float">
+				<i class="zmdi zmdi-sign-in"></i>
+			</button>
+		</form>
+	</div>
+</body>
+ 	<!-- jQuery -->
+ 	<script src="{{url_for('static', filename='js/jquery-3.6.0.min.js')}}"></script>
+ 	<!-- Angular -->
+	<script src="{{url_for('static', filename='login/js/bower_components/angular/angular.min.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-resource/angular-resource.min.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-animate/angular-animate.min.js')}}"></script>
+	<!-- Angular Modules -->
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-ui-router/release/angular-ui-router.min.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-loading-bar/src/loading-bar.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/oclazyload/dist/ocLazyLoad.min.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js')}}"></script>
+	<!-- Common js -->
+	<script src="{{url_for('static', filename='login/js/bower_components/angular-nouislider/src/nouislider.min.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/bower_components/ng-table/dist/ng-table.min.js')}}"></script>
+	<!-- Placeholder for IE9 -->
+	<!--[if IE 9 ]>
+	    <script src="{{url_for('static', filename='login/js/bower_components/jquery-placeholder/jquery.placeholder.min.js')}}"></script>
+	<![endif]-->
+	<!-- App level -->
+	<script src="{{url_for('static', filename='login/js/app.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/controllers/main.js')}}"></script>
+	<script src="{{url_for('static', filename='login/js/controllers/ui-bootstrap.js')}}"></script>
+	<!-- Template Modules -->
+	<script src="{{url_for('static', filename='login/js/modules/form.js')}}"></script>
+</html>

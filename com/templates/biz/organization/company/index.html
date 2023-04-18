@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-4 offset-6">
+        {{form.csrf_token}}
+        {{form.enterprise(class='form-control', onchange='load_companies()')}}
+    </div>
+    <div class="col-2 text-end">
+        <a class="btn btn-outline-primary" href="{{url_for('company.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="20%">所属事业处</th>
+        <th scope="col" width="20%">法人代码</th>
+        <th scope="col" width="20%">法人名称</th>
+        <th scope="col" width="20%">状态</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if companies %}
+        {% for company in companies %}
+            <tr>
+                <td class="align-middle">{{company.enterprise.name}}</td>
+                <td class="align-middle">{{company.code}}</td>
+                <td class="align-middle">{{company.name}}</td>
+                <td class="align-middle">{%if company.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('company.edit', id=company.id)}}" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="5" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function load_companies(){
+        $('form').submit()
+    }
+{% endblock %}

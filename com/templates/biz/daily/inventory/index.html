@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-3 text-end">
+        {{form.csrf_token}}
+        {{form.check_no(class='form-control', placeholder='盘点单号')}}
+    </div>
+    <div class="col-3 text-end">
+        <div class="input-group">
+            {{form.check_year(class='form-control', placeholder='盘点年份', readonly=True)}}
+            <div class="input-group-prepend">
+                <span id="clear_year" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary" href="{{url_for('inventory.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<div class="row">
+    <div class="col text-end">
+        <button class="btn btn-link text-success" id="results"><i class="bi bi-upload"></i>&nbsp;&nbsp;盘点结果导入</button>&nbsp;
+    </div>
+</div><br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="20%">盘点单号</th>
+        <th scope="col" width="15%">盘点年份</th>
+        <th scope="col" width="10%">盘点批次</th>
+        <th scope="col" width="10%">盘点担当</th>
+        <th scope="col" width="15%">计划开始日期</th>
+        <th scope="col" width="15%">计划完成日期</th>
+        <th scope="col" class="text-center" width="15%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if inventories %}
+        {% for inventory in inventories %}
+            <tr>
+                <td class="align-middle">{{inventory.check_no}}</td>
+                <td class="align-middle">{{inventory.check_year}}</td>
+                <td class="align-middle">{{inventory.check_batch}}</td>
+                <td class="align-middle">{{inventory.checker.name}}</td>
+                <td class="align-middle">{{inventory.plan_start_date}}</td>
+                <td class="align-middle">{{inventory.plan_finish_date}}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('inventory.edit', id=inventory.id)}}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="盘点清单导出" class="btn btn-link text-success" href="{{url_for('inventory.export', inventory_id=inventory.id)}}" target="_blank"><i class="bi bi-file-earmark-excel"></i></a>&nbsp;
+                    <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="自盘点通知" class="btn btn-link text-primary" onclick="self_check('{{inventory.id}}')"><i class="bi bi-megaphone"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="7" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+<div class="modal fade" id="fileModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fileModalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form id="fileForm" method="post">
+              <label for="checkFile" class="form-label">导入盘点结果</label>
+              <input class="form-control" type="file" id="checkFile">
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;&nbsp;关闭</button>
+        <button type="button" id="upload" class="btn btn-outline-primary">
+            <span id="ub"><i class="bi bi-upload"></i>&nbsp;&nbsp;导入</span>
+            <span id="up">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                正在导入......
+            </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date_year('check_year')
+        $('#up').hide()
+        $('#check_no').keyup(function(event){
+          if(event.keyCode == 13){
+            reload_data()
+          }
+        })
+        $('#clear_year').click(function(event){
+            $('#check_year').val('')
+        })
+        $('#results').click(function(){
+            $('#fileModal').modal('show')
+        })
+        /*$('#checkFile').change(function(e){
+            var files = e.target.files
+            var form_data = new FormData()
+            form_data.append('file', files[0])
+            alert(form_data)
+            $.ajax({
+                url:'/inventory/import_back',
+                type: 'post',
+                data: form_data,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(data, status){
+                    alert(data.code+' : '+data.message)
+                },
+                error: function(data, status, e){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统异常，请联系管理员！',
+                       onClose:function(){}
+                    })
+                }
+            })
+        })*/
+        $('#upload').click(function(){
+            if($('#checkFile').val() == ''){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '请选择要上传的Excel文件！',
+                   onClose:function(){}
+                })
+            }else{
+                files = document.getElementById('checkFile').files
+                var form_data = new FormData()
+                form_data.append('file', files[0])
+                $('#upload').prop('disabled', true)
+                $('#ub').hide()
+                $('#up').show()
+                $.ajax({
+                    url:'/inventory/import_back',
+                    type: 'post',
+                    data: form_data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function(data, status){
+                        if(data.code == '0')
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: data.message,
+                               onClose:function(){
+                                    $('#upload').prop('disabled', false)
+                                    $('#ub').show()
+                                    $('#up').hide()
+                                    $('#checkFile').val('')
+                               }
+                            })
+                        else
+                             $.alert({
+                                type:'green',
+                                title:'系统提示',
+                                content: data.message,
+                                onClose:function(){
+                                    $('#upload').prop('disabled', false)
+                                    $('#ub').show()
+                                    $('#up').hide()
+                                    $('#checkFile').val('')
+                                    $('#fileModal').modal('hide')
+                                }
+                             })
+                    },
+                    error: function(data, status, e){
+                        $.alert({
+                           type:'red',
+                           title:'系统提示',
+                           content: '系统异常，请联系管理员！',
+                           onClose:function(){}
+                        })
+                    }
+                })
+            }
+        })
+    })
+    function reload_data(){
+        $('form').submit()
+    }
+    function self_check(inventory_id){
+        $.post('/inventory/self_check/'+inventory_id, function(data){
+            if(data.code == 0){
+                $.alert({
+                   type:'green',
+                   title:'系统提示',
+                   content: data.message,
+                   onClose:function(){}
+                })
+            }
+        }, 'json')
+    }
+{% endblock %}

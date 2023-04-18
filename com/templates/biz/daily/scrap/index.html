@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 text-end">
+        {{form.csrf_token}}
+        {{form.asset_no(class='form-control', placeholder='资产编号')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.scrap_no(class='form-control', placeholder='报废单号')}}
+    </div>
+
+    <div class="col-6 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <!--<div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('scrap.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('scrap.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>-->
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="13%">资产编号</th>
+        <th scope="col" width="13%">资产名称</th>
+        <th scope="col" width="13%">报废单号</th>
+        <th scope="col" width="15%">判定人</th>
+        <th scope="col" width="13%">报废Draft号</th>
+        <th scope="col" width="13%">SAP是否报废</th>
+        <th scope="col" width="13%">报废状态</th>
+        <th scope="col" class="text-center" width="9%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if scraps %}
+        {% for scrap in scraps %}
+            <tr>
+                <td class="align-middle">{{scrap.asset.code}}</td>
+                <td class="align-middle">{{scrap.asset.class3.name}}</td>
+                <td class="align-middle">{{scrap.scrap_no}}</td>
+                <td class="align-middle">{{scrap.scraper.user_name if scrap.scraper else ''}}</td>
+                <td class="align-middle">{{scrap.scrap_draft}}</td>
+                <td class="align-middle">{{'是' if scrap.sap_scrap else '否'}}</td>
+                <td class="align-middle">{{scrap.scrap_state.display}}</td>
+                <td class="text-center align-middle">
+                    <button onclick="scrap('{{scrap.asset.id}}', '{{scrap.id}}')" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="#" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="7" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{%include 'biz/asset/master/_scrap.html'%}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function scrap(asset_id, scrap_id){
+        $.post('/scrap/info/'+scrap_id, function(data){
+            $('#scrap_no_edit').val(data.scrap_no)
+            $('#scrap_date').val(data.scrap_date)
+            $('#finish_date').val(data.finish_date)
+            $('#scrap_draft').val(data.scrap_draft)
+            $('#scrap_reason').val(data.scrap_reason)
+            $('#scrap_state').val(data.scrap_state)
+            if(data.sap_scrap)
+                $('#sap_scrap').prop('checked', true)
+            $('#scrap_asset_id').val(asset_id)
+            $('#action_sign').val('U')
+            $('#scrap_id').val(scrap_id)
+            $('#scrapModal').modal('show')
+        }, 'json')
+    }
+{% endblock %}

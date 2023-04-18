@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-6">
+        {{form.csrf_token}}
+        {{form.name(class='form-control', placeholder='角色名称')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary" href="{{url_for('role.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="80%">角色名称</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if roles %}
+        {% for role in roles %}
+            <tr>
+                <td class="align-middle">{{role.name}}</td>
+                <td class="align-middle text-center">
+                    <a href="{{url_for('role.edit', id=role.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <button class="btn btn-link text-success" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="菜单权限" onclick="get_menus('{{role.name}}', '{{role.id}}')"><i class="bi bi-menu-button"></i></button>
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="2" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+<!-- Modal -->
+<div class="modal fade" id="authModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <ul class="list-group" id="menus"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="do_auth()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    var role_id = ''
+    function get_menus(name, id){
+        $('#modalTitle').text(name)
+        role_id = id
+        $.ajax({
+            type:'post',
+            url:'/role/menus/'+id,
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                $('#menus').empty()
+                if(data.all_menus.length == 0){
+                    $('#menus').append("<li class='list-group-item'>尚未创建菜单！</li>")
+                }else{
+                    var authed = false
+                    for(var i = 0; i < data.all_menus.length; i++){
+                        //alert(i + ' menu id : ' + data.all_menus[i][0] + ', authed menus : ' + data.authed_menus)
+                        if($.inArray(data.all_menus[i][0], data.authed_menus) >= 0)
+                            authed = true
+                        else
+                            authed = false
+                        //alert(authed)
+                        if(authed)
+                            $('#menus').append(
+                                "<li class='list-group-item list-group-item-action'><div class='form-check'>"+
+                                "<input class='form-check-input' type='checkbox' value='"+data.all_menus[i][0]+"' id='"+data.all_menus[i][0]+"' checked>"+
+                                "<label class='form-check-label' for='"+data.all_menus[i][0]+"'>"+
+                                data.all_menus[i][1]+
+                                "</label>"+
+                                "</div></li>")
+                        else
+                            $('#menus').append(
+                                "<li class='list-group-item list-group-item-action'><div class='form-check'>"+
+                                "<input class='form-check-input' type='checkbox' value='"+data.all_menus[i][0]+"' id='"+data.all_menus[i][0]+"'>"+
+                                "<label class='form-check-label' for='"+data.all_menus[i][0]+"'>"+
+                                data.all_menus[i][1]+
+                                "</label>"+
+                                "</div></li>")
+                    }
+                }
+                $('#authModal').modal('show')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    //执行授权
+    function do_auth(){
+        var menu_ids = []
+        $(':checkbox').each(function(){
+            if($(this).is(':checked'))
+                menu_ids.push($(this).val())
+        })
+        if(menu_ids.length == 0)
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '请选择菜单！',
+               onClose:function(){
+
+               }
+           })
+        else
+            $.ajax({
+                type:'post',
+                url:'/role/auth',
+                data:JSON.stringify({role_id:role_id, menu_ids:menu_ids}),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#authModal').modal('hide')
+                           }
+                       })
+
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                   })
+                }
+            })
+    }
+{% endblock %}

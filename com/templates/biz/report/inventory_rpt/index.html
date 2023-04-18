@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+    {{load_static_file('js','js/echarts.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+<div class="row">
+    <div class="col-md-9">
+        <form method="post" id="search-form">
+          <div class="row">
+            <div class="col-2">
+                {{form.csrf_token}}
+                {{form.inventory_by_id}}
+                {{form.inventory_year(class='form-control', placeholder='盘点年份', readonly=True)}}
+                {#
+                <div class="input-group">
+                    {{form.inventory_year(class='form-control', placeholder='盘点年份', readonly=True)}}
+                    <div class="input-group-prepend">
+                        <span id="clear_year" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></span>
+                    </div>
+                </div>
+                #}
+            </div>
+            <div class="col-2">
+                {{form.inventory_batch(class='form-control', placeholder='盘点批次')}}
+            </div>
+            <div class="col-3">
+                <div class="input-group">
+                    {{form.inventory_by(class='form-control', placeholder='盘点担当', readonly=True)}}
+                    <div class="input-group-prepend">
+                        <div class="btn-group" role="group">
+                          <button type="button" onclick="select_employee()" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+                          <button type="button" id="clear_employee" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                {{form.status(class='form-control')}}
+            </div>
+          </div>
+        </form>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('inventory_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('inventory_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">盘点明细</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+{{render_pagination(pagination, align='right')}}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="5%">盘点年度</th>
+        <th scope="col" width="5%">盘点批次</th>
+        <th scope="col" width="5%">盘点担当</th>
+        <th scope="col" width="7%">计划开始时间</th>
+        <th scope="col" width="7%">计划结束时间</th>
+        <th scope="col" width="8%">资产编号</th>
+        <th scope="col" width="8%">SAP资产编号</th>
+        <th scope="col" width="8%">资产名称</th>
+        <th scope="col" width="5%">资产状态</th>
+        <th scope="col" width="6%">所属法人</th>
+        <th scope="col" width="12%">所属部门</th>
+        <th scope="col" width="5%">使用人</th>
+        <th scope="col" width="7%">购买日期</th>
+        <th scope="col" width="7%">存放位置</th>
+        <th scope="col" width="5%">盘点完成</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if items %}
+        {% for item in items %}
+            <tr>
+                <td class="align-middle">{{item.i_year}}</td>
+                <td class="align-middle">{{item.i_batch}}</td>
+                <td class="align-middle">{{item.i_handler}}</td>
+                <td class="align-middle">{{item.i_start_dt}}</td>
+                <td class="align-middle">{{item.i_finish_dt}}</td>
+                <td class="align-middle">{{item.a_code}}</td>
+                <td class="align-middle">{{item.a_sap_code}}</td>
+                <td class="align-middle">{{item.a_name}}</td>
+                <td class="align-middle">{{'出库' if item.a_status else '在库'}}</td>
+                <td class="align-middle">{{item.a_company}}</td>
+                <td class="align-middle">{{item.a_department}}</td>
+                <td class="align-middle">{{item.a_user}}</td>
+                <td class="align-middle">{{item.a_buy_dt}}</td>
+                <td class="align-middle">{{item.a_store}}</td>
+                {%if item.i_finished%}
+                    <td class="text-success align-middle">Y</td>
+                {%else%}
+                    <td class="text-danger align-middle">N</td>
+                {%endif%}
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="15" class="text-center align-middle"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">盘点汇总 - 担当别</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover table-sm">
+                  <thead>
+                    <tr class="text-center">
+                        <th scope="col">盘点年度</th>
+                        <th scope="col">盘点批次</th>
+                        <th scope="col">盘点担当</th>
+                        <th scope="col">盘点合计</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%for data in total_data%}
+                        {%for key ,value in data.items()%}
+                            {%set sign = key.split('-')[0] %}
+                            {%if sign == 'Y'%}
+                                <tr class="table-primary text-center">
+                                    <td class="align-middle">{{key.split('-')[1]}}</td>
+                                    <td class="align-middle">&nbsp;</td>
+                                    <td class="align-middle">&nbsp;</td>
+                                    <td class="align-middle">{{value}}</td>
+                                </tr>
+                            {%elif sign == 'B'%}
+                                <tr class="table-success text-center">
+                                    <td class="align-middle">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-arrow-return-right"></i></td>
+                                    <td class="align-middle">{{key.split('-')[1]}}</td>
+                                    <td class="align-middle">&nbsp;</td>
+                                    <td class="align-middle">{{value}}</td>
+                                </tr>
+                            {%else%}
+                                <tr class="table-secondary text-center">
+                                    <td class="align-middle">&nbsp;</td>
+                                    <td class="align-middle">&nbsp;<i class="bi bi-arrow-return-right"></i></td>
+                                    <td class="align-middle">{{key.split('-')[2]}}</td>
+                                    <td class="align-middle">{{value}}</td>
+                                </tr>
+                            {%endif%}
+                        {%endfor%}
+                    {%endfor%}
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div id="bar"></div>
+            </div>
+        </div>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">盘点汇总 - 资产别</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div id="dash"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="chart_data" value="{{chart_data}}">
+<input type="hidden" id="dash_data" value="{{dash_data}}">
+{% include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date_year('inventory_year')
+        $('#inventory_year').change(function(){
+            if($(this).val() == '')
+                $('#inventory_batch').val('')
+        })
+        $('#status').change(function(){
+            reload_data()
+        })
+        $('#clear_year').click(function(event){
+            $('#inventory_year').val('')
+            $('#inventory_batch').val('')
+        })
+        $('#clear_employee').click(function(event){
+            $('#inventory_by').val('')
+            $('#inventory_by_id').val('')
+        })
+        // bar
+        var chart_data = $('#chart_data').val()
+        var dash_data = $('#dash_data').val()
+        var json = $.parseJSON(chart_data)
+        //alert(json.length)
+        var x = [], x2 = []
+        var all = [], all2 = []
+        var finished = [], finished2 = []
+        var unfinished = [], unfinished2 = []
+        var perfinished = [], perfinished2 = []
+        for(var i = 0; i < json.length; i++){
+            for(var key in json[i]){
+                //alert(key+':'+json[i][key][0])
+                x.push(key)
+                all.push(json[i][key][0])
+                finished.push(json[i][key][1])
+                unfinished.push(json[i][key][2])
+            }
+        }
+        json = $.parseJSON(dash_data)
+        for(var i = 0; i < json.length; i++){
+            for(var key in json[i]){
+                //alert(key+':'+json[i][key][0])
+                x2.push(key)
+                all2.push(json[i][key][0])
+                finished2.push(json[i][key][1])
+                unfinished2.push(json[i][key][2])
+                perfinished2.push(json[i][key][3])
+            }
+        }
+        $("#bar").height($(document).height() * 0.34);
+        $("#dash").height($(document).height() * 0.4);
+        //初始化Echarts图表
+        var bar = echarts.init(document.getElementById('bar'))
+        //选项设置
+        var option = {
+            tooltip: {
+                trigger:"axis"	//不设置默认为item
+            },
+            legend: {
+                data:['盘点总数量', '完成数量', '未完成数量'] //必须和series里的各个name属性值一致
+            },
+            toolbox:{
+                show:true,
+                feature:{
+                    /*mark:{
+                        show:true
+                    },
+                    dataView:{
+                        show:true,
+                        readOnly:true
+                    },
+                    magicType:{
+                        show:true,
+                        type:['line','bar']
+                    },
+                    restore:{
+                        show:true
+                    },*/
+                    saveAsImage:{
+                        show:true
+                    }
+                }
+            },
+            calculable:true,
+            xAxis: [{
+                type:"category",
+                data: x,
+                  axisLabel:{
+                      formatter:'{value}'	//个性化设置坐标值
+                  }
+            }],
+            yAxis: [{
+                type:"value",
+                  axisLabel:{
+                      formatter:'{value}'	//个性化设置坐标值
+                  }
+            }],
+            series: [{
+                name: '盘点总数量',
+                type: 'bar',
+                data: all,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            },{
+                name: '完成数量',
+                type: 'bar',
+                data: finished,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            },{
+                name: '未完成数量',
+                type: 'bar',
+                data: unfinished,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            }]
+        }
+        //设置选项
+        bar.setOption(option)
+        var dash = echarts.init(document.getElementById('dash'))
+        //选项设置
+        var option2 = {
+            tooltip: {
+                trigger:"axis"	//不设置默认为item
+            },
+            legend: {
+                data:['盘点总数量','完成数量','未完成数量','完成率'] //必须和series里的各个name属性值一致
+            },
+            toolbox:{
+                show:true,
+                feature:{
+                    /*mark:{
+                        show:true
+                    },
+                    dataView:{
+                        show:true,
+                        readOnly:true
+                    },
+                    magicType:{
+                        show:true,
+                        type:['line','bar']
+                    },
+                    restore:{
+                        show:true
+                    },*/
+                    saveAsImage:{
+                        show:true
+                    }
+                }
+            },
+            calculable:true,
+            xAxis: [{
+                type:"category",
+                data: x2,
+                  axisLabel:{
+                      formatter:'{value}'	//个性化设置坐标值
+                  }
+            }],
+            yAxis: [
+                {
+                    name: '数量',
+                    type:"value",
+                    id:0,
+                    axisLabel:{
+                      formatter:'{value}'	//个性化设置坐标值
+                    }
+                },{
+                    name: '完成率(%)',
+                    nameLocation: 'end',
+                    type:"value",
+                    id:1,
+                    max: 100,
+                    axisLabel:{
+                      formatter:'{value}%'	//个性化设置坐标值
+                    }
+                }
+            ],
+            series: [{
+                name: '盘点总数量',
+                type: 'bar',
+                yAxisIndex:0,
+                data: all2,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            },{
+                name: '完成数量',
+                type: 'bar',
+                yAxisIndex:0,
+                data: finished2,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            },{
+                name: '未完成数量',
+                type: 'bar',
+                yAxisIndex:0,
+                data: unfinished2,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            },{
+                name: '完成率',
+                type: 'line',
+                yAxisIndex:1,
+                data: perfinished2,
+                itemStyle: {
+                  normal: {
+                    label: {
+                      show: true,           //开启显示数值
+                      position: 'top',      //数值在上方显示
+                      textStyle: {          //数值样式
+                        color: '#000',      //字体颜色
+                        fontSize: 14        //字体大小
+                      }
+                    }
+                  }
+                }
+            }]
+        }
+        //设置选项
+        dash.setOption(option2)
+    })
+    function reload_data(){
+        $('#search-form').submit()
+    }
+    function select_employee(){
+        e_id = 'inventory_by_id'
+        e_all = 'inventory_by'
+        $('#employeeModal').modal('show')
+    }
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-3 text-end">
+        {{form.csrf_token}}
+        {{form.out_type(class='form-control', onchange='reload_data()')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.out_no(class='form-control', placeholder='出库单号')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary" href="{{url_for('stockout.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="20%">出库单号</th>
+        <th scope="col" width="20%">出库类型</th>
+        <th scope="col" width="20%">出库人员</th>
+        <th scope="col" width="20%">出库日期</th>
+        <th scope="col" width="10%">审批状态</th>
+        <th scope="col" class="text-center" width="10%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if stockouts %}
+        {% for stockout in stockouts %}
+            <tr>
+                <td class="align-middle">{{stockout.out_no}}</td>
+                <td class="align-middle">{{stockout.out_type.display}}</td>
+                <td class="align-middle">{{stockout.charger.user_name}}</td>
+                <td class="align-middle">{{stockout.out_date}}</td>
+                <td class="align-middle">{{stockout.state.display}}</td>
+                <td class="text-center align-middle">
+                    {%if stockout.state.item != '0' %}
+                    <a href="{{url_for('stockout.edit', id=stockout.id, action='detail')}}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="详细" class="btn btn-link text-info"><i class="bi bi-files"></i></a>&nbsp;
+                    {%else%}
+                    <a href="{{url_for('stockout.edit', id=stockout.id, action='update')}}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    {%endif%}
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="6" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function reload_data(){
+        $('form').submit()
+    }
+{% endblock %}

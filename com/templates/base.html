@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+{# import macros with context#}
+{% from 'macros/_all.html' import load_static_file, current_location, show_alert with context %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{%block title%}IT资产管理系统{%endblock%}</title>
+  {%block static%}
+    {{load_static_file('icon', 'images/icon/sys.ico')}}
+    {{load_static_file('css', 'css/bootstrap.min.css')}}
+    {{load_static_file('css', 'css/bootstrap-icons.css')}}
+    {{load_static_file('css', 'css/jquery-confirm.min.css')}}
+    {{load_static_file('js', 'js/jquery-3.6.0.min.js')}}
+    {#load_static_file('js', 'js/popper.min.js')#}
+    {#load_static_file('js', 'js/bootstrap.min.js')#}
+    {{load_static_file('js', 'js/bootstrap.bundle.min.js')}}
+    {{load_static_file('js', 'js/jquery-confirm.min.js')}}
+  {%endblock%}
+  {# load page's css files #}
+  {%block link%}{%endblock%}
+  {# load page's javascript files #}
+  {%block scripts%}{%endblock%}
+  {# write page's css styles #}
+  {%block style%}{%endblock%}
+</head>
+{%block body%}
+<body>
+<header>{% block header %}{% include '_header.html' %}{% endblock %}</header>
+<main style="font-size:10pt;">
+  {%block main%}
+  <div class="container-fluid" style="margin-top:10px;">
+    <div class="row">
+        <div class="col-1">{% block menus %}{% include('_menus.html') %}{% endblock %}</div>
+        <div class="col-11">
+            {% block content%}{% endblock %}
+        </div>
+    </div>
+  </div>
+  {%endblock%}
+</main>
+<footer>{%block footer%}{%endblock%}</footer>
+<script>
+{% block script %}
+var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl)
+})
+var csrf_token = "{{ csrf_token() }}" //CSRF Token
+$(function(){
+    //add csrf validation for ajax
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader('X-CSRFToken', csrf_token);
+            }
+        },
+        complete:function(XMLHttpRequest,textStatus){
+          var login_timeout = XMLHttpRequest.getResponseHeader("login_timeout"); //通过XMLHttpRequest取得响应头，sessionstatus，
+            if(login_timeout == "Y"){  //如果超时提示并跳转至登录页
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '登录超时，请重新登录系统！！！',
+                   onClose:function(){
+                      window.location = '{{url_for('auth.login')}}'
+                   }
+                })
+            }
+        }
+    })
+})
+function init_date(id){
+    $('#'+id).datepicker({
+        weekStart: 1,
+        autoclose: true,
+        daysOfWeekHighlighted: "0,6",
+        format: "yyyy-mm-dd",
+        language: "zh-CN",
+        todayHighlight: true
+    })
+}
+function init_date_year(id){
+    $('#'+id).datepicker({
+      startView: 2,
+      minViewMode: 2,
+      maxViewMode: 2,
+      autoclose: true,
+      format: "yyyy",
+      language: "zh-CN"
+    })
+}
+{% endblock %}
+</script>
+</body>
+{%endblock%}
+</html>

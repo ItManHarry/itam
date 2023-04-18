@@ -1,0 +1,43 @@
+{# load static files #}
+{% macro load_static_file(type, file_or_url, local=True) %}
+    {% if local %}
+        {% set file_or_url = url_for('static', filename = file_or_url) %}
+    {% endif %}
+    {% if type == 'css' %}
+        <link rel="stylesheet" type="text/css" href="{{ file_or_url }}">
+    {% endif %}
+    {% if type == 'icon' %}
+        <link rel="icon" type="image/x-icon" href="{{ file_or_url }}">
+    {% endif %}
+    {% if type == 'js' %}
+        <script type="text/javascript" src="{{ file_or_url }}"></script>
+    {% endif %}
+{% endmacro %}
+{# 使用宏函数实现当前导航 #}
+{% macro current_location(location) %}
+    {% set active_module = session.get('active_module') %}
+    {% set active_menu = session.get('active_menu') %}
+    <div class="clearfix">
+        <small style="color:#888;" class="float-left">
+            <i class="{{get_current_menu(active_menu).icon}}"></i>&nbsp;&nbsp;{{get_current_module(active_module).name}}&nbsp;&nbsp;/&nbsp;&nbsp;
+            <span class="text-secondary">{{get_current_menu(active_menu).name}}</span>
+            {% if location %}
+            &nbsp;&nbsp;/&nbsp;&nbsp;
+            <span class="text-secondary">{{ location }}</span>
+            {% endif %}
+        </small>
+    </div>
+    <hr>
+{% endmacro %}
+{% macro show_alert() %}
+<div class="clearfix text-center">
+{% if get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {% for message in get_flashed_messages() %}
+        {{ message }}
+      {% endfor %}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+</div>
+{% endmacro%}

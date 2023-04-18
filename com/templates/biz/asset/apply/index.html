@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-2 text-end">
+        {{form.csrf_token}}
+        {{form.apply_no(class='form-control', placeholder='申请编号')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.draft_no(class='form-control', placeholder='申请起案号')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.company(class='form-control', placeholder='申请法人', onchange='do_search()')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.department(class='form-control', placeholder='申请部门', onchange='do_search()')}}
+    </div>
+    <div class="col-4 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('apply.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="10%">申请编号</th>
+        <th scope="col" width="10%">申请起案号</th>
+        <th scope="col" width="10%">接收日期</th>
+        <th scope="col" width="10%">申请法人</th>
+        <th scope="col" width="20%">申请部门</th>
+        <th scope="col" width="10%">申请人</th>
+        <th scope="col" width="5%">申请数量</th>
+        <th scope="col" class="text-center" width="15%">附件</th>
+        <th scope="col" class="text-center" width="10%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if applys %}
+        {% for apply in applys %}
+            <tr>
+                <td class="align-middle">{{apply.apply_no}}</td>
+                <td class="align-middle">{{apply.draft_no if apply.draft_no and apply.draft_no != 'None' else '-'}}</td>
+                <td class="align-middle">{{apply.receive_date}}</td>
+                <td class="align-middle">{{apply.company.name}}</td>
+                <td class="align-middle">{{apply.department.name}}</td>
+                <td class="align-middle">{{apply.applicant.name}}</td>
+                <td class="align-middle">{{apply.amount}}</td>
+                <td class="align-middle text-center">
+                    {%if apply.file_path%}
+                        <a class="btn btn-link btn-sm" target="_blank" href="{{url_for('apply.get_file', file_name=apply.file_path)}}">{{apply.file_path}}</a>
+                    {%else%}
+                        <i class="bi bi-file-x"></i>
+                    {%endif%}
+                </td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('apply.edit', id=apply.id)}}" class="btn btn-link text-info" ><i class="bi bi-pencil-square"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="9" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function do_search(){
+        $('form').submit()
+    }
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('编辑')}}
+<form method="post">
+    {{form.csrf_token}}
+    {{form.id}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.code.label}}
+            <div class="input-group">
+                {{form.code(class='form-control', readonly=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="select_employee()" class="btn btn-secondary" id="choose_user" ><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            {% for message in form.code.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.name.label}}
+            {{form.name(class='form-control', readonly=True)}}
+            {% for message in form.name.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-check form-switch">
+                {{form.is_ad(class='form-check-input')}}
+                {{form.is_ad.label(class='form-check-label')}}
+            </div>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.password.label}}
+            {{form.password(class='form-control')}}
+            {% for message in form.password.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.password_confirm.label}}
+            {{form.password_confirm(class='form-control')}}
+            {% for message in form.password_confirm.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.company.label}}
+            {%if current_user.company%}
+                {{form.company(class='form-control', disabled=True)}}
+            {%else%}
+                {{form.company(class='form-control')}}
+            {%endif%}
+            {% for message in form.company.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.role.label}}
+            {{form.role(class='form-control')}}
+            {% for message in form.role.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+     </div><br>
+     <div class="row">
+        <div class="col-md-6">
+            {{form.email.label}}
+            {{form.email(class='form-control', readonly=True)}}
+            {% for message in form.email.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.phone.label}}
+            {{form.phone(class='form-control')}}
+        </div>
+     </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('user.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+    </div>
+</form>
+{% include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        if($(':checkbox').prop('checked')){
+            $('#password').attr('disabled', true)
+            $('#password_confirm').attr('disabled', true)
+        }
+        $(':checkbox').change(function(){
+            if($(this).prop('checked')){
+                $('#password').val('')
+                $('#password').attr('disabled', true)
+                $('#password_confirm').val('')
+                $('#password_confirm').attr('disabled', true)
+            }else{
+                $('#password').attr('disabled', false)
+                $('#password_confirm').attr('disabled', false)
+            }
+        })
+    })
+    function select_employee(){
+        e_code = 'code'
+        e_name = 'name'
+        e_email = 'email'
+        $('#employeeModal').modal('show')
+    }
+{% endblock %}

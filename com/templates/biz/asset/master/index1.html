@@ -1,0 +1,366 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="{{url_for('master.index', class1=1)}}">资产</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{url_for('master.index', class1=0)}}">耗材</a>
+  </li>
+</ul><br>
+<div class="row">
+    <div class="col-md-9">
+        <form method="post" id="search-form">
+          <div class="row">
+            <div class="col-2">
+                {{form.csrf_token}}
+                {{form.used_by_id}}
+                {{form.companies(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.class2(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.class3(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.brands(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                {{form.models(class='form-control', onchange='reload_data()')}}
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    {{form.used_by(class='form-control', placeholder='使用者', readonly=True)}}
+                    <div class="input-group-prepend">
+                        <div class="btn-group" role="group">
+                          <button type="button" onclick="select_employee()" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+                          <button type="button" id="clear_employee" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-2">
+                {{form.code(class='form-control', placeholder='资产编号')}}
+            </div>
+            <div class="col-2">
+                {{form.sap_code(class='form-control', placeholder='SAP资产编号')}}
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    {{form.buy_s(class='form-control', placeholder='购买日期(FROM)', readonly=True)}}
+                    <div class="input-group-prepend">
+                        <div class="btn-group" role="group">
+                          <button type="button" id="clear_start" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    {{form.buy_e(class='form-control', placeholder='购买日期(TO)', readonly=True)}}
+                    <div class="input-group-prepend">
+                        <div class="btn-group" role="group">
+                          <button type="button" id="clear_end" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </form>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=1)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>&nbsp;&nbsp;
+        <button id="excel" onclick="transport()" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel"></i>&nbsp;Excel导入</button>
+    </div>
+</div>
+<br>
+{%if pagination.total > config['ITEM_COUNT_PER_PAGE']%}
+    {{render_pagination(pagination, align='right')}}
+{%endif%}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产名称</th>
+        <th scope="col" width="10%">资产编号</th>
+        <th scope="col" width="10%">SAP资产编号</th>
+        <th scope="col" width="10%">品牌</th>
+        <th scope="col" width="10%">型号</th>
+        <th scope="col" width="10%">购买日期</th>
+        <th scope="col" width="5%">使用年限</th>
+        <th scope="col" width="5%">使用者</th>
+        <th scope="col" width="5%">资产状态</th>
+        <th scope="col" width="5%">库存状态</th>
+        <th scope="col" class="text-center" width="5%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                <td class="align-middle">{{asset.class3.name}}</td>
+                <td class="align-middle">{{asset.code}}</td>
+                <td class="align-middle">{{asset.sap_code}}</td>
+                <td class="align-middle">{{asset.brand.name}}</td>
+                <td class="align-middle">{{asset.model.name}}</td>
+                <td class="align-middle">{{asset.buy_date}}</td>
+                <td class="align-middle">{{cal_delta_time(asset.buy_date)}}年</td>
+                <td class="align-middle">{{asset.user.name}}</td>
+                <td class="align-middle">{{asset.status.display}}</td>
+                <td class="align-middle">{%if asset.is_out%}<span class="text-secondary">已出库</span>{%else%}<span class="text-success">在库</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <div class="dropdown">
+                      <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="actions">
+                          <li>
+                              <div class="btn-group dropdown-item">
+                                  <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('master.edit', id=asset.id, class1=1)}}" class="btn btn-link text-info {%if asset.status.item in ['8','9','10']%}disabled{%endif%}"><i class="bi bi-pencil-square"></i></a>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="条码" class="btn btn-link text-success" onclick="bar('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-upc-scan"></i></button>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="续保" class="btn btn-link text-success" onclick="reinsurance('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-bootstrap-reboot"></i></button>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="变更" class="btn btn-link text-warning" onclick="change_user('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-people"></i></button>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="维修" class="btn btn-link text-success" onclick="repair('{{asset.id}}')" {%if asset.status.item in ['5','6','8','9','10']%}disabled{%endif%}><i class="bi bi-tools"></i></button>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="返还" class="btn btn-link text-secondary" onclick="restore('{{asset.id}}', '{{asset.code}}')" {%if asset.status.item in ['5','6', '8','9','10'] or not asset.is_out%}disabled{%endif%}><i class="bi bi-box-arrow-in-down-left"></i></button>
+                                  <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="报废" class="btn btn-link text-danger" onclick="scrap('{{asset.id}}')" {%if asset.status.item in ['8','9','10'] or asset.is_out%}disabled{%endif%}><i class="bi bi-trash2"></i></button>
+                              </div>
+                          </li>
+                      </ul>
+                    </div>
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="11" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{%include 'biz/asset/master/_repair.html'%}
+{%include 'biz/asset/master/_scrap.html'%}
+{%include 'biz/asset/master/_reinsurance.html'%}
+{%include 'biz/asset/master/_exuser.html'%}
+{%include 'biz/asset/master/_transport.html'%}
+{%include 'biz/asset/master/_bar.html'%}
+{%include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date('buy_s')
+        init_date('buy_e')
+        $('#clear_start').click(function(){
+            $('#buy_s').val('')
+        })
+        $('#clear_end').click(function(){
+            $('#buy_e').val('')
+        })
+    })
+    function reload_data(){
+        $('#search-form').submit()
+    }
+    function repair(asset_id){
+        $('#pre_finish_date').val('')
+        $('#rel_finish_date').val('')
+        $('#fee').val('0.0')
+        $('#repair_asset_id').val(asset_id)
+        $('#request_draft').val('')
+        $('#requested_by_nm').val('')
+        $('#requested_by_id').val('')
+        $('#repair_draft').val('')
+        $('#request_accept_dt').val('')
+        $('#out_date').val('')
+        $('#pre_in_date').val('')
+        $('#real_in_date').val('')
+        $('#pre_finish_date').val('')
+        $('#rel_finish_date').val('')
+        $('#repair_handler_nm').val('')
+        $('#repair_handler_id').val('')
+        $('#fee').val('0.0')
+        $('#action_sign').val('A')
+        $('#repairModal').modal('show')
+    }
+    function scrap(asset_id){
+        $('#scrap_date').val('')
+        $('#finish_date').val('')
+        $('#scrap_draft').val('')
+        $('#sap_scrap').prop('checked', false)
+        $('#scrap_asset_id').val(asset_id)
+        $('#action_sign').val('A')
+        $('#scrapModal').modal('show')
+    }
+    function reinsurance(asset_id){
+        $('#start_date').val('')
+        $('#expire_date').val('')
+        $('#content').val('')
+        $('#draft_no').val('')
+        $('#price').val('0.0')
+        $('#reinsurance_asset_id').val(asset_id)
+        $('#reinsuranceModal').modal('show')
+    }
+    function change_user(asset_id){
+        $.post('/master/check_user/'+asset_id, function(data){
+            if(data.code == 0){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: data.message,
+                   onClose:function(){}
+                })
+            }else{
+                //alert(data.employee.name+'('+data.employee.code+')')
+                var employee_id = data.employee.id, employee_name = data.employee.name, employee_code = data.employee.code
+                $.post('/master/change_list/'+asset_id, function(data){
+                    var l = data.list
+                    $('#change-history').empty()
+                    for(var i = 0; i < l.length; i++){
+                        //alert(l[i][0]+' - '+l[i][1]+' - '+l[i][2]+' - '+l[i][3])
+                        $('#change-history').append('<tr>'+
+                            '<th scope="row">'+l[i][0]+'</th>'+
+                            '<td>'+l[i][1]+'</td>'+
+                            '<td>'+l[i][2]+'</td>'+
+                            '<td>'+l[i][3]+'</td>'+
+                            '</tr>'
+                        )
+                    }
+                    $('#change_asset_id').val(asset_id)
+                    $('#pre_user_id').val(employee_id)
+                    if(employee_name == '0')
+                        $('#pre_user').val('---未指定---')
+                    else
+                        $('#pre_user').val(employee_name+'('+employee_code+')')
+                    $('#new_user').val('')
+                    $('#exuserModal').modal('show')
+                }, 'json')
+            }
+        }, 'json')
+    }
+    function restore(asset_id, asset_code){
+        $.post('/master/get_stores/'+asset_id, function(data){
+            //alert(data.stores)
+            //alert(data.store_id)
+            var select = '<select id="r_store" type="text" placeholder="返还仓库" class="form-control" value="1" required>'
+            for(var i = 0; i < data.stores.length; i++){
+                if(data.stores[i][0] == data.store_id)
+                    select += '<option selected="selected" value="'+data.stores[i][0]+'">'+data.stores[i][1]+'</option>'
+                else
+                    select += '<option value="'+data.stores[i][0]+'">'+data.stores[i][1]+'</option>'
+            }
+            select += '</select>'
+            //alert(select)
+            $.confirm({
+                type:'green',
+                title: '资产返还',
+                content: '<form>' +
+                    '<div class="form-group">' +
+                    '<lable for="r_reason">返还原因</lable><input id="r_reason" type="text" placeholder="返还原因" class="form-control" required/><br>' +
+                    '<lable for="r_amount">返还数量</lable><input id="r_amount" type="text" placeholder="返还数量" class="form-control" value="1" required/><br>' +
+                    '<lable for="r_store">返还仓库</lable>' + select +
+                    '</div>' +
+                '</form>',
+                buttons: {
+                    yes: {
+                        text:'<i class="bi bi-save"></i>&nbsp;&nbsp;保存',
+                        action: function () {
+                            var reason = $.trim($('#r_reason').val())
+                            var amount = $.trim($('#r_amount').val())
+                            var store = $('#r_store').val()
+                            if(!reason){
+                                $.alert('请填写返还原因！')
+                                return false
+                            }
+                            if(!amount){
+                                $.alert('请填写返还数量！')
+                                return false
+                            }
+                            $.ajax({
+                                type:'post',
+                                url:'/master/restore/'+asset_id,
+                                data:JSON.stringify({reason:reason, amount:amount, store:store}),
+                                contentType:'application/json;charset=UTF-8',
+                                success:function(data){
+                                    if(data.code == 1)
+                                        $.alert({
+                                           type:'green',
+                                           title:'系统提示',
+                                           content: data.message,
+                                           onClose:function(){
+                                              //刷新页面
+                                              window.location.reload()
+                                           }
+                                       })
+                                    else
+                                        $.alert({
+                                           type:'red',
+                                           title:'系统提示',
+                                           content: data.message,
+                                           onClose:function(){
+
+                                           }
+                                       })
+                                },
+                                error:function(){
+                                    $.alert({
+                                       type:'red',
+                                       title:'系统提示',
+                                       content: '系统错误,请联系管理员',
+                                       onClose:function(){
+
+                                       }
+                                   })
+                                }
+                            })
+                        }
+                    },
+                    no: {
+                        text: '<i class="bi bi-x-lg"></i>&nbsp;&nbsp;取消',
+                        action: function (){
+
+                        }
+                    }
+                }
+            });
+        }, 'json')
+    }
+    function bar(asset_id){
+        $('#print_asset_id').val(asset_id)
+        $.post('/master/card_show/'+asset_id, function(data){
+            $('#asset_sap_code').text(data.asset_sap_code)
+            $('#asset_buy_date').text(data.asset_buy_date)
+            $('#asset_name').text(data.asset_name)
+            $('#asset_code').text(data.asset_code)
+            $('#asset_model').text(data.asset_model)
+            $('#asset_bar').attr('src', '{{request.host_url}}master/get_bar_image/1/'+data.asset_bar)
+            $('#barModal').modal('show')
+        }, 'json')
+    }
+    function transport(){
+        $('#assetFile').val('')
+        $('#result').empty()
+        $('#fileModal').modal('show')
+    }
+    function select_employee(){
+        e_id = 'used_by_id'
+        e_name = 'used_by'
+        $('#employeeModal').modal('show')
+    }
+    $('#clear_employee').click(function(event){
+        $('#used_by').val('')
+        $('#used_by_id').val('')
+    })
+{% endblock %}

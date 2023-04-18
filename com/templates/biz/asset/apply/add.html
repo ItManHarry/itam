@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('添加')}}
+<form method="post" enctype="multipart/form-data">
+    {{form.csrf_token}}
+    {{form.company_id}}
+    {{form.department}}
+    {{form.applicant}}
+    {{form.class2_id}}
+    {{form.class3_id}}
+    {{form.brand_id}}
+    {{form.model_id}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.apply_no.label}}
+            {{form.apply_no(class='form-control', placeholder='申请编号,系统自动生成', readonly=True)}}
+            {% for message in form.apply_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.draft_no.label}}
+            {{form.draft_no(class='form-control')}}
+            {% for message in form.draft_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.applicant_slt.label}}
+            <div class="input-group">
+                {{form.applicant_slt(class='form-control', disabled=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="select_employee()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            {% for message in form.applicant.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.applicant_pos.label}}
+            {{form.applicant_pos(class='form-control')}}
+            {% for message in form.applicant_pos.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+             {{form.company.label}}
+             {{form.company(class='form-control', disabled=True)}}
+        </div>
+        <div class="col-md-6">
+            {{form.department_slt.label}}
+            {{form.department_slt(class='form-control', disabled=True)}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.amount.label}}
+            {{form.amount(class='form-control')}}
+            {% for message in form.amount.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.receive_date.label}}
+            {{form.receive_date(class='form-control')}}
+            {% for message in form.receive_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.class2_slt.label}}
+            {{form.class2_slt(class='form-control')}}
+            {% for message in form.class2_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            <label for="class3_slt">资产名称</label>
+            <select class="form-control" id="class3_slt" name="class3_slt"></select>
+            {% for message in form.class3_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.brand_slt.label}}
+            {{form.brand_slt(class='form-control')}}
+            {% for message in form.brand_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            <label for="model_slt">型号</label>
+            <select class="form-control" id="model_slt" name="model_slt"></select>
+            {% for message in form.model_id.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-12">
+            {{form.summary.label}}
+            {{form.summary(class='form-control', rows='3')}}
+            {% for message in form.summary.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-12">
+            {{form.file.label}}
+            {{form.file(class='form-control')}}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('apply.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+{% include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        //初始化时间控件
+        $("#receive_date").each(function(){
+            init_date($(this).attr('id'))
+        })
+        $('#applicant_slt').change(function(){
+            //alert('ID is : ' + $(this).val())
+            var app_id = $(this).val()
+            $('#applicant').val(app_id)
+            $.post('/employee/get_employee_org/'+app_id, function(data){
+                $('#company').val(data.company)
+                $('#company_id').val(data.company)
+                $('#department_slt').val(data.department)
+                $('#department').val(data.department)
+            }, 'json')
+        })
+        if($('#applicant').val() == '')
+            $('#applicant').val($('#applicant_slt').val())
+        else{
+            $('#applicant_slt').val($('#applicant').val())
+            $('#applicant_slt').change()
+        }
+        $('#class2_slt').change(function(){
+            var old_class2 = $('#class2_id').val()
+            $('#class2_id').val($(this).val())
+            $.post('/clazz/get_class3_options/'+$('#class2_slt').val(), function(data){
+                $('#class3_slt').empty()
+                var options = data.options
+                for(var i = 0; i < options.length; i++){
+                    $('#class3_slt').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                }
+                if($('#class3_id').val() != '' && $('#class2_slt').val() == old_class2)
+                    $('#class3_slt').val($('#class3_id').val())
+                else
+                    if(options.length != 0)
+                        $('#class3_id').val(options[0][0])
+                    else
+                        $('#class3_id').val('')
+            }, 'json')
+        })
+        if($('#class2_id').val() == '')
+            $('#class2_id').val($('#class2_slt').val())
+        else{
+            $('#class2_slt').val($('#class2_id').val())
+            $('#class2_slt').change()
+        }
+        $('#class3_slt').change(function(){
+            $('#class3_id').val($(this).val())
+        })
+        $('#brand_slt').change(function(){
+            var old_brand = $('#brand_id').val()
+            $('#brand_id').val($(this).val())
+            $.post('/brand/get_model_options/'+$('#brand_slt').val(), function(data){
+                $('#model_slt').empty()
+                var options = data.options
+                for(var i = 0; i < options.length; i++){
+                    $('#model_slt').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                }
+                if($('#model_id').val() != '' && $('#brand_slt').val() == old_brand)
+                    $('#model_slt').val($('#model_id').val())
+                else
+                    if(options.length != 0)
+                        $('#model_id').val(options[0][0])
+                    else
+                        $('#model_id').val('')
+            }, 'json')
+        })
+        if($('#brand_id').val() == '')
+            $('#brand_id').val($('#brand_slt').val())
+        else{
+            $('#brand_slt').val($('#brand_id').val())
+            $('#brand_slt').change()
+        }
+        $('#model_slt').change(function(){
+            $('#model_id').val($(this).val())
+        })
+    })
+    function select_employee(){
+        e_id = 'applicant_slt'
+        $('#employeeModal').modal('show')
+    }
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link" href="{{url_for('master.index', class1=1)}}">资产</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{{url_for('master.index', class1=0)}}">耗材</a>
+  </li>
+</ul><br>
+<form method="post">
+  <div class="row">
+    <div class="col-1">
+        {{form.csrf_token}}
+        {{form.class2(class='form-control', onchange='reload_data()')}}
+    </div>
+    <div class="col-1">
+        {{form.class3(class='form-control', onchange='reload_data()')}}
+    </div>
+    <div class="col-1">
+        {{form.brands(class='form-control', onchange='reload_data()')}}
+    </div>
+    <div class="col-1">
+        {{form.models(class='form-control', onchange='reload_data()')}}
+    </div>
+    <div class="col-1">
+        {{form.code(class='form-control', placeholder='资产编号')}}
+    </div>
+    <div class="col-2">
+            <div class="input-group">
+                {{form.buy_s(class='form-control', placeholder='购买日期(FROM)', readonly=True)}}
+                <div class="input-group-prepend">
+                    <div class="btn-group" role="group">
+                      <button type="button" id="clear_start" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="input-group">
+                {{form.buy_e(class='form-control', placeholder='购买日期(TO)', readonly=True)}}
+                <div class="input-group-prepend">
+                    <div class="btn-group" role="group">
+                      <button type="button" id="clear_end" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=0)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+{%if pagination.total > config['ITEM_COUNT_PER_PAGE']%}
+    {{render_pagination(pagination, align='right')}}
+{%endif%}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产名称</th>
+        <th scope="col" width="10%">资产编号</th>
+        <th scope="col" width="10%">品牌</th>
+        <th scope="col" width="10%">型号</th>
+        <th scope="col" width="15%">购买日期</th>
+        <th scope="col" width="10%">资产状态</th>
+        <th scope="col" width="10%">库存状态</th>
+        <th scope="col" class="text-center" width="10%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                <td class="align-middle">{{asset.class3.name}}</td>
+                <td class="align-middle">{{asset.code}}</td>
+                <td class="align-middle">{{asset.brand.name}}</td>
+                <td class="align-middle">{{asset.model.name}}</td>
+                <td class="align-middle">{{asset.buy_date}}</td>
+                <td class="align-middle">{{asset.status.display}}</td>
+                <td class="align-middle">{%if asset.is_out%}<span class="text-info">已出库</span>{%else%}<span class="text-info">在库</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('master.edit', id=asset.id, class1=0)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <button class="btn btn-link text-secondary" onclick="restore('{{asset.id}}', '{{asset.code}}')" {%if not asset.is_out%}disabled{%endif%} data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="返还" ><i class="bi bi-box-arrow-in-down-left"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="8" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+<!-- Modal -->
+<div class="modal fade" id="lineModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <div class="row align-items-center justify-content-center">
+              <div class="col-2">
+                <small class="text-secondary">审批角色</small>
+              </div>
+              <div class="col-7">
+                  <select id="roles" class="form-select">
+                      {%for role in roles%}
+                      <option value="{{role.id}}">{{role.name}}</option>
+                      {%endfor%}
+                  </select>
+              </div>
+              <div class="col-3">
+                  <button class="btn btn-outline-success" onclick="add_role()">添加到审批线</button>
+              </div>
+          </div><br>
+          <div class="row align-items-center justify-content-center">
+              <div class="col">
+                  <table class="table table-sm">
+                  <thead class="table-dark">
+                    <tr>
+                        <th scope="col" width="20%">审批角色</th>
+                        <th scope="col" width="40%">审批人员</th>
+                        <th scope="col" width="20%">审批等级</th>
+                        <th scope="col" width="20%">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="nodes">
+                    <tr>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>Jack,Harry,Tom</td>
+                        <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date('buy_s')
+        init_date('buy_e')
+        $('#clear_start').click(function(){
+            $('#buy_s').val('')
+        })
+        $('#clear_end').click(function(){
+            $('#buy_e').val('')
+        })
+    })
+    function reload_data(){
+        $('form').submit()
+    }
+    function restore(asset_id, asset_code){
+        $.post('/master/get_stores/'+asset_id, function(data){
+            //alert(data.stores)
+            //alert(data.store_id)
+            var select = '<select id="r_store" type="text" placeholder="返还仓库" class="form-control" value="1" required>'
+            for(var i = 0; i < data.stores.length; i++){
+                if(data.stores[i][0] == data.store_id)
+                    select += '<option selected="selected" value="'+data.stores[i][0]+'">'+data.stores[i][1]+'</option>'
+                else
+                    select += '<option value="'+data.stores[i][0]+'">'+data.stores[i][1]+'</option>'
+            }
+            select += '</select>'
+            //alert(select)
+            $.confirm({
+                type:'green',
+                title: '资产返还',
+                content: '<form>' +
+                    '<div class="form-group">' +
+                    '<lable for="r_reason">返还原因</lable><input id="r_reason" type="text" placeholder="返还原因" class="form-control" required/><br>' +
+                    '<lable for="r_amount">返还数量</lable><input id="r_amount" type="text" placeholder="返还数量" class="form-control" value="1" required/><br>' +
+                    '<lable for="r_store">返还仓库</lable>' + select +
+                    '</div>' +
+                '</form>',
+                buttons: {
+                    yes: {
+                        text:'<i class="bi bi-save"></i>&nbsp;&nbsp;保存',
+                        action: function () {
+                            var reason = $.trim($('#r_reason').val())
+                            var amount = $.trim($('#r_amount').val())
+                            var store = $('#r_store').val()
+                            if(!reason){
+                                $.alert('请填写返还原因！')
+                                return false
+                            }
+                            if(!amount){
+                                $.alert('请填写返还数量！')
+                                return false
+                            }
+                            $.ajax({
+                                type:'post',
+                                url:'/master/restore/'+asset_id,
+                                data:JSON.stringify({reason:reason, amount:amount, store:store}),
+                                contentType:'application/json;charset=UTF-8',
+                                success:function(data){
+                                    if(data.code == 1)
+                                        $.alert({
+                                           type:'green',
+                                           title:'系统提示',
+                                           content: data.message,
+                                           onClose:function(){
+                                              //刷新页面
+                                              window.location.reload()
+                                           }
+                                       })
+                                    else
+                                        $.alert({
+                                           type:'red',
+                                           title:'系统提示',
+                                           content: data.message,
+                                           onClose:function(){
+
+                                           }
+                                       })
+                                },
+                                error:function(){
+                                    $.alert({
+                                       type:'red',
+                                       title:'系统提示',
+                                       content: '系统错误,请联系管理员',
+                                       onClose:function(){
+
+                                       }
+                                   })
+                                }
+                            })
+                        }
+                    },
+                    no: {
+                        text: '<i class="bi bi-x-lg"></i>&nbsp;&nbsp;取消',
+                        action: function (){
+
+                        }
+                    }
+                }
+            });
+        }, 'json')
+    }
+{% endblock %}

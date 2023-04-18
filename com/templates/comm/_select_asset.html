@@ -1,0 +1,280 @@
+<!-- 资产选择窗体 -->
+<div class="modal fade" id="assetModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assetModalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <table class="table table-hover table-sm">
+              <thead>
+                <tr>
+                    <th scope="col" width="2%">&nbsp;</th>
+                    <th scope="col" width="8%" class="text-center" style="font-size:3pt;">资产分类</th>
+                    <th scope="col" width="8%" class="text-center" style="font-size:3pt;">资产名称</th>
+                    <th scope="col" width="8%" class="text-center" style="font-size:3pt;">资产编号</th>
+                    <th scope="col" width="8%" class="text-center" style="font-size:3pt;">SAP资产编号</th>
+                    <th scope="col" width="7%" class="text-center" style="font-size:3pt;">品牌</th>
+                    <th scope="col" width="6%" class="text-center" style="font-size:3pt;">型号</th>
+                    <th scope="col" width="8%" class="text-center" style="font-size:3pt;">使用者</th>
+                    <th scope="col" width="15%" class="text-center" style="font-size:3pt;">部门</th>
+                    <th scope="col" width="10%" class="text-center" style="font-size:3pt;">购买日期</th>
+                    <th scope="col" width="10%" class="text-center" style="font-size:3pt;">存放位置</th>
+                    <th scope="col" width="10%" class="text-center" style="font-size:3pt;">资产状态</th>
+                </tr>
+                <tr id="conditions">
+                    <th scope="col">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="select_all">
+                        </div>
+                    </th>
+                    <th scope="col"  class="text-center">
+                        <select class="form-control form-control-sm" id="s_cls">
+                            <option value="0">---All---</option>
+                            <option value="1">---First Line Hide---</option>
+                        </select>
+                    </th>
+                    <th scope="col" class="text-center">
+                        <select class="form-control form-control-sm" id="s_name">
+                          <option value="0">---All---</option>
+                        </select>
+                    </th>
+                    <th scope="col" class="text-center">
+                        <input type="text" id="s_no" placeholder="回车查询......" class="form-control form-control-sm">
+                    </th>
+                    <th scope="col" class="text-center">
+                        <input type="text" id="s_sap_no" placeholder="回车查询......" class="form-control form-control-sm">
+                    </th>
+                    <th scope="col" class="text-center">
+                        <select class="form-control form-control-sm" id="s_brand"></select>
+                    </th>
+                    <th scope="col" class="text-center">
+                        <select class="form-control form-control-sm" id="s_model">
+                          <option value="0">---All---</option>
+                        </select>
+                    </th>
+                    <th scope="col" class="text-center">
+                        <input type="text" id="s_user" placeholder="回车查询......" class="form-control form-control-sm">
+                    </th>
+                    <th scope="col" class="text-center">
+                        <input type="text" id="s_dept" placeholder="回车查询......" class="form-control form-control-sm">
+                    </th>
+                    <th scope="col" class="text-center">
+                        <input type="text" id="s_buy_dt" placeholder="回车查询......" class="form-control form-control-sm">
+                    </th>
+                    <th scope="col" class="text-center">
+                        <select class="form-control form-control-sm" id="s_store">
+                          <option value="0">---All---</option>
+                        </select>
+                    </th>
+                    <th scope="col" class="text-center">
+                        <select class="form-control form-control-sm" id="s_status">
+                          <option value="0">---All---</option>
+                        </select>
+                    </th>
+                </tr>
+              </thead>
+              <tbody id="assets_for_select">
+                {% if assets %}
+                    {% for asset in assets %}
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" data-vid="{{asset.id}}" data-vno="{{asset.code}}" data-vsapno="{{asset.sap_code if asset.sap_code else ''}}" data-vname="{{asset.class3.name}}" data-vbrand="{{asset.brand.name}}"  data-vmodel="{{asset.model.name}}" data-assetid="{{asset.id}}" data-vuser="{{asset.user.name+'('+asset.user.code+')' if asset.user else ''}}">
+                                </div>
+                            </td>
+                            <td data-dv="{{asset.class2.id}}" style="font-size:2pt;">{{asset.class2.name}}</td>
+                            <td data-dv="{{asset.class3.id}}" style="font-size:2pt;">{{asset.class3.name}}</td>
+                            <td data-dv="{{asset.code}}" style="font-size:2pt;">{{asset.code}}</td>
+                            <td data-dv="{{asset.sap_code if asset.sap_code else ''}}" style="font-size:2pt;">{{asset.sap_code if asset.sap_code else ''}}</td>
+                            <td data-dv="{{asset.brand.id}}" style="font-size:2pt;">{{asset.brand.name}}</td>
+                            <td data-dv="{{asset.model.id}}" style="font-size:2pt;">{{asset.model.name}}</td>
+                            <td data-dv="{{asset.user.name}}" style="font-size:2pt;">{{asset.user.name}}</td>
+                            <td data-dv="{{asset.user.department.name if asset.user else ''}}" style="font-size:2pt;">{{asset.user.department.name if asset.user else ''}}</td>
+                            <td data-dv="{{asset.buy_date}}" style="font-size:2pt;">{{asset.buy_date}}</td>
+                            <td data-dv="{{asset.store.id}}" style="font-size:2pt;">{{asset.store.name}}</td>
+                            <td data-dv="{{asset.status.id}}" style="font-size:2pt;">{{asset.status.display}}</td>
+                        </tr>
+                    {%endfor%}
+                {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center"><small>没有记录!!!</small></td>
+                    </tr>
+                {% endif %}
+              </tbody>
+            </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;&nbsp;关闭</button>
+        <button type="button" id="choose" class="btn btn-outline-primary"><i class="bi bi-check-lg"></i>&nbsp;&nbsp;选择</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        $('#select_all').click(function(){
+            var v = $(this).prop('checked')
+            $('#assets_for_select').find(':checkbox').each(function(){
+                if(v){  // 筛选后只全选显示的资产
+                    if($(this).parent().parent().is(':visible'))
+                        $(this).prop('checked', v)
+                }else{
+                    $(this).prop('checked', v)
+                }
+            })
+        })
+        // 获取资产分类数据
+        $.get('/clazz/get_class2_options', function(data){
+            $('#s_cls').empty()
+            $('#s_cls').append("<option value='0'>---All---</option>")
+            var options = data.options
+            for(var i = 0; i < options.length; i++)
+                $('#s_cls').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+        }, 'json')
+        // 获取品牌数据
+        $.get('/brand/get_brands', function(data){
+            $('#s_brand').empty()
+            $('#s_brand').append("<option value='0'>---All---</option>")
+            var options = data.options
+            for(var i = 0; i < options.length; i++)
+                $('#s_brand').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+        }, 'json')
+        // 获取仓库数据
+        $.get('/store/get_stores', function(data){
+            $('#s_store').empty()
+            $('#s_store').append("<option value='0'>---All---</option>")
+            var options = data.options
+            for(var i = 0; i < options.length; i++)
+                $('#s_store').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+        }, 'json')
+        // 获取资产状态数据
+        $.get('/dict/get_enums/D003', function(data){
+            $('#s_status').empty()
+            $('#s_status').append("<option value='0'>---All---</option>")
+            var options = data.options
+            for(var i = 0; i < options.length; i++)
+                $('#s_status').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+        }, 'json')
+        $('#s_cls').change(function(){
+            if($(this).val() == '0'){
+                $('#s_name').empty()
+                $('#s_name').append("<option value='0'>---All---</option>")
+                filter_data()
+            }else{
+                $.post('/clazz/get_class3_options/'+$('#s_cls').val(), function(data){
+                    $('#s_name').empty()
+                    $('#s_name').append("<option value='0'>---All---</option>")
+                    var options = data.options
+                    for(var i = 0; i < options.length; i++)
+                        $('#s_name').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                    filter_data()
+                }, 'json')
+            }
+        })
+        $('#s_name').change(function(){
+            filter_data()
+        })
+        $('#s_no').keyup(function(event){
+          if(event.keyCode == 13){
+            filter_data()
+          }
+        })
+        $('#s_sap_no').keyup(function(event){
+          if(event.keyCode == 13){
+            filter_data()
+          }
+        })
+        $('#s_brand').change(function(){
+            if($('#s_brand').val() == '0'){
+                $('#s_model').empty()
+                $('#s_model').append("<option value='0'>---All---</option>")
+                filter_data()
+            }else{
+                $.post('/brand/get_model_options/'+$('#s_brand').val(), function(data){
+                    $('#s_model').empty()
+                    $('#s_model').append("<option value='0'>---All---</option>")
+                    var options = data.options
+                    for(var i = 0; i < options.length; i++)
+                        $('#s_model').append("<option value='"+options[i][0]+"'>"+options[i][1]+"</option>")
+                    filter_data()
+                }, 'json')
+            }
+        })
+        $('#s_model').change(function(){
+            filter_data()
+        })
+        $('#s_user').keyup(function(event){
+          if(event.keyCode == 13){
+            filter_data()
+          }
+        })
+        $('#s_buy_dt').keyup(function(event){
+          if(event.keyCode == 13){
+            filter_data()
+          }
+        })
+        $('#s_dept').keyup(function(event){
+          if(event.keyCode == 13){
+            filter_data()
+          }
+        })
+        $('#s_store').change(function(){
+            filter_data()
+        })
+        $('#s_status').change(function(){
+            filter_data()
+        })
+    })
+    //数据过滤
+    function filter_data(){
+        // 取消选择
+        $('#select_all').prop('checked', false)
+        $('#assets_for_select').find(':checkbox').each(function(){
+            $(this).prop('checked', false)
+        })
+        var conditions = {}
+        //获取条件
+        $('#conditions').find('th').each(function(index){
+            if(index == 1 || index == 2 || index == 5 || index == 6 || index == 10 || index == 11){
+                conditions[index] = $(this).find('select').val()
+            }
+            if(index == 3 || index == 4 || index == 7 || index == 8 || index == 9){
+                conditions[index] = $.trim($(this).find('input').val())
+            }
+        })
+        //执行过滤-逐行过滤
+        $('#assets_for_select').find('tr').each(function(index){
+            var tr = $(this)
+            var show = true
+            var results = []
+            Object.getOwnPropertyNames(conditions).forEach(function(key){
+                var s_value = conditions[key]
+                var d_value = $(tr).find('td').eq(key).data('dv')+''  //数据量类型会被识别为数字，故要进行转换为字符串
+                if(s_value == '' || s_value == '0'){
+                    results.push(true)
+                }else{
+                    if(d_value.search(s_value) < 0)
+                        results.push(false)
+                    else
+                        results.push(true)
+                }
+            })
+            //各个列过滤结果
+            //alert('Check'+(index+1)+'行!('+$(tr).find('td').eq(1).text()+')'+' ---> Check result length is : ' +results.length)
+            for(var i = 0; i < results.length; i++){
+                //alert('Result index :  '+i+' result is : ' + results[i])
+                if(!results[i]){
+                    show = false
+                    //break
+                }
+            }
+            //显示隐藏数据
+            if(show)
+                $(tr).show()
+            else
+                $(tr).hide()
+        })
+    }
+</script>

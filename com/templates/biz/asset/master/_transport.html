@@ -1,0 +1,93 @@
+<!-- 资产导入 -->
+<div class="modal fade" id="fileModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fileModalTitle">资产导入</h5>&nbsp;&nbsp;
+        <a class="btn btn-link text-success" href="{{url_for('master.template', _external=True)}}" target="_blank"><i class="bi bi-file-earmark-arrow-down"></i>&nbsp;模板下载</a>&nbsp;&nbsp;
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form id="fileForm" method="post">
+              <small class="text-danger">注意:资产导入仅限新增资产，故切记避免导入重复数据！</small><br><br>
+              <input class="form-control" type="file" id="assetFile">
+          </form><br>
+          <div class="row">
+              <div class="col text-danger" id="result"></div>
+          </div>
+      </div>
+      <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;&nbsp;关闭</button>
+            <button type="button" id="upload" class="btn btn-outline-primary">
+                <span id="ub"><i class="bi bi-upload"></i>&nbsp;&nbsp;导入</span>
+                <span id="up">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    正在导入......
+                </span>
+            </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        $('#up').hide()
+        $('#upload').click(function(){
+            if($('#assetFile').val() == ''){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '请选择要上传的Excel文件(*.xlsx)！',
+                   onClose:function(){}
+                })
+            }else{
+                files = document.getElementById('assetFile').files
+                var form_data = new FormData()
+                form_data.append('file', files[0])
+                $('#result').empty()
+                $('#upload').prop('disabled', true)
+                $('#ub').hide()
+                $('#up').show()
+                $.ajax({
+                    url:'/master/transport',
+                    type: 'post',
+                    data: form_data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function(data, status){
+                        if(data.code == '0'){
+                            $('#assetFile').val('')
+                            $('#result').append('<h5><i class="bi bi-info-circle"></i>&nbsp;&nbsp;数据校验失败，错误信息如下:</h5><hr>')
+                            $('#result').append(data.result)
+                            $('#upload').prop('disabled', false)
+                            $('#ub').show()
+                            $('#up').hide()
+                        }else
+                             $.alert({
+                                type:'green',
+                                title:'系统提示',
+                                content: data.result,
+                                onClose:function(){
+                                    $('#upload').prop('disabled', false)
+                                    $('#ub').show()
+                                    $('#up').hide()
+                                    $('#fileModal').modal('hide')
+                                    //刷新页面
+                                    window.location.reload()
+                                }
+                             })
+                    },
+                    error: function(data, status, e){
+                        $.alert({
+                           type:'red',
+                           title:'系统提示',
+                           content: '系统异常，请联系管理员！',
+                           onClose:function(){}
+                        })
+                    }
+                })
+            }
+        })
+    })
+</script>

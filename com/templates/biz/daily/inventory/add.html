@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('添加')}}
+<form method="post">
+    {{form.csrf_token}}
+    {{form.checker_id}}
+    {{form.check_asset_ids}}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">单据信息</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-4">
+            {{form.check_no.label}}
+            {{form.check_no(class='form-control', placeholder='盘点单号自动生成......', readonly=True)}}
+        </div>
+        <div class="col-md-4">
+            {{form.check_year.label}}
+            {{form.check_year(class='form-control', readonly=True)}}
+            {% for message in form.check_year.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            {{form.check_batch.label}}
+            {{form.check_batch(class='form-control')}}
+            {% for message in form.check_batch.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-4">
+            {{form.checker.label}}
+            <div class="input-group">
+                {{form.checker(class='form-control', readonly=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="select_employee()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            {% for message in form.checker.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            {{form.plan_start_date.label}}
+            {{form.plan_start_date(class='form-control', readonly=True)}}
+            {% for message in form.plan_start_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            {{form.plan_finish_date.label}}
+            {{form.plan_finish_date(class='form-control', readonly=True)}}
+            {% for message in form.plan_finish_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div>
+</form><br>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">盘点明细</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col text-end">
+        <button class="btn btn-outline-success" id="add_asset"><i class="bi bi-plus-lg"></i>&nbsp;&nbsp;添加</button>&nbsp;&nbsp;
+        <button class="btn btn-outline-danger" id="clear_asset"><i class="bi bi-trash3"></i>&nbsp;&nbsp;清空</button>
+    </div>
+</div><br>
+<table class="table table-hover table-sm table-bordered">
+  <thead>
+    <tr>
+        <th scope="col" width="15%">资产编号</th>
+        <th scope="col" width="15%">SAP资产编号</th>
+        <th scope="col" width="20%">资产名称</th>
+        <th scope="col" width="15%">品牌</th>
+        <th scope="col" width="15%">型号</th>
+        <th scope="col" width="10%">使用者</th>
+        <th scope="col" class="text-center" width="10%">Action</th>
+    </tr>
+  </thead>
+  <tbody id="assets">
+    {%if selected_assets%}
+        {%for asset in selected_assets%}
+            <tr id="{{asset.id}}">
+                <td>{{asset.code}}</td>
+                <td>{{asset.sap_code if asset.sap_code else ''}}</td>
+                <td>{{asset.class3.name}}</td>
+                <td>{{asset.brand.name}}</td>
+                <td>{{asset.model.name}}</td>
+                <td>{{asset.user.name if asset.user else ''}}</td>
+                <td class="text-center"><button onclick="remove_asset(this)" class="btn btn-link text-danger"><i class="bi bi-dash-circle"></i></button></td>
+            </tr>
+        {%endfor%}
+    {%endif%}
+  </tbody>
+  {%if form.check_asset_ids.errors%}
+    <tfoot>
+        <tr>
+            <td colspan="7">
+                {% for message in form.check_asset_ids.errors %}
+                    <small class="text-danger">{{message}}</small>
+                {% endfor %}
+            </td>
+        </tr>
+    </tfoot>
+  {%endif%}
+</table><br>
+<div class="row">
+    <div class="col">
+        <button onclick="do_submit()" class="btn btn-outline-primary"><i class="bi bi-download"></i>&nbsp;&nbsp;保存</button>
+    </div>
+    <div class="col text-end">
+        <a class="btn btn-outline-secondary" href="{{url_for('inventory.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+    </div>
+</div>
+{% include 'comm/_select_asset.html' %}
+{% include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date('plan_start_date')
+        init_date('plan_finish_date')
+        init_date_year('check_year')
+        $('#add_asset').click(function(){
+            $('#assetModal').modal('show')
+        })
+        $('#clear_asset').click(function(){
+            $('#check_asset_ids').val('')
+            $('#assets').empty()
+        })
+        $('#choose').click(function(){
+            var chose = false
+            $('#assets_for_select').find(':checkbox').each(function(){
+                if($(this).prop('checked'))
+                    chose = true
+            })
+            if(chose){
+                $('#assets_for_select').find(':checkbox').each(function(){
+                    if($(this).prop('checked') && $('#check_asset_ids').val().search($(this).data('assetid')) < 0){
+                        var tr = "<tr id=\'"+$(this).data('assetid')+"\'>"+
+                            "<td>"+$(this).data('vno')+"</td>"+
+                            "<td>"+$(this).data('vsapno')+"</td>"+
+                            "<td>"+$(this).data('vname')+"</td>"+
+                            "<td>"+$(this).data('vbrand')+"</td>"+
+                            "<td>"+$(this).data('vmodel')+"</td>"+
+                            "<td>"+$(this).data('vuser')+"</td>"+
+                            "<td class='text-center'><button onclick='remove_asset(this)' class='btn btn-link text-danger'><i class='bi bi-dash-circle'></i></button></td>"+
+                        "</tr>"
+                        $('#assets').append(tr)
+                    }
+                })
+                set_selected_asset_ids()
+                $('#assetModal').modal('hide')
+            }else{
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '请选择要盘点的资产！',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    })
+    function do_submit(){
+        set_selected_asset_ids()
+        if($('#check_asset_ids').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '请选择要盘点的资产！',
+               onClose:function(){
+
+               }
+           })
+        }else{
+            $('form').submit()
+        }
+    }
+    function remove_asset(e){
+        $(e).parent().parent().remove()
+    }
+    function select_employee(){
+        e_id = 'checker_id'
+        e_all = 'checker'
+        $('#employeeModal').modal('show')
+    }
+    function set_selected_asset_ids(){
+        var ids = []
+        // 设置asset id值
+        $('#assets').find('tr').each(function(index){
+            ids.push($(this).attr('id'))
+        })
+        $('#check_asset_ids').val(ids.join(','))
+    }
+{% endblock %}

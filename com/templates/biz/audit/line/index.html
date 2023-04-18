@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-3 text-end">
+        {{form.csrf_token}}
+        {{form.code(class='form-control', placeholder='模板代码')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.name(class='form-control', placeholder='模板名称')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('line.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="25%">模板代码</th>
+        <th scope="col" width="25%">模板名称</th>
+        <th scope="col" width="20%">审批业务</th>
+        <th scope="col" width="10%">状态</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if lines %}
+        {% for line in lines %}
+            <tr>
+                <td class="align-middle">{{line.code}}</td>
+                <td class="align-middle">{{line.name}}</td>
+                <td class="align-middle">{{line.biz_code.name}}</td>
+                <td class="align-middle">{%if line.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('line.edit', id=line.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <button class="btn btn-link text-success" onclick="show_line('{{line.name}}', '{{line.id}}')" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="审批线"><i class="bi bi-bezier"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="5" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<!-- Modal -->
+<div class="modal fade" id="lineModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <div class="row align-items-center justify-content-center">
+              <div class="col-2">
+                <small class="text-secondary">审批角色</small>
+              </div>
+              <div class="col-7">
+                  <select id="roles" class="form-select">
+                      {%for role in roles%}
+                      <option value="{{role.id}}">{{role.name}}</option>
+                      {%endfor%}
+                  </select>
+              </div>
+              <div class="col-3">
+                  <button class="btn btn-outline-success" onclick="add_role()">添加到审批线</button>
+              </div>
+          </div><br>
+          <div class="row align-items-center justify-content-center">
+              <div class="col">
+                  <table class="table table-sm">
+                  <thead class="table-dark">
+                    <tr>
+                        <th scope="col" width="20%">审批角色</th>
+                        <th scope="col" width="40%">审批人员</th>
+                        <th scope="col" width="20%">审批等级</th>
+                        <th scope="col" width="20%">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="nodes">
+                    <tr>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>Jack,Harry,Tom</td>
+                        <td><button class="btn btn-link text-danger"><i class="bi bi-x-lg"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    var line_id = ''
+    //打开审批线
+    function show_line(title, id){
+        line_id = id
+        $('#modalTitle').text(title)
+        get_nodes('init')
+    }
+    //添加审批角色(审批节点)
+    function add_role(){
+        var role_id = $('#roles').val()
+        $.ajax({
+            type:'post',
+            url:'/line/node_add',
+            data:JSON.stringify({line_id:line_id, role_id:role_id}),
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.code == 1)
+                    $.alert({
+                       type:'green',
+                       title:'系统提示',
+                       content: data.message,
+                       onClose:function(){
+                            //refresh audit nodes
+                            get_nodes('refresh')
+                       }
+                   })
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    //异步获取审批节点
+    function get_nodes(action){
+        $.ajax({
+            type:'post',
+            url:'/line/audit_nodes/'+line_id,
+            data:{},
+            success:function(data){
+                $('#nodes').empty()
+                var nodes = data.nodes
+                for(var i = 0; i < nodes.length; i++){
+                    $('#nodes').append("<tr>"+
+                            "<td>"+nodes[i].role+"</td>"+
+                            "<td>"+nodes[i].people+"</td>"+
+                            "<td>"+nodes[i].grade+"</td>"+
+                            "<td><button onclick='remove_role(\""+nodes[i].rel_id+"\")' class='btn btn-link text-danger "+(i!=nodes.length-1?"disabled":"")+"'><i class='bi bi-x-lg'></i></button></td>"+
+                    "</tr>")
+                }
+                if(action == 'init')
+                    $('#lineModal').modal('show')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    //移除审批角色(审批节点)
+    function remove_role(rel_id){
+        //alert('remove : '+rel_id)
+        $.confirm({
+            type:'red',
+            title: '确认将该审批角色移除?',
+            content: '移除前请务必确认对应审批单据均已审批完成!',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/line/node_remove',
+                        data:JSON.stringify({rel_id:rel_id}),
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){
+                                       //refresh audit nodes
+                                        get_nodes('refresh')
+                                   }
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
+    }
+{% endblock %}

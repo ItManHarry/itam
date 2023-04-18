@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-3 text-end">
+        {{form.csrf_token}}
+        {{form.code(class='form-control', placeholder='角色代码')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.name(class='form-control', placeholder='角色名称')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('performer.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="35%">角色代码</th>
+        <th scope="col" width="35%">角色名称</th>
+        <th scope="col" width="10%">状态</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if performers %}
+        {% for performer in performers %}
+            <tr>
+                <td class="align-middle">{{performer.code}}</td>
+                <td class="align-middle">{{performer.name}}</td>
+                <td class="align-middle">{%if performer.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="text-center align-middle">
+                    <a href="{{url_for('performer.edit', id=performer.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <button class="btn btn-link text-success" onclick="set_performers('{{performer.name}}', '{{performer.id}}')" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="审批人"><i class="bi bi-people"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="4" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<!-- Modal -->
+<div class="modal fade" id="performerModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <div class="row align-items-center justify-content-center">
+              <div class="col-5">
+                  <label for="for_select">待选</label>
+                  <select id="for_select" class="form-select" multiple></select>
+              </div>
+              <div class="col-2">
+                  <br>
+                  <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(1)"><i class="bi bi-arrow-right"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="do_move(0)"><i class="bi bi-arrow-left"></i></button>
+                  </div>
+              </div>
+              <div class="col-5">
+                  <label for="selected">已选</label>
+                  <select id="selected" class="form-select" multiple></select>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="do_save()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    var performer_id = ''
+    function set_performers(title, id){
+        performer_id = id
+        $('#modalTitle').text(title)
+        $.ajax({
+            type:'post',
+            url:'/performer/people/'+id,
+            data:{},
+            success:function(data){
+                $('#for_select').empty()
+                $('#selected').empty()
+                var for_select = data.for_select, selected = data.selected
+                for(var i = 0; i < for_select.length; i++){
+                    $('#for_select').append("<option value='"+for_select[i][0]+"'>"+for_select[i][1]+"</option>")
+                }
+                for(var i = 0; i < selected.length; i++){
+                    $('#selected').append("<option value='"+selected[i][0]+"'>"+selected[i][1]+"</option>")
+                }
+                $('#performerModal').modal('show')
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function do_move(action){
+        var option = null
+        if(action == 1){    //若为1执行增加审批人
+            $('#for_select option').each(function(){
+                if($(this).is(':checked')){
+                    $('#selected').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
+                    $(this).remove()
+                }
+            })
+        }else{              //若为0执行移除审批人
+            $('#selected option').each(function(){
+                if($(this).is(':checked')){
+                    $('#for_select').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>")
+                    $(this).remove()
+                }
+            })
+        }
+    }
+    function do_save(){
+        var people = []
+        $('#selected option').each(function(){
+            people.push($(this).val())
+        })
+        if(people.length == 0)
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '请添加审批人员！',
+               onClose:function(){}
+            })
+        else
+            $.ajax({
+                type:'post',
+                url:'/performer/people_add',
+                data:JSON.stringify({performer_id:performer_id, people:people}),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#performerModal').modal('hide')
+                           }
+                       })
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                   })
+                }
+            })
+    }
+{% endblock %}

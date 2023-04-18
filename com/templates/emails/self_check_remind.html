@@ -1,0 +1,38 @@
+<!-- 自点检提醒邮件 -->
+<h5 style="color:cornflowerblue;font-family:'Microsoft YaHei'; margin-bottom:0px;">
+    现进行{{check.check_year}}年度{{check.check_batch}}次资产盘点！以下是您名下的资产信息:
+</h5>
+<table width="60%" cellspacing="0" cellpadding="0" style="border:1px solid #ccc;border-collapse:collapse">
+  <thead>
+    <tr>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">资产编号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">SAP资产编号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">资产名称</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">品牌</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">型号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">购买日期</th>
+    </tr>
+  </thead>
+  <tbody id="assets">
+    {%if assets%}
+        {%for asset in assets%}
+            <tr id="{{asset.id}}">
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.code}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.sap_code if asset.sap_code else ''}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.class3.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.brand.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.model.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{asset.buy_date}}</td>
+            </tr>
+        {%endfor%}
+    {%endif%}
+  </tbody>
+</table><br>
+<h5 style="color:cornflowerblue;font-family:'Microsoft YaHei'; margin-bottom:0px;">
+    现邀请您点击以下链接进行资产自行盘点确认，感谢合作！
+</h5>
+<small style="color:gray;font-family:'Microsoft YaHei'"><a style="font-family:'Microsoft YaHei'" href="{{url_for('inventory.my_check', check_id=check.id, employee_id=employee.id, _external=True)}}">个人资产自盘点邀请&nbsp;&nbsp;&gt;&gt;&gt;</a></small>
+<br><br>
+<hr width="60%" align="left">
+<br>
+<small style="color:cornflowerblue;font-family:'Microsoft YaHei'">该邮件为系统提醒邮件，无需回复！</small>

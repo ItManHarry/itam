@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-2 text-end">
+        {{form.csrf_token}}
+        {{form.asset_no(class='form-control', placeholder='资产编号')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.scrap_no(class='form-control', placeholder='报废单号')}}
+    </div>
+    <div class="col-2 text-end">
+        <div class="input-group">
+            {{form.check_year(class='form-control', placeholder='报废年份', readonly=True)}}
+            <div class="input-group-prepend">
+                <span id="clear_year" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('scrap_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('scrap_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="5%">法人</th>
+        <th scope="col" width="5%">报废年度</th>
+        <th scope="col" width="5%">物料类型</th>
+        <th scope="col" width="5%">品牌</th>
+        <th scope="col" width="5%">型号</th>
+        <th scope="col" width="5%">部门</th>
+        <th scope="col" width="5%">使用担当</th>
+        <th scope="col" width="5%">判定日期</th>
+        <th scope="col" width="5%">报废原因</th>
+        <th scope="col" width="5%">报废完成日</th>
+        <th scope="col" width="5%">资产编号</th>
+        <th scope="col" width="5%">资产名称</th>
+        <th scope="col" width="5%">报废单号</th>
+        <th scope="col" width="5%">判定人</th>
+        <th scope="col" width="5%">报废Draft号</th>
+        <th scope="col" width="5%">SAP是否报废</th>
+        <th scope="col" width="13%">报废状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if scraps %}
+        {% for scrap in scraps %}
+            <tr>
+                <td class="align-middle">{{scrap.asset.user.company.name if scrap.asset.user else ''}}</td>
+                <td class="align-middle">{{format_date_year(scrap.finish_date)}}</td>
+                <td class="align-middle">{{scrap.asset.class2.name}}</td>
+                <td class="align-middle">{{scrap.asset.brand.name}}</td>
+                <td class="align-middle">{{scrap.asset.model.name}}</td>
+                <td class="align-middle">{{scrap.asset.department.name if scrap.asset.department else ''}}</td>
+                <td class="align-middle">{{scrap.asset.user.name if scrap.asset.user else ''}}</td>
+                <td class="align-middle">{{scrap.scrap_date}}</td>
+                <td class="align-middle">{{scrap.scrap_reason.display}}</td>
+                <td class="align-middle">{{scrap.finish_date}}</td>
+
+                <td>{{scrap.asset.code}}</td>
+                <td>{{scrap.asset.class3.name}}</td>
+                <td>{{scrap.scrap_no}}</td>
+                <td>{{scrap.scraper.user_name if scrap.scraper else ''}}</td>
+                <td>{{scrap.scrap_draft}}</td>
+                <td>{{'是' if scrap.sap_scrap else '否'}}</td>
+                <td>{{scrap.scrap_state.display}}</td>
+
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="17" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{%include 'biz/asset/master/_scrap.html'%}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date_year('check_year')
+        $('#clear_year').click(function(event){
+            $('#check_year').val('')
+        })
+    })
+    function scrap(asset_id, scrap_id){
+        $.post('/scrap/info/'+scrap_id, function(data){
+            $('#scrap_no_edit').val(data.scrap_no)
+            $('#scrap_date').val(data.scrap_date)
+            $('#finish_date').val(data.finish_date)
+            $('#scrap_draft').val(data.scrap_draft)
+            $('#scrap_reason').val(data.scrap_reason)
+            $('#scrap_state').val(data.scrap_state)
+            if(data.sap_scrap)
+                $('#sap_scrap').prop('checked', true)
+            $('#scrap_asset_id').val(asset_id)
+            $('#action_sign').val('U')
+            $('#scrap_id').val(scrap_id)
+            $('#scrapModal').modal('show')
+        }, 'json')
+    }
+{% endblock %}

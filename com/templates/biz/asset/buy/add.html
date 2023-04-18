@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('添加')}}
+<form method="post">
+    {{form.csrf_token}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.buy_no.label}}
+            {{form.buy_no(class='form-control', placeholder='购买单号,系统自动生成', readonly=True)}}
+            {% for message in form.buy_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.draft_no.label}}
+            {{form.draft_no(class='form-control')}}
+            {% for message in form.draft_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.application_no.label}}
+            {{form.application_no(class='form-control')}}
+            {% for message in form.application_no.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            {{form.applicant.label}}
+            {{form.applicant(class='form-control', readonly=True)}}
+        </div>
+        <div class="col-md-6">
+            {{form.total_price.label}}
+            {{form.total_price(class='form-control')}}
+            {% for message in form.total_price.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
+            {{form.asset_class.label}}
+            {{form.asset_class(class='form-control', readonly=True)}}
+        </div>
+        <div class="col-md-3">
+            {{form.asset_name.label}}
+            {{form.asset_name(class='form-control', readonly=True)}}
+        </div>
+        <div class="col-md-3">
+            {{form.brand.label}}
+            {{form.brand(class='form-control', readonly=True)}}
+        </div>
+        <div class="col-md-3">
+            {{form.model.label}}
+            {{form.model(class='form-control', readonly=True)}}
+        </div>
+    </div><br>
+    <div class="row">
+            <div class="col-md-6">
+            {{form.bill_date.label}}
+            {{form.bill_date(class='form-control')}}
+            {% for message in form.bill_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.receive_due_date.label}}
+            {{form.receive_due_date(class='form-control')}}
+            {% for message in form.receive_due_date.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('buy.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        //初始化时间控件
+        $("#bill_date").each(function(){
+            init_date($(this).attr('id'))
+        })
+        $("#receive_due_date").each(function(){
+            init_date($(this).attr('id'))
+        })
+        $('#application_no').change(function(){
+            var apply_no = $(this).val()
+            $.post('/apply/get_info/'+apply_no, function(data){
+                $('#applicant').val(data.info.applicant)
+                $('#asset_class').val(data.info.asset_class)
+                $('#asset_name').val(data.info.asset_name)
+                $('#brand').val(data.info.brand)
+                $('#model').val(data.info.model)
+            }, 'json')
+        })
+    })
+{% endblock %}

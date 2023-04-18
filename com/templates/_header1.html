@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="{{url_for('main.to_function')}}"><i class="bi bi-laptop"  style="font-size:1em;"></i></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class = "container-fluid">
+        <form class="form-inline" action="{{url_for('main.to_function')}}" method="post">
+            <div class="form-group">
+                <input type="hidden" value="{{csrf_token()}}" id="csrf_token" name="csrf_token">
+                <input type="text" name="menu_code" class="form-control form-control-sm" placeholder="请输入功能代码" required>
+            </div>&nbsp;&nbsp;
+            <button type = "submit" class="btn btn-light btn-sm">GO!</button>
+        </form>
+        <div class="row text-right">
+            {% if current_user.is_authenticated %}
+                <div class="col-12">
+                    <span class="text-secondary"><i class="bi bi-person"></i>&nbsp;{{current_user.user_name}}</span>&nbsp;&nbsp;
+                    <a class="btn btn-outline-success btn-sm" title="登出" href="{{url_for('auth.logout')}}"><i class="bi bi-box-arrow-right"></i></a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>

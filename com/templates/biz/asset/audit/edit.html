@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('详细')}}
+ <div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">单据信息</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-6">
+        {{form.in_no.label}}
+        {{form.in_no(class='form-control' , disabled=True)}}
+        {% for message in form.in_no.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+    </div>
+    <div class="col-md-6">
+        {{form.in_date.label}}
+        {{form.in_date(class='form-control' , disabled=True)}}
+        {% for message in form.in_date.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-6">
+        {{form.charger_id.label}}
+        {{form.charger_id(class='form-control' , disabled=True)}}
+        {% for message in form.charger_id.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+    </div>
+    <div class="col-md-6">
+        {{form.state_id.label}}
+        {{form.state_id(class='form-control' , disabled=True)}}
+        {% for message in form.state_id.errors %}
+            <small class="text-danger">{{message}}</small>
+        {% endfor %}
+    </div>
+</div><br>
+<div class="row">
+    <div class="col">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <span class="nav-link active text-primary">资产信息</span>
+          </li>
+        </ul>
+    </div>
+</div><br>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+        <th scope="col" width="7%">资产名称</th>
+        <th scope="col" width="7%">资产编号</th>
+        <th scope="col" width="7%">SAP资产编号</th>
+        <th scope="col" width="7%">品牌</th>
+        <th scope="col" width="7%">型号</th>
+        <th scope="col" width="6%">购买价格</th>
+        <th scope="col" width="7%">申请人</th>
+        <th scope="col" width="7%">申请法人</th>
+        <th scope="col" width="25%">申请部门</th>
+        <th scope="col" width="20%">申请概要</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if assets %}
+        {% for asset in assets %}
+            <tr>
+                <td>{{asset.class3.name}}</td>
+                <td>{{asset.code}}</td>
+                <td>{{asset.sap_code if asset.sap_code else '-'}}</td>
+                <td>{{asset.brand.name}}</td>
+                <td>{{asset.model.name}}</td>
+                <td>{{asset.buy_fee if asset.buy_fee else '-'}}</td>
+                <td>{{asset.buy_bill.application.applicant.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.company.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.department.name if asset.buy_bill.application else '-'}}</td>
+                <td>{{asset.buy_bill.application.summary if asset.buy_bill.application else '-'}}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="10" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+<div class="row">
+    <div class="col-md-12 text-end">
+        <a class="btn btn-outline-secondary" href="{{url_for('audit.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+    </div>
+ </div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        //初始化时间控件
+        $("#in_date").each(function(){
+            init_date($(this).attr('id'))
+        })
+    })
+
+{% endblock %}

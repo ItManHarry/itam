@@ -1,0 +1,258 @@
+<!-- 维修申请窗体 -->
+<div class="modal fade" id="repairModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="repairModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="repairModalTitle">维修申请</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="repair_no_edit" class="form-label">维修单号</label>
+              <input type="text" class="form-control" placeholder="系统自动生成......" id="repair_no_edit" readonly>
+            </div>
+            <div class="col-md-4">
+              <label for="request_draft" class="form-label">维修申请Draft</label>
+              <input type="text" class="form-control" placeholder="维修申请Draft" id="request_draft">
+            </div>
+            <div class="col-md-4">
+              <label for="requested_by_nm" class="form-label">维修申请人</label>
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="维修申请人" id="requested_by_nm" readonly>
+                <div class="input-group-prepend">
+                    <span onclick="select_repair_requestor()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="repair_draft" class="form-label">维修Draft</label>
+              <input type="text" class="form-control" placeholder="维修Draft" id="repair_draft">
+            </div>
+            <div class="col-md-4">
+              <label for="repair_type" class="form-label">维修类型</label>
+              <select class="form-control" id="repair_type">
+                {% for repair_type in repair_types %}
+                <option value="{{repair_type[0]}}">{{repair_type[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="repair_state" class="form-label">维修状态</label>
+              <select class="form-control" id="repair_state">
+                {% for repair_state in repair_states %}
+                <option value="{{repair_state[0]}}">{{repair_state[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="request_accept_dt" class="form-label">维修申请接收日期</label>
+              <input type="text" class="form-control" id="request_accept_dt" readonly>
+            </div>
+            <div class="col-md-4">
+              <label for="out_date" class="form-label">搬出日期</label>
+              <input type="text" class="form-control" id="out_date" readonly>
+            </div>
+            <div class="col-md-4">
+              <label for="pre_in_date" class="form-label">预计搬入日期</label>
+              <input type="text" class="form-control" id="pre_in_date" readonly>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="real_in_date" class="form-label">实际搬入日期</label>
+              <input type="text" class="form-control" id="real_in_date" readonly>
+            </div>
+            <div class="col-md-4">
+              <label for="pre_finish_date" class="form-label">预计维修完成日期</label>
+              <input type="text" class="form-control" id="pre_finish_date" readonly>
+            </div>
+            <div class="col-md-4">
+              <label for="rel_finish_date" class="form-label">实际维修完成日期</label>
+              <input type="text" class="form-control" id="rel_finish_date" readonly>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="repair_handler_nm" class="form-label">IT处理担当</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="repair_handler_nm" readonly>
+                <div class="input-group-prepend">
+                    <span onclick="select_repair_handler()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="fee" class="form-label">维修费用</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="fee" value="0.0">
+                <span class="input-group-text"><i class="bi bi-currency-yen"></i></span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="repair_part_id" class="form-label">故障部位</label>
+              <select class="form-control" id="repair_part_id">
+                {% for repair_part in repair_parts %}
+                <option value="{{repair_part[0]}}">{{repair_part[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <label for="repair_content" class="form-label">维修内容</label>
+              <textarea class="form-control" id="repair_content" rows="3"></textarea>
+            </div>
+          </div>
+          <input type="hidden" id="repair_asset_id">
+          <input type="hidden" id="repair_id">
+          <input type="hidden" id="repair_handler_id">
+          <input type="hidden" id="requested_by_id">
+          {#A:新增  U:修改#}
+          <input type="hidden" id="action_sign">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;关闭</button>
+        <button id="save_repair" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        init_date('pre_finish_date')
+        init_date('rel_finish_date')
+        init_date('out_date')
+        init_date('pre_in_date')
+        init_date('real_in_date')
+        init_date('request_accept_dt')
+        $('#save_repair').click(function(){
+          if($('#request_draft').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '维修申请Draft未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else if($('#requested_by_nm').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '维修申请人未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else if($('#repair_draft').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '维修Draft未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else if($('#request_accept_dt').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '维修申请接收日期未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else if($('#repair_handler_nm').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: 'IT处理担当未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else{
+            var r = /^[+-]?[1-9]?[0-9]*\.?[0-9]*$/
+            if(r.test($('#fee').val())){
+              var params = {
+                repair_type_id: $('#repair_type').val(),
+                repair_state_id: $('#repair_state').val(),
+                pre_finish_date: $('#pre_finish_date').val(),
+                rel_finish_date: $('#rel_finish_date').val(),
+                out_date: $('#out_date').val(),
+                pre_in_date: $('#pre_in_date').val(),
+                real_in_date: $('#real_in_date').val(),
+                fee: $('#fee').val(),
+                request_draft:$('#request_draft').val(),
+                request_accept_dt:$('#request_accept_dt').val(),
+                requested_by_id:$('#requested_by_id').val(),
+                repair_draft:$('#repair_draft').val(),
+                repair_handler_id:$('#repair_handler_id').val(),
+                asset_id: $('#repair_asset_id').val(),
+                repair_id: $('#repair_id').val(),
+                repair_part_id:$('#repair_part_id').val(),
+                repair_content:$.trim($('#repair_content').val()),
+                action: $('#action_sign').val()
+              }
+              $.ajax({
+                  type:'post',
+                  url:'/master/repair',
+                  data:JSON.stringify(params),
+                  contentType:'application/json;charset=UTF-8',
+                  success:function(data){
+                      if(data.code == 1)
+                          $.alert({
+                             type:'green',
+                             title:'系统提示',
+                             content: data.message,
+                             onClose:function(){
+                                  $('#repairModal').modal('hide')
+                                  //刷新页面
+                                  window.location.reload()
+                             }
+                         })
+
+                  },
+                  error:function(){
+                      $.alert({
+                         type:'red',
+                         title:'系统提示',
+                         content: '系统错误,请联系管理员',
+                         onClose:function(){
+
+                         }
+                     })
+                  }
+              })
+            }else{
+              $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '维修费用不为小数，请更正！',
+               onClose:function(){
+
+               }
+            })
+            }
+          }
+        })
+    })
+    function select_repair_requestor(){
+        e_id = 'requested_by_id'
+        e_all = 'requested_by_nm'
+        $('#employeeModal').modal('show')
+    }
+    function select_repair_handler(){
+        e_id = 'repair_handler_id'
+        e_all = 'repair_handler_nm'
+        $('#employeeModal').modal('show')
+    }
+</script>

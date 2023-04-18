@@ -1,0 +1,142 @@
+<!-- 雇员选择窗体(引用界面需要导入法人列表信息) -->
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="employeeModalTitle">&nbsp;</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <table class="table">
+              <thead>
+                  <tr>
+                      <th width="15%">法人</th>
+                      <th width="60%">部门</th>
+                      <th width="25%">雇员</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td>
+                        <ul class="list-group" id="companies">
+                            {%for company in companies%}
+                                <button onclick="get_departments('{{company.id}}')" class="list-group-item list-group-item-action" id="{{company.id}}">{{company.name}}</button>
+                            {%endfor%}
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" onkeyup="search_departments(event)" id="department" class="form-control" placeholder="部门名称(输入后回车或点击按钮查询即可)">
+                            <button onclick="set_departments()" class="input-group-text"><i class="bi bi-search"></i></button>
+                        </div>
+                        <ul class="list-group" id="departments"></ul>
+                    </td>
+                    <td>
+                        <ul class="list-group" id="employees"></ul>
+                    </td>
+                </tr>
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    var departments = []    //所有的部门存于该数组，用于过滤
+    var e_id = ''           //要设置雇员id的element
+    var e_code = ''         //要设置雇员职号的element
+    var e_name = ''         //要设置雇员姓名的element
+    var e_all = ''          //要设置雇员职号&姓名的element
+    var e_email = ''        //要设置雇员邮箱的element
+    function get_departments(company_id){
+        //alert(company_id)
+        $('#companies').find(':button').each(function(){
+            if($(this).attr('id') == company_id)
+                $(this).addClass('active')
+            else
+                $(this).removeClass('active')
+        })
+        $.ajax({
+            type:'post',
+            url:'/company/get_departments/'+company_id,
+            data:{},
+            success:function(data){
+                departments = data.departments
+                $('#department').val('')
+                set_departments()
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function search_departments(event){
+        if (event.keyCode == 13){
+             set_departments()
+        }
+    }
+    function set_departments(){
+        $('#departments').empty()
+        var for_search = $.trim($('#department').val())
+        if(for_search == '')
+            for(var i = 0; i < departments.length; i++)
+                $('#departments').append("<button onclick='get_employees(\""+departments[i][0]+"\")' id='"+departments[i][0]+"' class='list-group-item list-group-item-action'>"+departments[i][1]+"</button>")
+        else
+            for(var i = 0; i < departments.length; i++)
+                if(departments[i][1].search(for_search) != -1)
+                    $('#departments').append("<button onclick='get_employees(\""+departments[i][0]+"\")' id='"+departments[i][0]+"' class='list-group-item list-group-item-action'>"+departments[i][1]+"</button>")
+    }
+    function get_employees(department_id){
+        //alert(department_id)
+        $('#departments').find(':button').each(function(){
+            if($(this).attr('id') == department_id)
+                $(this).addClass('active')
+            else
+                $(this).removeClass('active')
+        })
+        $.ajax({
+            type:'post',
+            url:'/department/get_employees/'+department_id,
+            data:{},
+            success:function(data){
+                $('#employees').empty()
+                var employees = data.employees
+                for(var i = 0; i < employees.length; i++){
+                    //alert(employees[i][0])
+                    $('#employees').append("<button onclick='set_employee(this)' data-name='"+employees[i][1]+"' data-code='"+employees[i][2]+"' data-email='"+employees[i][3]+"' id='"+employees[i][0]+"' class='list-group-item list-group-item-action'><span class='text-success'><i class='bi bi-check2-circle'></i>&nbsp;&nbsp;</span>"+employees[i][1]+"("+employees[i][2]+")</button>")
+                }
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function set_employee(e){
+        //alert($(e).data('code')+':'+$(e).data('name'))
+        if(e_id != '')
+            $('#'+e_id).val($(e).attr('id'))
+        if(e_code != '')
+            $('#'+e_code).val($(e).data('code'))
+        if(e_name != '')
+            $('#'+e_name).val($(e).data('name'))
+        if(e_email != '')
+            $('#'+e_email).val($(e).data('email'))
+        if(e_all != '')
+            $('#'+e_all).val($(e).text())
+        $('#employeeModal').modal('hide')
+    }
+</script>

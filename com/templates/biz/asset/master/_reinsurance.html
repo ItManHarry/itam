@@ -1,0 +1,132 @@
+<!-- 续保窗体 -->
+<div class="modal fade" id="reinsuranceModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="reinsuranceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reinsuranceModalTitle">资产续保</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="vendor" class="form-label">供应商</label>
+              <select class="form-control" id="vendor">
+                {% for vendor in vendors %}
+                <option value="{{vendor[0]}}">{{vendor[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="draft_no" class="form-label">续保Draft号</label>
+              <input type="text" class="form-control" placeholder="续保Draft号......" id="draft_no">
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="start_date" class="form-label">维保开始日期</label>
+              <input type="text" class="form-control" id="start_date" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="expire_date" class="form-label">维保结束日期</label>
+              <input type="text" class="form-control" id="expire_date" readonly>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-3">
+              <label for="price" class="form-label">维保费用</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="price" value="0.0">
+                <span class="input-group-text"><i class="bi bi-currency-yen"></i></span>
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-12">
+              <label for="content" class="form-label">维保内容</label>
+              <textarea class="form-control" id="content" rows="3"></textarea>
+            </div>
+          </div><br>
+          <input type="hidden" id="reinsurance_asset_id">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;关闭</button>
+        <button id="save_insurance" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        init_date('start_date')
+        init_date('expire_date')
+        $('#save_insurance').click(function(){
+          var r = /^[+-]?[1-9]?[0-9]*\.?[0-9]*$/
+          var validate_ok = true, message = ''
+          if($('#draft_no').val() == ''){
+            validate_ok= false
+            message = '续保Draft号为空！'
+          }else if($('#start_date').val() == ''){
+            validate_ok= false
+            message = '维保开始日期为空！'
+          }else if($('#expire_date').val() == ''){
+            validate_ok= false
+            message = '维保结束日期为空！'
+          }else if(!r.test($('#price').val())){
+            validate_ok= false
+            message = '维保费用应为数字！'
+          }
+          if(!validate_ok){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: message,
+               onClose:function(){
+
+               }
+            })
+          }else{
+            var params = {
+              start_date: $('#start_date').val(),
+              expire_date: $('#expire_date').val(),
+              content: $('#content').val(),
+              draft_no: $('#draft_no').val(),
+              price: $('#price').val(),
+              vendor_id: $('#vendor').val(),
+              asset_id: $('#reinsurance_asset_id').val()
+            }
+            $.ajax({
+                type:'post',
+                url:'/master/reinsurance',
+                data:JSON.stringify(params),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#reinsuranceModal').modal('hide')
+                                //刷新页面
+                                window.location.reload()
+                           }
+                       })
+
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                   })
+                }
+            })
+          }
+        })
+    })
+</script>

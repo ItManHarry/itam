@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('添加')}}
+<form method="post">
+    {{form.csrf_token}}
+    {{form.company_id}}
+    {{form.parent_id}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.code.label}}
+            {{form.code(class='form-control')}}
+            {% for message in form.code.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.name.label}}
+            {{form.name(class='form-control')}}
+            {% for message in form.name.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            {{form.enterprise.label}}
+            {%if current_user.is_admin%}
+                {{form.enterprise(class='form-control')}}
+            {%else%}
+                {{form.enterprise(class='form-control', disabled=True)}}
+            {%endif%}
+        </div>
+        <div class="col-md-6">
+            {{form.company.label}}
+            <div class="input-group mb-2 mr-sm-2">
+            {{form.company(class='form-control', readonly=True)}}
+            <div class="input-group-prepend">
+                <a class="btn btn-secondary {%if not current_user.is_admin%}disabled{%endif%}" id="choose_company" ><i class="bi bi-search"></i></a>
+            </div>
+            </div>
+            {% for message in form.company.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                {{form.has_parent(class='form-check-input')}}
+                {{form.has_parent.label(class='form-check-label')}}
+            </div><br>
+            <div class="input-group mb-2 mr-sm-2">
+            {{form.parent(class='form-control', readonly=True)}}
+            <div class="input-group-prepend">
+              <a class="btn btn-secondary disabled" id="choose_parent"><i class="bi bi-search"></i></a>
+            </div>
+            </div>
+            {% for message in form.parent.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('department.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+<!-- Modal -->
+<div class="modal fade" id="selectModel" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+          <select id="choose" class="form-control"></select>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    var select = 0  //窗体弹出标识 0: 选择法人  1: 选择上级部门
+    $(function(){
+        if($('#has_parent').is(':checked'))
+            $('#choose_parent').removeClass('disabled')
+        $('#has_parent').change(function(){
+            if($(this).is(':checked')){
+                $('#parent').removeAttr('disabled')
+                $('#choose_parent').removeClass('disabled')
+            }else{
+                $('#parent').attr('disabled', true)
+                $('#choose_parent').addClass('disabled')
+                $('#parent').val('')
+            }
+        })
+        $('#enterprise').change(function(){
+            //清空已选择的法人及上级部门
+            $('#company').val('')
+            $('#parent').val('')
+        })
+        $('#choose_company').click(function(){
+            flag = 0
+            $('#parent').val('')
+            var enterprise_id = $('#enterprise').val()
+            //alert('Enterprise : '+enterprise_id)
+            $.ajax({
+                type:'post',
+                url:'/department/companies/'+enterprise_id,
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    $('#choose').empty()
+                    for(var i = 0; i < data.length; i++){
+                        $('#choose').append("<option value='"+data[i][0]+"'>"+data[i][1]+"</option>")
+                    }
+                    $('#selectModel').modal('show')
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                   })
+                }
+            })
+        })
+        $('#choose_parent').click(function(){
+            flag = 1
+            var company_id = $('#company_id').val()
+            //alert('Company id : '+company_id)
+            $.ajax({
+                type:'post',
+                url:'/department/parents',
+                data:JSON.stringify({action:'add',company_id:company_id,department_id:''}),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    $('#choose').empty()
+                    for(var i = 0; i < data.length; i++){
+                        $('#choose').append("<option value='"+data[i][0]+"'>"+data[i][1]+"</option>")
+                    }
+                    $('#selectModel').modal('show')
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                   })
+                }
+            })
+        })
+        $('#choose').change(function(){
+            if(flag == 0){
+                $('#company_id').val($(this).val())
+                $('#company').val($(this).find('option:selected').text())
+            }else{
+                $('#parent_id').val($(this).val())
+                $('#parent').val($(this).find('option:selected').text())
+            }
+            $('#selectModel').modal('hide')
+        })
+    })
+{% endblock %}

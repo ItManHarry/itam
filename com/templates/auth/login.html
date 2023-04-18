@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>IT资产管理系统</title>
+        <!-- CSS -->
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/bootstrap/css/bootstrap.min.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/font-awesome/css/font-awesome.min.css')}}">
+		<link rel="stylesheet" href="{{url_for('static', filename='assets/css/form-elements.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/style.css')}}">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!-- Favicon and touch icons -->
+        <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='images/icon/sys.ico')}}">
+    </head>
+    <body>
+        <!-- Top content -->
+        <div class="top-content">        	
+            <div class="inner-bg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2 text">
+                            <h1>IT Asset Management System</h1>
+                            <div class="description">
+                            	<p>&nbsp;</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3 form-box">
+                        	<div class="form-top">
+                        		<div class="form-top-left">
+                        			<h3>System Login</h3>
+                            		<p>Please enter your username and password to log on:</p>
+                        		</div>
+                        		<div class="form-top-right">
+                        			<i class="fa fa-lock"></i>
+                        		</div>
+                            </div>
+                            <div class="form-bottom">
+			                    <form role="form" method="post" class="login-form">
+                                    {{form.csrf_token}}
+			                    	<div class="form-group">
+                                        {{form.user_id(class='form-username form-control', placeholder='Username...')}}
+                                        {% for message in form.user_id.errors %}
+                                            <small class="text-danger">
+                                                {{ message }}
+                                            </small>
+                                        {% endfor %}
+                                    </div>
+			                        <div class="form-group">
+                                        {{form.user_pwd(class='form-password form-control', placeholder='Password...')}}
+                                        {% for message in form.user_pwd.errors %}
+                                            <small class="text-danger">
+                                                {{ message }}
+                                            </small>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="form-group text-center text-danger">
+                                        {%if get_flashed_messages()%}
+                                            {%for message in get_flashed_messages()%}
+                                                <i class="fa fa-warning"></i> <small>{{message}}</small>
+                                            {%endfor%}
+                                        {%endif%}
+                                    </div>
+			                        <button type="submit" class="btn">Sign in!</button>
+			                    </form>
+		                    </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>            
+        </div>
+        <!-- Javascript -->
+        <script src="{{url_for('static', filename='assets/js/jquery-1.11.1.min.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/bootstrap/js/bootstrap.min.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/js/jquery.backstretch.min.js')}}"></script>
+        <script>
+            jQuery(document).ready(function() {
+            /*
+                Fullscreen background
+            */
+            $.backstretch("{{url_for('static', filename='assets/img/backgrounds/1.jpg')}}");
+            /*
+                Form validation
+            */
+            $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function() {
+                $(this).removeClass('input-error');
+            });
+            $('.login-form').on('submit', function(e) {
+                $(this).find('input[type="text"], input[type="password"], textarea').each(function(){
+                    if( $(this).val() == "" ) {
+                        e.preventDefault();
+                        $(this).addClass('input-error');
+                    }
+                    else {
+                        $(this).removeClass('input-error');
+                    }
+                });
+            });
+        });
+        </script>
+        <!--[if lt IE 10]>
+            <script src="{{url_for('static', filename='assets/js/placeholder.js')}}"></script>
+        <![endif]-->
+    </body>
+</html>

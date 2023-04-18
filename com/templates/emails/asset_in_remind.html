@@ -1,0 +1,32 @@
+<h5 style="color:cornflowerblue;font-family:'Microsoft YaHei'; margin-bottom:0px;">
+    以下资产维修预计搬入已到期，请及时确认！
+</h5>
+<table width="60%" cellspacing="0" cellpadding="0" style="border:1px solid #ccc;border-collapse:collapse">
+  <thead>
+    <tr>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">资产编号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">SAP资产编号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">资产名称</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">品牌</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">型号</th>
+        <th style="font-size:x-small;border:1px solid #ccc;background-color:cornflowerblue;color:#333;font-family:'Microsoft YaHei'">预计搬入</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%if aps%}
+        {%for ap in aps%}
+            <tr>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.asset.code}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.asset.sap_code if ap.asset.sap_code else ''}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.asset.class3.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.asset.brand.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.asset.model.name}}</td>
+                <td style="font-size:x-small;border:1px solid #ccc;color:#777;font-family:'Microsoft YaHei'" align="center">{{ap.pre_in_date}}</td>
+            </tr>
+        {%endfor%}
+    {%endif%}
+  </tbody>
+</table><br>
+<hr width="60%" align="left">
+<br>
+<small style="color:cornflowerblue;font-family:'Microsoft YaHei'">该邮件为系统提醒邮件，无需回复！</small>

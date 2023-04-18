@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-2 text-end">
+        {{form.csrf_token}}
+        {{form.asset_no(class='form-control', placeholder='资产编号')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.repair_no(class='form-control', placeholder='维修单号')}}
+    </div>
+    <div class="col-2 text-end">
+        <div class="input-group">
+            {{form.check_year(class='form-control', placeholder='维修年份', readonly=True)}}
+            <div class="input-group-prepend">
+                <span id="clear_year" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('repair_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('repair_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>
+<br>
+{%if pagination.total > config['ITEM_COUNT_PER_PAGE']%}
+    {{render_pagination(pagination, align='right')}}
+{%endif%}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="5%">法人</th>
+        <th scope="col" width="8%">接收日期</th>
+        <th scope="col" width="8%">物料类型</th>
+        <th scope="col" width="8%">订单日期</th>
+        <th scope="col" width="5%">维修费</th>
+        <th scope="col" width="8%">资产编号</th>
+        <th scope="col" width="8%">资产名称</th>
+        <th scope="col" width="5%">维修类型</th>
+        <th scope="col" width="8%">搬出日期</th>
+        <th scope="col" width="8%">预计完成日期</th>
+        <th scope="col" width="8%">预计搬入日期</th>
+        <th scope="col" width="8%">实际完成日期</th>
+        <th scope="col" width="8%">实际搬入日期</th>
+        <th scope="col" width="5%">维修状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if repairs %}
+        {% for repair in repairs %}
+            <tr>
+                <td class="align-middle">{{repair.asset.user.company.name if repair.asset.user else ''}}</td>
+                <td class="align-middle">{{repair.request_accept_dt if repair.request_accept_dt else ''}}</td>
+                <td class="align-middle">{{repair.asset.class2.name}}</td>
+                <td class="align-middle">{{format_date(repair.createtime_loc)}}</td>
+                <td class="align-middle">{{repair.fee}}</td>
+                <td class="align-middle">{{repair.asset.code}}</td>
+                <td class="align-middle">{{repair.asset.class3.name}}</td>
+                <td class="align-middle">{{repair.repair_type.display}}</td>
+                <td class="align-middle">{{repair.out_date if repair.out_date else ''}}</td>
+                <td class="align-middle">{{repair.pre_finish_date if repair.pre_finish_date else ''}}</td>
+                <td class="align-middle">{{repair.pre_in_date  if repair.pre_in_date else ''}}</td>
+                <td class="align-middle">{{repair.rel_finish_date if repair.rel_finish_date else ''}}</td>
+                <td class="align-middle">{{repair.real_in_date if repair.real_in_date else ''}}</td>
+                <td class="align-middle">{{repair.repair_state.display}}</td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="14" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{%include 'biz/asset/master/_repair.html'%}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    $(function(){
+        init_date_year('check_year')
+        $('#clear_year').click(function(event){
+            $('#check_year').val('')
+        })
+    })
+    function repair(asset_id, repair_id){
+        $.post('/repair/info/'+repair_id, function(data){
+            $('#repair_no_edit').val(data.repair_no)
+            $('#pre_finish_date').val(data.pre_finish_date)
+            $('#rel_finish_date').val(data.rel_finish_date)
+            $('#repair_type').val(data.repair_type)
+            $('#repair_state').val(data.repair_state)
+            $('#out_date').val(data.out_date)
+            $('#pre_in_date').val(data.pre_in_date)
+            $('#real_in_date').val(data.real_in_date)
+            $('#fee').val(data.fee)
+            $('#repair_asset_id').val(asset_id)
+            $('#action_sign').val('U')
+            $('#repair_id').val(repair_id)
+            $('#repairModal').modal('show')
+        }, 'json')
+    }
+{% endblock %}

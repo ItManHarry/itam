@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 text-end">
+        {{form.csrf_token}}
+        {{form.in_no(class='form-control', placeholder='审批单号')}}
+    </div>
+    <div class="col-9 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="20%">审批单号</th>
+        <th scope="col" width="20%">入库日期</th>
+        <th scope="col" width="20%">入库人员</th>
+        <th scope="col" width="20%">审批状态</th>
+        <th scope="col" class="text-center" width="30%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if audits %}
+        {% for audit in audits %}
+            <tr>
+                <td class="align-middle">{{audit.in_no}}</td>
+                <td class="align-middle">{{audit.in_date}}</td>
+                <td class="align-middle">{{audit.charger.user_name}}</td>
+                <td class="align-middle">{{audit.state.display}}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="明细查看"  href="{{url_for('audit.edit', id=audit.id)}}" class="btn btn-link text-info" ><i class="bi bi-files"></i></a>&nbsp;
+                    <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="重新提交" class="btn btn-link text-danger " {%if audit.state.item in ['1','2','3']%}disabled{%endif%} onclick="resubmit('{{audit.id}}')" ><i class="bi bi-journal-arrow-up"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="5" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function resubmit(id){
+        alert(id)
+        $.confirm({
+            type:'red',
+            title: '重新审批',
+            content: '确认重新提交?',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/audit/resubmit/'+id,
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){
+                                    //刷新页面
+                                  window.location.reload()
+                                    }
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
+    }
+{% endblock %}

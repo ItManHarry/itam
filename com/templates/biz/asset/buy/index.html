@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 text-end">
+        {{form.csrf_token}}
+        {{form.application_no(class='form-control', placeholder='申请单号')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.buy_no(class='form-control', placeholder='购买号')}}
+    </div>
+       <div class="col-3 text-end">
+        {{form.draft_no(class='form-control', placeholder='执行起案号')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('buy.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="10%">购买编号</th>
+        <th scope="col" width="10%">申请编号</th>
+        <th scope="col" width="10%">执行起案号</th>
+        <th scope="col" width="5%">申请人</th>
+        <th scope="col" width="10%">订单日期</th>
+        <th scope="col" width="10%">预计到货日期</th>
+        <th scope="col" width="5%">购买总价</th>
+        <th scope="col" width="10%">资产类别</th>
+        <th scope="col" width="10%">资产名称</th>
+        <th scope="col" width="10%">品牌</th>
+        <th scope="col" width="5%">型号</th>
+        <th scope="col" class="text-center" width="5%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if buys %}
+        {% for buy in buys %}
+            <tr>
+                <td class="align-middle">{{buy.buy_no}}</td>
+                <td class="align-middle">{{buy.application_no}}</td>
+                <td class="align-middle">{{buy.draft_no}}</td>
+                <td class="align-middle">{{buy.application.applicant.name if buy.application else '-'}}</td>
+                <td class="align-middle">{{buy.bill_date}}</td>
+                <td class="align-middle">{{buy.receive_due_date}}</td>
+                <td class="align-middle">{{buy.total_price}}</td>
+                <td class="align-middle">{{buy.application.class2.name if buy.application and buy.application.class2 else '-'}}</td>
+                <td class="align-middle">{{buy.application.class3.name if buy.application and buy.application.class3 else '-'}}</td>
+                <td class="align-middle">{{buy.application.brand.name if buy.application and buy.application.brand else '-'}}</td>
+                <td class="align-middle">{{buy.application.model.name if buy.application and buy.application.model else '-'}}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('buy.edit', id=buy.id)}}" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="12" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location('编辑')}}
+<form method="post">
+    {{form.csrf_token}}
+    {{form.id}}
+    <div class="row">
+        <div class="col-md-6">
+            {{form.code.label}}
+            {{form.code(class='form-control', readonly=True)}}
+            {% for message in form.code.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {{form.name.label}}
+            {{form.name(class='form-control')}}
+            {% for message in form.name.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                {{form.has_parent(class='form-check-input')}}
+                {{form.has_parent.label(class='form-check-label')}}
+            </div><br>
+            <div class="input-group mb-2 mr-sm-2">
+            {{form.parent(class='form-control')}}
+            </div>
+            {% for message in form.parent.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+        <div class="col-md-2">
+            <br>
+            {{form.unit.label}}
+            {{form.unit(class='form-control', readonly=True)}}
+            {% for message in form.unit.errors %}
+                <small class="text-danger">{{message}}</small>
+            {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-outline-secondary" href="{{url_for('clazz.index')}}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;返回</a>
+        </div>
+     </div>
+</form>
+{% endblock %}
+{%block script%}
+    {{super()}}
+    $(function(){
+        if($('#has_parent').is(':checked')){
+            $('#parent').removeClass('disabled')
+        }else{
+            $('#parent').attr('disabled', true)
+            $('#parent').val('')
+        }
+        if($('#parent').val() != '' && $('#parent').val() != null)
+            check_grade($('#parent').val())
+        $('#has_parent').change(function(){
+            if($(this).is(':checked')){
+                $('#parent').removeAttr('disabled')
+            }else{
+                $('#unit').attr('readonly', true)
+                $('#unit').val('')
+                $('#parent').attr('disabled', true)
+                $('#parent').val('')
+            }
+        })
+        $('#parent').change(function(){
+            var id = $(this).val()
+            check_grade(id)
+        })
+    })
+    function check_grade(id){
+        $.ajax({
+            type:'post',
+            url:'/clazz/grade/'+id,
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.grade == 2){
+                    $('#unit').removeAttr('readonly')
+                }else{
+                    $('#unit').val('')
+                    $('#unit').attr('readonly', true)
+                }
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+{%endblock%}

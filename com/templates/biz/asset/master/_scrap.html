@@ -1,0 +1,140 @@
+<!-- 资产报废窗体 -->
+<div class="modal fade" id="scrapModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="scrapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scrapModalTitle">资产报废</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="scrap_no_edit" class="form-label">报废单号</label>
+              <input type="text" class="form-control" placeholder="系统自动生成......" id="scrap_no_edit" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="scrap_draft" class="form-label">报废Draft号</label>
+              <input type="text" class="form-control" placeholder="报废Draft号......" id="scrap_draft">
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="scrap_reason" class="form-label">报废原因</label>
+              <select class="form-control" id="scrap_reason">
+                {% for scrap_reason in scrap_reasons %}
+                <option value="{{scrap_reason[0]}}">{{scrap_reason[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="scrap_state" class="form-label">报废状态</label>
+              <select class="form-control" id="scrap_state">
+                {% for scrap_state in scrap_states %}
+                <option value="{{scrap_state[0]}}">{{scrap_state[1]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="scrap_date" class="form-label">报废判定日期</label>
+              <input type="text" class="form-control" id="scrap_date" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="finish_date" class="form-label">报废完成日期</label>
+              <input type="text" class="form-control" id="finish_date" readonly>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sap_scrap">
+                <label class="form-check-label" for="sap_scrap">
+                  SAP已报废
+                </label>
+              </div>
+            </div>
+          </div><br>
+          <input type="hidden" id="scrap_asset_id">
+          <input type="hidden" id="scrap_id">
+          {#A:新增  U:修改#}
+          <input type="hidden" id="action_sign">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>&nbsp;关闭</button>
+        <button id="save_scrap" class="btn btn-outline-primary"><i class="bi bi-save"></i>&nbsp;&nbsp;保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(function(){
+        init_date('scrap_date')
+        init_date('finish_date')
+        $('#save_scrap').click(function(){
+          if($('#scrap_draft').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '报废Draft号未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else if($('#scrap_date').val() == ''){
+            $.alert({
+               type:'red',
+               title:'系统提示',
+               content: '报废判定日期未填写！',
+               onClose:function(){
+
+               }
+            })
+          }else{
+            var params = {
+              scrap_reason_id: $('#scrap_reason').val(),
+              scrap_state_id: $('#scrap_state').val(),
+              scrap_date: $('#scrap_date').val(),
+              finish_date: $('#finish_date').val(),
+              scrap_draft: $('#scrap_draft').val(),
+              sap_scrap: $('#sap_scrap').is(':checked')?1:0,
+              asset_id: $('#scrap_asset_id').val(),
+              scrap_id: $('#scrap_id').val(),
+              action: $('#action_sign').val()
+            }
+            $.ajax({
+                type:'post',
+                url:'/master/scrap',
+                data:JSON.stringify(params),
+                contentType:'application/json;charset=UTF-8',
+                success:function(data){
+                    if(data.code == 1)
+                        $.alert({
+                           type:'green',
+                           title:'系统提示',
+                           content: data.message,
+                           onClose:function(){
+                                $('#scrapModal').modal('hide')
+                                //刷新页面
+                                window.location.reload()
+                           }
+                       })
+
+                },
+                error:function(){
+                    $.alert({
+                       type:'red',
+                       title:'系统提示',
+                       content: '系统错误,请联系管理员',
+                       onClose:function(){
+
+                       }
+                    })
+                }
+            })
+          }
+        })
+    })
+</script>

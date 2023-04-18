@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-3 offset-3 text-end">
+        {{form.csrf_token}}
+        {{form.code(class='form-control', placeholder='用户代码')}}
+    </div>
+    <div class="col-3 text-end">
+        {{form.name(class='form-control', placeholder='用户姓名')}}
+    </div>
+    <div class="col-3 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary" href="{{url_for('user.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="20%">用户代码</th>
+        <th scope="col" width="20%">用户名称</th>
+        <th scope="col" width="20%">法人</th>
+        <th scope="col" width="15%">角色</th>
+        <th scope="col" width="5%">状态</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if users %}
+        {% for user in users %}
+            <tr>
+                <td class="align-middle">{{user.user_id}}</td>
+                <td class="align-middle">{{user.user_name}}</td>
+                <td class="align-middle">{{user.company.name}}</td>
+                <td class="align-middle">{{user.role.name}}</td>
+                <td class="align-middle">{%if user.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
+                <td class="align-middle text-center">
+                    <a href="{{url_for('user.edit', id=user.id)}}" class="btn btn-link text-info {%if not user.active or user.user_id == 'admin'%}disabled{%endif%}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    {#<button class="btn btn-link text-warning {%if not user.active or user.user_id == 'admin'%}disabled{%endif%}" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="hover focus" data-bs-html="true" data-bs-content="<small class='text-info'>重置密码</small>" onclick="reset_password('{{user.id}}')"><i class="bi bi-unlock"></i></button>&nbsp;#}
+                    <button class="btn btn-link text-warning {%if not user.active or user.user_id == 'admin'%}disabled{%endif%}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="密码重置" onclick="reset_password('{{user.id}}')"><i class="bi bi-unlock"></i></button>&nbsp;
+                    <button class="btn btn-link text-danger {%if not user.active or user.user_id == 'admin'%}disabled{%endif%}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="停用" onclick="status('{{user.id}}', 0)"><i class="bi bi-x-circle"></i></button>&nbsp;
+                    <button class="btn btn-link text-success {%if user.active or user.user_id == 'admin'%}disabled{%endif%}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="启用" onclick="status('{{user.id}}', 1)"><i class="bi bi-check-circle"></i></button>
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="6" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function status(id, status){
+        $.ajax({
+            type:'post',
+            url:'/user/status/'+id+'/'+status,
+            //data:JSON.stringify({code:$.trim($("#code").val()), name:$.trim($("#name").val()), password:$.trim($("#password").val())}),
+            contentType:'application/json;charset=UTF-8',
+            success:function(data){
+                if(data.code == 1)
+                    location.reload()
+            },
+            error:function(){
+                $.alert({
+                   type:'red',
+                   title:'系统提示',
+                   content: '系统错误,请联系管理员',
+                   onClose:function(){
+
+                   }
+               })
+            }
+        })
+    }
+    function reset_password(id){
+        $.confirm({
+            type:'red',
+            title: '密码重置',
+            content: '确认将该用户密码重置为(Di123456)?',
+            buttons: {
+                yes: function () {
+                    $.ajax({
+                        type:'post',
+                        url:'/user/reset_password/'+id,
+                        //data:JSON.stringify({code:$.trim($("#code").val()), name:$.trim($("#name").val()), password:$.trim($("#password").val())}),
+                        contentType:'application/json;charset=UTF-8',
+                        success:function(data){
+                            if(data.code == 1)
+                                $.alert({
+                                   type:'green',
+                                   title:'系统提示',
+                                   content: data.message,
+                                   onClose:function(){}
+                               })
+                        },
+                        error:function(){
+                            $.alert({
+                               type:'red',
+                               title:'系统提示',
+                               content: '系统错误,请联系管理员',
+                               onClose:function(){
+
+                               }
+                           })
+                        }
+                    })
+                },
+                no: function () {
+
+                }
+            }
+        });
+    }
+{% endblock %}

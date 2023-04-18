@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+{{current_location(None)}}
+{{show_alert()}}
+<div class="clearfix">
+  <a href="{{url_for('enterprise.add')}}" class="btn btn-outline-primary float-end"><i class="bi bi-plus"></i>&nbsp;新增</a>
+</div>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="40%">事业处代码</th>
+        <th scope="col" width="40%">事业处名称</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if enterprises %}
+        {% for enterprise in enterprises %}
+            <tr>
+                <td class="align-middle">{{enterprise.code}}</td>
+                <td class="align-middle">{{enterprise.name}}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('enterprise.edit', id=enterprise.id)}}" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="3" class="align-middle text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}

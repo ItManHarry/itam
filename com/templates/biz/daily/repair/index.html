@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block link %}
+    {{load_static_file('css','css/bootstrap-datepicker3.min.css')}}
+{% endblock %}
+{% block scripts %}
+    {{load_static_file('js','js/bootstrap-datepicker.min.js')}}
+    {{load_static_file('js','js/bootstrap-datepicker.zh-CN.min.js')}}
+{% endblock %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<form method="post">
+  <div class="row">
+    <div class="col-2 text-end">
+        {{form.csrf_token}}
+        {{form.request_by_id}}
+        {{form.asset_no(class='form-control', placeholder='资产编号')}}
+    </div>
+    <div class="col-2 text-end">
+        {{form.repair_no(class='form-control', placeholder='维修单号')}}
+    </div>
+    <div class="col-2 text-end">
+        <div class="input-group">
+            {{form.request_by(class='form-control', placeholder='维修申请人', readonly=True)}}
+            <div class="input-group-prepend">
+                <div class="btn-group" role="group">
+                  <button type="button" onclick="select_employee()" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+                  <button type="button" id="clear_employee" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 text-end">
+        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+      <!--  <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('repair.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('repair.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
+        </div>-->
+    </div>
+  </div>
+</form>
+<br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="7%">资产编号</th>
+        <th scope="col" width="7%">资产名称</th>
+        <th scope="col" width="8%">维修单号</th>
+        <th scope="col" width="8%">维修类型</th>
+        <th scope="col" width="8%">维修申请人</th>
+        <th scope="col" width="8%">搬出日期</th>
+        <th scope="col" width="8%">维修接收日期</th>
+        <th scope="col" width="8%">预计完成日期</th>
+        <th scope="col" width="8%">预计搬入日期</th>
+        <th scope="col" width="8%">实际完成日期</th>
+        <th scope="col" width="8%">实际搬入日期</th>
+        <th scope="col" width="8%">维修状态</th>
+        <th scope="col" class="text-center" width="6%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if repairs %}
+        {% for repair in repairs %}
+            <tr>
+                <td class="align-middle">{{repair.asset.code}}</td>
+                <td class="align-middle">{{repair.asset.class3.name}}</td>
+                <td class="align-middle">{{repair.repair_no}}</td>
+                <td class="align-middle">{{repair.repair_type.display}}</td>
+                <td class="align-middle">{{repair.requested_by.name}}</td>
+                <td class="align-middle">{{repair.out_date if repair.out_date else ''}}</td>
+                <td class="align-middle">{{repair.request_accept_dt if repair.request_accept_dt else ''}}</td>
+                <td class="align-middle">{{repair.pre_finish_date if repair.pre_finish_date else ''}}</td>
+                <td class="align-middle">{{repair.pre_in_date if repair.pre_in_date else ''}}</td>
+                <td class="align-middle">{{repair.rel_finish_date if repair.rel_finish_date else ''}}</td>
+                <td class="align-middle">{{repair.real_in_date if repair.real_in_date else ''}}</td>
+                <td class="align-middle">{{repair.repair_state.display}}</td>
+                <td class="text-center align-middle">
+                    <button onclick="repair('{{repair.asset.id}}', '{{repair.id}}')" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="#" class="btn btn-link text-info"><i class="bi bi-pencil-square"></i></button>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="13" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+{{render_pagination(pagination, align='right')}}
+{%include 'biz/asset/master/_repair.html'%}
+{%include 'comm/_select_employee.html' %}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    function repair(asset_id, repair_id){
+        $.post('/repair/info/'+repair_id, function(data){
+            $('#repair_no_edit').val(data.repair_no)
+            $('#pre_finish_date').val(data.pre_finish_date)
+            $('#rel_finish_date').val(data.rel_finish_date)
+            $('#repair_type').val(data.repair_type)
+            $('#repair_state').val(data.repair_state)
+            $('#out_date').val(data.out_date)
+            $('#pre_in_date').val(data.pre_in_date)
+            $('#real_in_date').val(data.real_in_date)
+            $('#request_draft').val(data.request_draft)
+            $('#request_accept_dt').val(data.request_accept_dt)
+            $('#requested_by_id').val(data.requested_by_id)
+            $('#requested_by_nm').val(data.requested_by_nm)
+            $('#repair_draft').val(data.repair_draft)
+            $('#repair_handler_id').val(data.repair_handler_id)
+            $('#repair_handler_nm').val(data.repair_handler_nm)
+            $('#fee').val(data.fee)
+            $('#repair_part_id').val(data.repair_part_id)
+            $('#repair_content').val(data.repair_content)
+            $('#repair_asset_id').val(asset_id)
+            $('#action_sign').val('U')
+            $('#repair_id').val(repair_id)
+            $('#repairModal').modal('show')
+        }, 'json')
+    }
+    function select_employee(){
+        e_id = 'request_by_id'
+        e_name = 'request_by'
+        $('#employeeModal').modal('show')
+    }
+    $('#clear_employee').click(function(event){
+        $('#request_by').val('')
+        $('#request_by_id').val('')
+    })
+{% endblock %}

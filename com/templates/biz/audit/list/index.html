@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination with context %}
+{% block content %}
+{{current_location('')}}
+{{show_alert()}}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="{{url_for('list.index', class1=1)}}">待审批</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link " href="{{url_for('list.index', class1=0)}}">审批完成</a>
+  </li>
+</ul><br>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+        <th scope="col" width="25%">单据NO</th>
+        <th scope="col" width="25%">单据类型</th>
+        <th scope="col" width="20%">审批等级</th>
+        <th scope="col" width="10%">审批人</th>
+        <th scope="col" class="text-center" width="20%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if lists %}
+        {% for list in lists %}
+            <tr>
+                <td class="align-middle">{{list.audit_item.bill_no}}</td>
+                <td class="align-middle">{%if list.audit_item.bill_type == 'SI'%}<span class="text-success">入库单</span>{%elif list.audit_item.bill_type == 'SO' %}<span class="text-success">出库单</span>{%endif%}</td>
+                <td class="align-middle">{%if list.audit_item.audit_level == 1 %}<span class="text-success">一级审批</span>{%elif list.audit_item.audit_level == 2 %}<span class="text-success">二级审批</span>{%endif%}</td>
+                <td class="align-middle">{{list.user.user_name}}</td>
+                <td class="text-center align-middle">
+                    <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="审批" href="{{url_for('list.detail', id=list.id)}}" class="btn btn-link text-success" ><i class="bi bi-bezier"></i></a>&nbsp;
+                </td>
+            </tr>
+        {%endfor%}
+    {% else %}
+        <tr>
+            <td colspan="5" class="text-center"><small>没有记录!!!</small></td>
+        </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+{{render_pagination(pagination, align='right')}}
+{% endblock %}
+{% block script %}
+    {{ super() }}
+
+{% endblock %}
