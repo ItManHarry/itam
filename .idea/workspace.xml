@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="asset apply draft no 'None'">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/regs/web_globals.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/regs/web_globals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/views/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/auth.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="29Y33EwZ7WXWdvaodI0YRXCmzWX" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
+    <ConfirmationsSetting value="2" id="Remove" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "full.screen.before.presentation.mode": "false",
+    "last_opened_file_path": "D:/Development/Python/github/itam",
+    "settings.editor.selected.configurable": "terminal"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Development\Python\workplaces\itam\printer" />
+      <recent name="D:\Development\Python\workplaces\itam\com\templates\biz\asset\master" />
+      <recent name="D:\Development\Python\workplaces\itam" />
+      <recent name="D:\Development\Python\workplaces\itam\com\templates\comm" />
+      <recent name="D:\Development\Python\workplaces\itam\com\static\js" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Development\Python\workplaces\itam\com\templates\biz" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python tests.Python tests in D:/Development/Python/workplaces/itam/com/test_table_inrowsplit.py">
+    <configuration name="utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="itam" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/com" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/com/utils.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in D:/Development/Python/workplaces/itam/com/test_table_inrowsplit.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="itam" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/com" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/com/test_table_inrowsplit.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests in D:/Development/Python/workplaces/itam/com/test_table_inrowsplit.py" />
+        <item itemvalue="Python.utils" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\20112004\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="" />
+      <created>1653275991176</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1653275991176</updated>
+    </task>
+    <task id="LOCAL-00394" summary="modify stock io report">
+      <created>1670986047943</created>
+      <option name="number" value="00394" />
+      <option name="presentableId" value="LOCAL-00394" />
+      <option name="project" value="LOCAL" />
+      <updated>1670986047944</updated>
+    </task>
+    <task id="LOCAL-00395" summary="modify stock io report">
+      <created>1670997033222</created>
+      <option name="number" value="00395" />
+      <option name="presentableId" value="LOCAL-00395" />
+      <option name="project" value="LOCAL" />
+      <updated>1670997033222</updated>
+    </task>
+    <task id="LOCAL-00396" summary="asset apply add attachments">
+      <created>1671505569986</created>
+      <option name="number" value="00396" />
+      <option name="presentableId" value="LOCAL-00396" />
+      <option name="project" value="LOCAL" />
+      <updated>1671505569987</updated>
+    </task>
+    <task id="LOCAL-00397" summary="asset apply add attachments">
+      <created>1671526630157</created>
+      <option name="number" value="00397" />
+      <option name="presentableId" value="LOCAL-00397" />
+      <option name="project" value="LOCAL" />
+      <updated>1671526630158</updated>
+    </task>
+    <task id="LOCAL-00398" summary="asset apply add attachments">
+      <created>1671606084097</created>
+      <option name="number" value="00398" />
+      <option name="presentableId" value="LOCAL-00398" />
+      <option name="project" value="LOCAL" />
+      <updated>1671606084098</updated>
+    </task>
+    <task id="LOCAL-00399" summary="asset apply add attachments">
+      <created>1671687347484</created>
+      <option name="number" value="00399" />
+      <option name="presentableId" value="LOCAL-00399" />
+      <option name="project" value="LOCAL" />
+      <updated>1671687347484</updated>
+    </task>
+    <task id="LOCAL-00400" summary="repair view and report change">
+      <created>1671696425932</created>
+      <option name="number" value="00400" />
+      <option name="presentableId" value="LOCAL-00400" />
+      <option name="project" value="LOCAL" />
+      <updated>1671696425932</updated>
+    </task>
+    <task id="LOCAL-00401" summary="repair view and report change">
+      <created>1672298646238</created>
+      <option name="number" value="00401" />
+      <option name="presentableId" value="LOCAL-00401" />
+      <option name="project" value="LOCAL" />
+      <updated>1672298646239</updated>
+    </task>
+    <task id="LOCAL-00402" summary="repair view and report change">
+      <created>1672310525445</created>
+      <option name="number" value="00402" />
+      <option name="presentableId" value="LOCAL-00402" />
+      <option name="project" value="LOCAL" />
+      <updated>1672310525447</updated>
+    </task>
+    <task id="LOCAL-00403" summary="repair view and report change">
+      <created>1672390116769</created>
+      <option name="number" value="00403" />
+      <option name="presentableId" value="LOCAL-00403" />
+      <option name="project" value="LOCAL" />
+      <updated>1672390116770</updated>
+    </task>
+    <task id="LOCAL-00404" summary="repair view and report change">
+      <created>1672713033293</created>
+      <option name="number" value="00404" />
+      <option name="presentableId" value="LOCAL-00404" />
+      <option name="project" value="LOCAL" />
+      <updated>1672713033294</updated>
+    </task>
+    <task id="LOCAL-00405" summary="repair view and report change">
+      <created>1672725678368</created>
+      <option name="number" value="00405" />
+      <option name="presentableId" value="LOCAL-00405" />
+      <option name="project" value="LOCAL" />
+      <updated>1672725678368</updated>
+    </task>
+    <task id="LOCAL-00406" summary="repair view and report change">
+      <created>1672726427315</created>
+      <option name="number" value="00406" />
+      <option name="presentableId" value="LOCAL-00406" />
+      <option name="project" value="LOCAL" />
+      <updated>1672726427315</updated>
+    </task>
+    <task id="LOCAL-00407" summary="repair view and report change">
+      <created>1672794862082</created>
+      <option name="number" value="00407" />
+      <option name="presentableId" value="LOCAL-00407" />
+      <option name="project" value="LOCAL" />
+      <updated>1672794862083</updated>
+    </task>
+    <task id="LOCAL-00408" summary="repair view and report change">
+      <created>1672811038836</created>
+      <option name="number" value="00408" />
+      <option name="presentableId" value="LOCAL-00408" />
+      <option name="project" value="LOCAL" />
+      <updated>1672811038836</updated>
+    </task>
+    <task id="LOCAL-00409" summary="repair view and report change">
+      <created>1672814233643</created>
+      <option name="number" value="00409" />
+      <option name="presentableId" value="LOCAL-00409" />
+      <option name="project" value="LOCAL" />
+      <updated>1672814233643</updated>
+    </task>
+    <task id="LOCAL-00410" summary="repair view and report change">
+      <created>1672817808953</created>
+      <option name="number" value="00410" />
+      <option name="presentableId" value="LOCAL-00410" />
+      <option name="project" value="LOCAL" />
+      <updated>1672817808953</updated>
+    </task>
+    <task id="LOCAL-00411" summary="repair view and report change">
+      <created>1672818111933</created>
+      <option name="number" value="00411" />
+      <option name="presentableId" value="LOCAL-00411" />
+      <option name="project" value="LOCAL" />
+      <updated>1672818111933</updated>
+    </task>
+    <task id="LOCAL-00412" summary="repair view and report change">
+      <created>1672818952721</created>
+      <option name="number" value="00412" />
+      <option name="presentableId" value="LOCAL-00412" />
+      <option name="project" value="LOCAL" />
+      <updated>1672818952721</updated>
+    </task>
+    <task id="LOCAL-00413" summary="repair view and report change">
+      <created>1672818974731</created>
+      <option name="number" value="00413" />
+      <option name="presentableId" value="LOCAL-00413" />
+      <option name="project" value="LOCAL" />
+      <updated>1672818974731</updated>
+    </task>
+    <task id="LOCAL-00414" summary="repair view and report change">
+      <created>1672820864428</created>
+      <option name="number" value="00414" />
+      <option name="presentableId" value="LOCAL-00414" />
+      <option name="project" value="LOCAL" />
+      <updated>1672820864428</updated>
+    </task>
+    <task id="LOCAL-00415" summary="repair view and report change">
+      <created>1672821105990</created>
+      <option name="number" value="00415" />
+      <option name="presentableId" value="LOCAL-00415" />
+      <option name="project" value="LOCAL" />
+      <updated>1672821105990</updated>
+    </task>
+    <task id="LOCAL-00416" summary="repair view and report change">
+      <created>1673597691102</created>
+      <option name="number" value="00416" />
+      <option name="presentableId" value="LOCAL-00416" />
+      <option name="project" value="LOCAL" />
+      <updated>1673597691102</updated>
+    </task>
+    <task id="LOCAL-00417" summary="repair view and report change">
+      <created>1673761233403</created>
+      <option name="number" value="00417" />
+      <option name="presentableId" value="LOCAL-00417" />
+      <option name="project" value="LOCAL" />
+      <updated>1673761233404</updated>
+    </task>
+    <task id="LOCAL-00418" summary="repair view and report change">
+      <created>1673827549696</created>
+      <option name="number" value="00418" />
+      <option name="presentableId" value="LOCAL-00418" />
+      <option name="project" value="LOCAL" />
+      <updated>1673827549696</updated>
+    </task>
+    <task id="LOCAL-00419" summary="repair view and report change">
+      <created>1673827606783</created>
+      <option name="number" value="00419" />
+      <option name="presentableId" value="LOCAL-00419" />
+      <option name="project" value="LOCAL" />
+      <updated>1673827606787</updated>
+    </task>
+    <task id="LOCAL-00420" summary="repair view and report change">
+      <created>1675145768913</created>
+      <option name="number" value="00420" />
+      <option name="presentableId" value="LOCAL-00420" />
+      <option name="project" value="LOCAL" />
+      <updated>1675145768914</updated>
+    </task>
+    <task id="LOCAL-00421" summary="repair view and report change">
+      <created>1676340006591</created>
+      <option name="number" value="00421" />
+      <option name="presentableId" value="LOCAL-00421" />
+      <option name="project" value="LOCAL" />
+      <updated>1676340006591</updated>
+    </task>
+    <task id="LOCAL-00422" summary="repair view and report change">
+      <created>1677546882221</created>
+      <option name="number" value="00422" />
+      <option name="presentableId" value="LOCAL-00422" />
+      <option name="project" value="LOCAL" />
+      <updated>1677546882221</updated>
+    </task>
+    <task id="LOCAL-00423" summary="repair view and report change">
+      <created>1678175455992</created>
+      <option name="number" value="00423" />
+      <option name="presentableId" value="LOCAL-00423" />
+      <option name="project" value="LOCAL" />
+      <updated>1678175455993</updated>
+    </task>
+    <task id="LOCAL-00424" summary="repair view and report change">
+      <created>1678861858101</created>
+      <option name="number" value="00424" />
+      <option name="presentableId" value="LOCAL-00424" />
+      <option name="project" value="LOCAL" />
+      <updated>1678861858101</updated>
+    </task>
+    <task id="LOCAL-00425" summary="repair view and report change">
+      <created>1679645983229</created>
+      <option name="number" value="00425" />
+      <option name="presentableId" value="LOCAL-00425" />
+      <option name="project" value="LOCAL" />
+      <updated>1679645983229</updated>
+    </task>
+    <task id="LOCAL-00426" summary="repair view and report change">
+      <created>1679648104857</created>
+      <option name="number" value="00426" />
+      <option name="presentableId" value="LOCAL-00426" />
+      <option name="project" value="LOCAL" />
+      <updated>1679648104857</updated>
+    </task>
+    <task id="LOCAL-00427" summary="repair view and report change">
+      <created>1679881264745</created>
+      <option name="number" value="00427" />
+      <option name="presentableId" value="LOCAL-00427" />
+      <option name="project" value="LOCAL" />
+      <updated>1679881264745</updated>
+    </task>
+    <task id="LOCAL-00428" summary="repair view and report change">
+      <created>1679887639045</created>
+      <option name="number" value="00428" />
+      <option name="presentableId" value="LOCAL-00428" />
+      <option name="project" value="LOCAL" />
+      <updated>1679887639045</updated>
+    </task>
+    <task id="LOCAL-00429" summary="repair view and report change">
+      <created>1679899919041</created>
+      <option name="number" value="00429" />
+      <option name="presentableId" value="LOCAL-00429" />
+      <option name="project" value="LOCAL" />
+      <updated>1679899919041</updated>
+    </task>
+    <task id="LOCAL-00430" summary="repair view and report change">
+      <created>1679899949892</created>
+      <option name="number" value="00430" />
+      <option name="presentableId" value="LOCAL-00430" />
+      <option name="project" value="LOCAL" />
+      <updated>1679899949892</updated>
+    </task>
+    <task id="LOCAL-00431" summary="remove the company name from printer page">
+      <created>1680769219524</created>
+      <option name="number" value="00431" />
+      <option name="presentableId" value="LOCAL-00431" />
+      <option name="project" value="LOCAL" />
+      <updated>1680769219524</updated>
+    </task>
+    <task id="LOCAL-00432" summary="remove the company name from printer page">
+      <created>1680844064125</created>
+      <option name="number" value="00432" />
+      <option name="presentableId" value="LOCAL-00432" />
+      <option name="project" value="LOCAL" />
+      <updated>1680844064125</updated>
+    </task>
+    <task id="LOCAL-00433" summary="remove the company name from printer page">
+      <created>1680844818664</created>
+      <option name="number" value="00433" />
+      <option name="presentableId" value="LOCAL-00433" />
+      <option name="project" value="LOCAL" />
+      <updated>1680844818665</updated>
+    </task>
+    <task id="LOCAL-00434" summary="asset apply draft no 'None'">
+      <created>1680845616903</created>
+      <option name="number" value="00434" />
+      <option name="presentableId" value="LOCAL-00434" />
+      <option name="project" value="LOCAL" />
+      <updated>1680845616903</updated>
+    </task>
+    <task id="LOCAL-00435" summary="asset apply draft no 'None'">
+      <created>1680848145877</created>
+      <option name="number" value="00435" />
+      <option name="presentableId" value="LOCAL-00435" />
+      <option name="project" value="LOCAL" />
+      <updated>1680848145877</updated>
+    </task>
+    <task id="LOCAL-00436" summary="asset apply draft no 'None'">
+      <created>1681174441783</created>
+      <option name="number" value="00436" />
+      <option name="presentableId" value="LOCAL-00436" />
+      <option name="project" value="LOCAL" />
+      <updated>1681174441784</updated>
+    </task>
+    <task id="LOCAL-00437" summary="asset apply draft no 'None'">
+      <created>1681176002564</created>
+      <option name="number" value="00437" />
+      <option name="presentableId" value="LOCAL-00437" />
+      <option name="project" value="LOCAL" />
+      <updated>1681176002564</updated>
+    </task>
+    <task id="LOCAL-00438" summary="asset apply draft no 'None'">
+      <created>1681192437923</created>
+      <option name="number" value="00438" />
+      <option name="presentableId" value="LOCAL-00438" />
+      <option name="project" value="LOCAL" />
+      <updated>1681192437923</updated>
+    </task>
+    <task id="LOCAL-00439" summary="asset apply draft no 'None'">
+      <created>1681258659752</created>
+      <option name="number" value="00439" />
+      <option name="presentableId" value="LOCAL-00439" />
+      <option name="project" value="LOCAL" />
+      <updated>1681258659752</updated>
+    </task>
+    <task id="LOCAL-00440" summary="asset apply draft no 'None'">
+      <created>1681259667865</created>
+      <option name="number" value="00440" />
+      <option name="presentableId" value="LOCAL-00440" />
+      <option name="project" value="LOCAL" />
+      <updated>1681259667865</updated>
+    </task>
+    <task id="LOCAL-00441" summary="asset apply draft no 'None'">
+      <created>1681269193651</created>
+      <option name="number" value="00441" />
+      <option name="presentableId" value="LOCAL-00441" />
+      <option name="project" value="LOCAL" />
+      <updated>1681269193651</updated>
+    </task>
+    <task id="LOCAL-00442" summary="asset apply draft no 'None'">
+      <created>1681801023356</created>
+      <option name="number" value="00442" />
+      <option name="presentableId" value="LOCAL-00442" />
+      <option name="project" value="LOCAL" />
+      <updated>1681801023356</updated>
+    </task>
+    <option name="localTasksCounter" value="443" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="it assets management" />
+    <MESSAGE value="alert added shadow class" />
+    <MESSAGE value="change file upload path" />
+    <MESSAGE value="add tables" />
+    <MESSAGE value="add tables of assets" />
+    <MESSAGE value="brand" />
+    <MESSAGE value="change audit table name to audit_instance" />
+    <MESSAGE value="add login page" />
+    <MESSAGE value="add sap report view" />
+    <MESSAGE value="send mail" />
+    <MESSAGE value="change stockout" />
+    <MESSAGE value="set table vertical alignment - middle" />
+    <MESSAGE value="modify stock io report" />
+    <MESSAGE value="asset apply add attachments" />
+    <MESSAGE value="repair view and report change" />
+    <MESSAGE value="remove the company name from printer page" />
+    <MESSAGE value="asset apply draft no 'None'" />
+    <option name="LAST_COMMIT_MESSAGE" value="asset apply draft no 'None'" />
+  </component>
+</project>

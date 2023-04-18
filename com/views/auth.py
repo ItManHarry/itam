@@ -26,7 +26,7 @@ def login():
                 if validate_ok:
                     login_user(user, True)
                     session.permanent = True
-                    current_app.permanent_session_lifetime = timedelta(minutes=1)
+                    current_app.permanent_session_lifetime = timedelta(minutes=15)
                     session['user_id'] = user_id
                     log = SysLog(id=uuid.uuid4().hex, url='auth.login', operation='登录系统', user=user)
                     db.session.add(log)
