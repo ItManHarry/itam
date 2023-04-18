@@ -19,17 +19,13 @@ def reg_web_global_path(app):
         exclude_urls = [url_for('index'), url_for('auth.login'), url_for('auth.logout')]
         response = make_response()
         if request_path not in exclude_urls:
-            if ajax_request:
-                if time_out:
+            if time_out:
+                if ajax_request:
                     response.headers['login_timeout'] = 'Y'
-            else:
-                if time_out:
+                    return response
+                else:
                     flash('登录超时，请重新登录！')
                     return redirect(url_for('auth.logout'))
-
-    @app.errorhandler(CSRFError)
-    def csrf_error(e):
-        print('CSRF token error ......................')
 def reg_web_global_context(app):
     @app.context_processor
     def config_template_conext():
