@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="asset apply draft no 'None'">
+    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/regs/web_globals.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/regs/web_globals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/views/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/auth.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,16 +35,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "full.screen.before.presentation.mode": "false",
-    "last_opened_file_path": "D:/Development/Python/github/itam",
-    "settings.editor.selected.configurable": "terminal"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Development/Python/github/itam&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Development\Python\workplaces\itam\printer" />
@@ -114,13 +112,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00394" summary="modify stock io report">
-      <created>1670986047943</created>
-      <option name="number" value="00394" />
-      <option name="presentableId" value="LOCAL-00394" />
-      <option name="project" value="LOCAL" />
-      <updated>1670986047944</updated>
     </task>
     <task id="LOCAL-00395" summary="modify stock io report">
       <created>1670997033222</created>
@@ -458,7 +449,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681801023356</updated>
     </task>
-    <option name="localTasksCounter" value="443" />
+    <task id="LOCAL-00443" summary="asset apply draft no 'None'">
+      <created>1681801088866</created>
+      <option name="number" value="00443" />
+      <option name="presentableId" value="LOCAL-00443" />
+      <option name="project" value="LOCAL" />
+      <updated>1681801088866</updated>
+    </task>
+    <option name="localTasksCounter" value="444" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -479,6 +477,7 @@
     <MESSAGE value="repair view and report change" />
     <MESSAGE value="remove the company name from printer page" />
     <MESSAGE value="asset apply draft no 'None'" />
-    <option name="LAST_COMMIT_MESSAGE" value="asset apply draft no 'None'" />
+    <MESSAGE value="add session time out check" />
+    <option name="LAST_COMMIT_MESSAGE" value="add session time out check" />
   </component>
 </project>
