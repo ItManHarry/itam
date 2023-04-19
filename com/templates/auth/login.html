@@ -79,6 +79,8 @@
         <script src="{{url_for('static', filename='assets/js/jquery.backstretch.min.js')}}"></script>
         <script>
             jQuery(document).ready(function() {
+            // 5分钟自动刷新登录页，防止session过去 csrf认证异常
+            setInterval("reload_login()", 1000*300);
             /*
                 Fullscreen background
             */
@@ -101,6 +103,10 @@
                 });
             });
         });
+        function reload_login(){
+            alert('Reload Page!')
+            window.location.reload()
+        }
         </script>
         <!--[if lt IE 10]>
             <script src="{{url_for('static', filename='assets/js/placeholder.js')}}"></script>

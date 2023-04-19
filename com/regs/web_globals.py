@@ -24,6 +24,7 @@ def reg_web_global_path(app):
         # print('请求地址 : ', request_path, '是否属于非检查URL : ', exclude)
         response = make_response()
         if not exclude:
+            print('<', request_path, '>检查session是否超时!')
             if time_out:
                 if ajax_request:
                     response.headers['login_timeout'] = 'Y'
