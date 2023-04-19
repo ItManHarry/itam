@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/regs/web_globals.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/regs/web_globals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/auth/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,13 +112,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00396" summary="asset apply add attachments">
-      <created>1671505569986</created>
-      <option name="number" value="00396" />
-      <option name="presentableId" value="LOCAL-00396" />
-      <option name="project" value="LOCAL" />
-      <updated>1671505569987</updated>
     </task>
     <task id="LOCAL-00397" summary="asset apply add attachments">
       <created>1671526630157</created>
@@ -456,7 +449,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681868089537</updated>
     </task>
-    <option name="localTasksCounter" value="445" />
+    <task id="LOCAL-00445" summary="add session time out check">
+      <created>1681869975700</created>
+      <option name="number" value="00445" />
+      <option name="presentableId" value="LOCAL-00445" />
+      <option name="project" value="LOCAL" />
+      <updated>1681869975700</updated>
+    </task>
+    <option name="localTasksCounter" value="446" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
