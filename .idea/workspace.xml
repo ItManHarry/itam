@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/auth/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -112,13 +111,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00397" summary="asset apply add attachments">
-      <created>1671526630157</created>
-      <option name="number" value="00397" />
-      <option name="presentableId" value="LOCAL-00397" />
-      <option name="project" value="LOCAL" />
-      <updated>1671526630158</updated>
     </task>
     <task id="LOCAL-00398" summary="asset apply add attachments">
       <created>1671606084097</created>
@@ -456,7 +448,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681869975700</updated>
     </task>
-    <option name="localTasksCounter" value="446" />
+    <task id="LOCAL-00446" summary="add session time out check">
+      <created>1681870732500</created>
+      <option name="number" value="00446" />
+      <option name="presentableId" value="LOCAL-00446" />
+      <option name="project" value="LOCAL" />
+      <updated>1681870732500</updated>
+    </task>
+    <option name="localTasksCounter" value="447" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
