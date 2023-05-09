@@ -14,12 +14,12 @@
     <div class="col">
         <form method="post" id="search-form">
             <div class="row">
-                <div class="col-2">
+                <div class="col-1">
                     {{form.csrf_token}}
                     {{form.class2.label}}
                     {{form.class2(class='form-control', onchange='reload_data()')}}
                 </div>
-                <div class="col-2">
+                <div class="col-1">
                     {{form.class3.label}}
                     {{form.class3(class='form-control', onchange='reload_data()')}}
                 </div>
@@ -61,24 +61,31 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-1">
+                    {{form.asset_status.label}}
+                    {{form.asset_status(class='form-control', onchange='reload_data()')}}
+                </div>
+                 <div class="col-1">
+                    {{form.store_status.label}}
+                    {{form.store_status(class='form-control', onchange='reload_data()')}}
+                </div>
             </div>
         </form>
     </div>
 </div><br>
 <div class="row">
-    <div class="col">
-        <div class="col text-end">
-            <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
-            <div class="btn-group">
-              <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
-              </button>
-              <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=1)}}" target="_blank">当前页</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
-              </div>
-            </div>
+    <div class="col text-end">
+        <br>
+        <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查询</button>&nbsp;&nbsp;
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel"></i>&nbsp;导出
+          </button>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=1)}}" target="_blank">当前页</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{url_for('asset_rpt.export', sign=0)}}" target="_blank">全&nbsp;&nbsp;&nbsp;&nbsp;部</a>
+          </div>
         </div>
     </div>
 </div>

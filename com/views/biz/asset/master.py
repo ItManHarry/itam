@@ -368,6 +368,24 @@ def add(class1):
         flash('资产信息新增成功！')
         return redirect(url_for('.index', class1=class1))
     return render_template('biz/asset/master/add.html', form=form, companies=companies)
+@bp_master.route('/generate_bar/<id>', methods=['POST'])
+@login_required
+@log_record('重新生成条码')
+def generate_bar(id):
+    asset = BizAssetMaster.query.get(id)
+    code = asset.code
+    name = BizAssetClass.query.get(asset.class3_id).name
+    data = "{'code'='" + code + "', 'name'='" + name + "'}"
+    gen_barcode(current_app.config['BAR_CODE_PATH'], code)
+    qr_path = current_app.config['QR_CODE_PATH'] + '\\' + code + '.png'
+    gen_qrcode(qr_path, data)
+    asset.bar_path = code + '.png'
+    asset.qr_path = code + '.png'
+    asset.update_id = current_user.id
+    asset.updatetime_utc = datetime.utcfromtimestamp(time.time())
+    asset.updatetime_loc = datetime.fromtimestamp(time.time())
+    db.session.commit()
+    return jsonify(code=asset.code, message='重新生成条码成功！')
 @bp_master.route('/edit/<id>/<int:class1>', methods=['GET', 'POST'])
 @login_required
 @log_record('修改资产主数据信息')

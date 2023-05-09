@@ -10,3 +10,5 @@ class SearchForm(FlaskForm):
     sap_code = StringField('SAP资产编号', [validators.optional()])
     log_s = StringField('登记日期(FROM)', [validators.optional()])
     log_e = StringField('登记日期(TO)', [validators.optional()])
+    store_status = SelectField('库存状态', [validators.optional()], choices=[('0', '库存-All'), ('1', '在库'), ('2', '已出库')])
+    asset_status = SelectField('资产状态', [validators.optional()], choices=[])

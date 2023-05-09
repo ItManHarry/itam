@@ -25,8 +25,9 @@ def login():
                     validate_ok = user.validate_password(user_pwd)
                 if validate_ok:
                     login_user(user, True)
+                    # 设置session超时时间
                     session.permanent = True
-                    current_app.permanent_session_lifetime = timedelta(minutes=15)
+                    current_app.permanent_session_lifetime = timedelta(hours=1)
                     session['user_id'] = user_id
                     log = SysLog(id=uuid.uuid4().hex, url='auth.login', operation='登录系统', user=user)
                     db.session.add(log)

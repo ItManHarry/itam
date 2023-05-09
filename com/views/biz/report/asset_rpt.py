@@ -7,6 +7,7 @@ import flask_excel as excel
 from operator import itemgetter
 from itertools import groupby
 from datetime import datetime
+from com.utils import get_options
 import json
 bp_asset_rpt = Blueprint('asset_rpt', __name__)
 @bp_asset_rpt.route('/index', methods=['GET', 'POST'])
@@ -18,6 +19,7 @@ def index():
     # form.class1.choices = [('0', '资产大类-All')]
     # if classes_1:
     #     form.class1.choices += [(clazz.id, clazz.name) for clazz in classes_1]
+    form.asset_status.choices = [('0', '资产状态-All')] + get_options('D003')
     form.class2.choices = [('0', '资产分类-All')]
     classes_2 = BizAssetClass.query.filter_by(grade=2).order_by(BizAssetClass.name).all()
     if classes_2:
@@ -40,6 +42,8 @@ def index():
             form.brands.data = session['asset_report_search_brand'] if searched else '0'
             form.code.data = session['asset_report_search_code'] if searched else ''
             form.sap_code.data = session['asset_report_search_sap_code'] if searched else ''
+            form.store_status.data = session['asset_report_search_store_status'] if searched else '0'
+            form.asset_status.data = session['asset_report_search_asset_status'] if searched else '0'
             if form.class2.data is None or form.class2.data == '0':
                 form.class3.choices = [('0', '资产名称-All')]
             else:
@@ -94,6 +98,8 @@ def index():
         session['asset_report_search_model'] = form.models.data
         session['asset_report_search_code'] = form.code.data
         session['asset_report_search_sap_code'] = form.sap_code.data
+        session['asset_report_search_store_status'] = form.store_status.data
+        session['asset_report_search_asset_status'] = form.asset_status.data
     # 搜索条件
     search_all = {}
     search_all['class2'] = '0'
@@ -104,6 +110,8 @@ def index():
     search_all['sap_code'] = form.sap_code.data
     search_all['log_s'] = ''
     search_all['log_e'] = ''
+    search_all['store_status'] = '0'
+    search_all['asset_status'] = '0'
     if form.class2.data is not None and form.class2.data != '0':
         search_all['class2'] = form.class2.data
     if form.class3.data is not None and form.class3.data != '0':
@@ -116,6 +124,11 @@ def index():
         search_all['log_s'] = form.log_s.data
     if form.log_e.data:
         search_all['log_e'] = form.log_e.data
+    if form.store_status.data is not None and form.store_status.data != '0':
+        search_all['store_status'] = form.store_status.data
+    if form.asset_status.data is not None and form.asset_status.data != '0':
+        search_all['asset_status'] = form.asset_status.data
+    print('Store status is : ', form.store_status.data)
     conditions = get_condition_set(search_all)
     session['asset_report_current_page'] = page
     # 分页数据
@@ -197,4 +210,8 @@ def get_condition_set(cm):
         conditions.add(BizAssetMaster.createtime_loc >= datetime.strptime(cm['log_s'], '%Y-%m-%d'))
     if cm['log_e']:
         conditions.add(BizAssetMaster.createtime_loc <= datetime.strptime(cm['log_e'], '%Y-%m-%d'))
+    if cm['store_status'] != '0':
+        conditions.add(BizAssetMaster.is_out == (True if cm['store_status'] == '2' else False))
+    if cm['asset_status'] != '0':
+        conditions.add(BizAssetMaster.status_id == cm['asset_status'])
     return conditions

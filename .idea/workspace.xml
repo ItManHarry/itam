@@ -2,7 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/forms/biz/report/asset_rpt.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/forms/biz/report/asset_rpt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/jobs/task_synch_hr.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/jobs/task_synch_hr.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/auth/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/templates/biz/asset/master/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/biz/asset/master/edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/templates/biz/report/asset_rpt/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/biz/report/asset_rpt/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/views/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/views/biz/asset/master.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/biz/asset/master.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/views/biz/report/asset_rpt.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/biz/report/asset_rpt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,16 +42,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Development/Python/github/itam&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "full.screen.before.presentation.mode": "false",
+    "last_opened_file_path": "D:/Development/Python/github/itam/printer",
+    "settings.editor.selected.configurable": "terminal"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Development\Python\workplaces\itam\printer" />
@@ -111,13 +119,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00398" summary="asset apply add attachments">
-      <created>1671606084097</created>
-      <option name="number" value="00398" />
-      <option name="presentableId" value="LOCAL-00398" />
-      <option name="project" value="LOCAL" />
-      <updated>1671606084098</updated>
     </task>
     <task id="LOCAL-00399" summary="asset apply add attachments">
       <created>1671687347484</created>
@@ -455,7 +456,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681870732500</updated>
     </task>
-    <option name="localTasksCounter" value="447" />
+    <task id="LOCAL-00447" summary="add session time out check">
+      <created>1681870937416</created>
+      <option name="number" value="00447" />
+      <option name="presentableId" value="LOCAL-00447" />
+      <option name="project" value="LOCAL" />
+      <updated>1681870937416</updated>
+    </task>
+    <option name="localTasksCounter" value="448" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

@@ -59,7 +59,12 @@
     <div class="row">
         <div class="col-md-3">
             {{form.code.label}}
-            {{form.code(class='form-control', placeholder='系统自动生成......', readonly=True)}}
+            <div class="input-group">
+                {{form.code(class='form-control', readonly=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="regenerate_bar()" class="btn btn-secondary"><i class="bi bi-upc"></i>&nbsp;重新生成条码</span>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
             {{form.sap_code.label}}
@@ -465,5 +470,20 @@
         $('#parent_asset_id').val($(e).attr('id'))
         $('#parent_asset').val($(e).text())
         $('#parentAssetModal').modal('hide')
+    }
+    function regenerate_bar(){
+        var master_id = $('#id').val()
+        //alert(master_id)
+        $.post('/master/generate_bar/'+master_id, function(data){
+            //alert('Code is : '+data.code+', message : '+data.message)
+            $.alert({
+                   type:'green',
+                   title:'系统提示',
+                   content: data.message,
+                   onClose:function(){
+
+                   }
+               })
+        }, 'json')
     }
 {% endblock %}

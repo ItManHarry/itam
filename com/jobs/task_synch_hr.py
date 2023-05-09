@@ -61,11 +61,15 @@ def synchronize_hr_data_job():
         items = get_employees()
         employee_total = len(items)
         print('雇员数量 : ', len(items))
+        # 部门调整人员清单,用以更新资产法人部门所属
+        department_changed_employees = []
         #count = 0
         for item in items:
             #count += 1
             employee = BizEmployee.query.filter_by(code=item.code).first()
             if employee:
+                if employee.department_id != department_map[item.department_code]:
+                    department_changed_employees.append(employee)
                 #print('Item(%d)执行雇员更新:职号(%s) --- ' %(count, item.code))
                 employee.name = item.name
                 employee.company_id = company_map[item.company_id]
@@ -110,3 +114,22 @@ def synchronize_hr_data_job():
         log = SysLog(id=uuid.uuid4().hex, url='null', operation=log_str, create_id=user.id, user_id=user.id)
         db.session.add(log)
         db.session.commit()
+        print('执行资产法人部门所属变更')
+        # 临时执行一次全部更新，后续每天会联动HR信息进行更新
+        # department_changed_employees = BizEmployee.query.all()
+        if department_changed_employees:
+            changed_cnt = 0
+            no_assets_cnt = 0
+            for employee in department_changed_employees:
+                if employee.used_assets:
+                    changed_cnt += 1
+                    for asset in employee.used_assets:
+                        asset.department_id = employee.department_id
+                        asset.company_id = employee.company_id
+                    db.session.commit()
+                else:
+                    no_assets_cnt += 1
+                    print('名下无资产，不执行变更!')
+            print('部门调整人员总数{}, 调整资产法人部门信息数量{}, 无资产人员数量{}.'.format(len(department_changed_employees), changed_cnt, no_assets_cnt))
+        else:
+            print('无部门调整人员信息......')
