@@ -14,6 +14,8 @@ class SearchForm(FlaskForm):
     used_by = StringField('使用者', [validators.optional()])
     buy_s = StringField('购买日期(FROM)', [validators.optional()])
     buy_e = StringField('购买日期(TO)', [validators.optional()])
+    store_status = SelectField('库存状态', [validators.optional()], choices=[('0', '库存状态-All'), ('1', '在库'), ('2', '已出库')])
+    asset_status = SelectField('资产状态', [validators.optional()], choices=[])
     used_by_id = HiddenField()
 class AssetForm(FlaskForm):
     # 资产主数据

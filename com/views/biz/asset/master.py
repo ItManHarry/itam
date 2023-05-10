@@ -20,6 +20,7 @@ bp_master = Blueprint('master', __name__)
 def index():
     class1 = request.args.get('class1', type=int) if request.args.get('class1') else 1  # 1:资产 0:耗材  默认为1
     form = SearchForm()
+    form.asset_status.choices = [('0', '资产状态-All')] + get_options('D003')
     form.companies.choices = [('0', '资产法人-All')]+[(company.id, company.name) for company in BizCompany.query.order_by(BizCompany.code).all()]
     # 资产类别一级大类代码必须是'01':资产'02':耗材
     class_1 = BizAssetClass.query.filter(BizAssetClass.code == '01', BizAssetClass.bg_id == current_user.company_id).first() if class1 == 1 else BizAssetClass.query.filter(BizAssetClass.code == '02', BizAssetClass.bg_id == current_user.company_id).first()
@@ -47,6 +48,8 @@ def index():
                 form.sap_code.data = session['asset_view_search_sap_code'] if searched else ''
                 form.used_by_id.data = session['asset_view_search_used_by'] if searched else ''
                 form.companies.data = session['asset_view_search_company'] if searched else '0'
+                form.asset_status.data = session['asset_view_search_asset_status'] if searched else '0'
+                form.store_status.data = session['asset_view_search_store_status'] if searched else '0'
             if form.class2.data is None or form.class2.data == '0':
                 form.class3.choices = [('0', '资产名称-All')]
             else:
@@ -107,6 +110,8 @@ def index():
             session['asset_view_search_sap_code'] = form.sap_code.data
             session['asset_view_search_used_by'] = form.used_by_id.data
             session['asset_view_search_company'] = form.companies.data
+            session['asset_view_search_asset_status'] = form.asset_status.data
+            session['asset_view_search_store_status'] = form.store_status.data
     # 搜索条件
     conditions = set()
     if class_1:
@@ -131,6 +136,10 @@ def index():
         conditions.add(BizAssetMaster.company_id == form.companies.data)
     if form.used_by_id.data:
         conditions.add(BizAssetMaster.user_id == form.used_by_id.data)
+    if form.asset_status.data is not None and form.asset_status.data != '0':
+        conditions.add(BizAssetMaster.status_id == form.asset_status.data)
+    if form.store_status.data is not None and form.store_status.data != '0':
+        conditions.add(BizAssetMaster.is_out == (True if form.store_status.data == '2' else False))
     per_page = current_app.config['ITEM_COUNT_PER_PAGE']
     pagination = BizAssetMaster.query.filter(*conditions).order_by(BizAssetMaster.buy_date.desc()).paginate(page, per_page)
     assets = pagination.items
