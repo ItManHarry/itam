@@ -536,6 +536,7 @@ def edit(id, class1):
         asset.manager_id = manager.id if manager else ''
         asset.vendor_id = form.vendors.data
         asset.store_id = form.store.data
+        asset.sap_code = form.sap_code.data
         # 设置使用人
         old_user_id = asset.user_id if asset.user_id else ''
         if form.used_by_id.data:
