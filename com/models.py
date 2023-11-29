@@ -217,6 +217,7 @@ class BizCompany(BaseModel, db.Model):
     audit_lines = db.relationship('AuditLine', back_populates='bg')             # 审批线
     audit_roles = db.relationship('AuditRole', back_populates='bg')             # 审批角色
     audit_items = db.relationship('AuditItem', back_populates='bg')             # 审批单据
+    payment_bgs = db.relationship('BizPaymentBgMaster', back_populates='company')   # 结算BG信息
     # 初始化法人
     @staticmethod
     def init_companies():
@@ -260,6 +261,10 @@ class BizDepartment(BaseModel, db.Model):
     child_department = db.relationship('RelDepartment', foreign_keys=[RelDepartment.child_department_id], back_populates='child_department', lazy='dynamic', cascade='all')     # 子部门
     applications = db.relationship('BizAssetApply', back_populates='department')    # 物料申请单
     assets = db.relationship('BizAssetMaster', back_populates='department')         # 资产清单
+    payment_bg_id = db.Column(db.String(32))                                        # 部门结算BG信息
+    @property
+    def payment_bg(self):
+        return BizPaymentBgMaster.query.get(self.payment_bg_id) if self.payment_bg_id else None
     # 设置父部门
     def set_parent_department(self, department):
         '''
@@ -385,16 +390,70 @@ class BizAssetApply(BaseModel, db.Model):
     applicant_id = db.Column(db.String(32), db.ForeignKey('biz_employee.id'))                                       # 申请人ID
     applicant = db.relationship('BizEmployee', back_populates='applications')                                       # 申请人
     applicant_pos = db.Column(db.String(48))                                                                        # 申请人职位
-    class2_id = db.Column(db.String(32))                                                                            # 资产分类
-    class3_id = db.Column(db.String(32))                                                                            # 资产名称
-    brand_id = db.Column(db.String(32))                                                                             # 品牌
-    model_id = db.Column(db.String(32))                                                                             # 型号
+    class2_id = db.Column(db.String(32))                                                                            # 资产分类-弃用
+    class3_id = db.Column(db.String(32))                                                                            # 资产名称-弃用
+    brand_id = db.Column(db.String(32))                                                                             # 品牌-弃用
+    model_id = db.Column(db.String(32))                                                                             # 型号-弃用
     file_path = db.Column(db.String(128))                                                                           # 附件路径
     summary = db.Column(db.Text)                                                                                    # 申请概要
-    amount = db.Column(db.Integer)                                                                                  # 申请数量
+    amount = db.Column(db.Integer)                                                                                  # 申请数量-合计明细后更新即可
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))                                               # 单据所属法人ID
     bg = db.relationship('BizCompany', back_populates='apply_bills', lazy=True, foreign_keys=[bg_id])               # 单据所属法人
-    buy_bill = db.relationship('BizAssetBuy', uselist=False, back_populates='application')                          # 购买订单
+    buy_bill = db.relationship('BizAssetBuy', uselist=False, back_populates='application')                          # 购买订单-弃用
+    # 2023年升级新增字段
+    e_approval_app_dt = db.Column(db.Date())    # E-Approval申请日期
+    e_approval_fin_dt = db.Column(db.Date())    # E-Approval完成日期
+    e_approval_url = db.Column(db.String(256))  # E-Approval链接URL
+    items = db.relationship('BizAssetItem', back_populates='apply')    # 申请明细
+    # 资产分类
+    @property
+    def class2(self):
+        return BizAssetClass.query.get(self.class2_id) if self.class2_id else None
+    # 资产名称
+    @property
+    def class3(self):
+        return BizAssetClass.query.get(self.class3_id) if self.class3_id else None
+    # 品牌
+    @property
+    def brand(self):
+        return BizBrandMaster.query.get(self.brand_id) if self.brand_id else None
+    # 型号
+    @property
+    def model(self):
+        return BizBrandModel.query.get(self.model_id) if self.model_id else None
+class RelAssetBuyItem(BaseModel, db.Model):
+    asset_item_id = db.Column(db.String(32), db.ForeignKey('biz_asset_item.id'))    # 资产申请明细ID
+    asset_buy_id = db.Column(db.String(32), db.ForeignKey('biz_asset_buy.id'))      # 资产购买订单ID
+    amount = db.Column(db.Integer)                                                  # 购买数量
+    is_stock_in = db.Column(db.Boolean, default=False)                              # 是否已入库(默认否)
+'''
+资产申请/购买明细
+实现逻辑：
+    1. 临时ID-用于表单中新增时执行明细异步增删改查，修改时按照apply_id来执行异步增删改查
+    2. 每次新增/编辑申请单时，先执行申请明细查询，apply_id为空的执行物理删除，清除垃圾数据
+'''
+class BizAssetItem(BaseModel, db.Model):
+    tmp_id = db.Column(db.String(32))           # 临时ID
+    class2_id = db.Column(db.String(32))        # 资产分类
+    class3_id = db.Column(db.String(32))        # 资产名称
+    brand_id = db.Column(db.String(32))         # 品牌
+    model_id = db.Column(db.String(32))         # 型号
+    user_id = db.Column(db.String(32))          # 使用人-对应雇员信息
+    amount = db.Column(db.Integer, default=1)   # 申请数量-默认为1
+    std_model = db.Column(db.String(32))        # 标准型号-对应标准型号
+    is_bought = db.Column(db.Boolean, default=False)    # 已购买（默认否）
+    is_stored = db.Column(db.Boolean, default=False)    # 已入库（默认否）
+    apply_id = db.Column(db.String(32), db.ForeignKey('biz_asset_apply.id'))    # 申请单ID
+    apply = db.relationship('BizAssetApply', back_populates='items')            # 申请单
+    buy_bills = db.relationship('BizAssetBuy', secondary='rel_asset_buy_item', back_populates='apply_items')    # 购买订单多个
+    # 使用者
+    @property
+    def user(self):
+        return BizEmployee.query.get(self.user_id) if self.user_id else None
+    # 标准型号
+    @property
+    def standard_model(self):
+        return BizStandardModel.query.get(self.std_model) if self.std_model else None
     # 资产分类
     @property
     def class2(self):
@@ -426,6 +485,8 @@ class BizAssetBuy(BaseModel, db.Model):
     assets = db.relationship('BizAssetMaster', back_populates='buy_bill')           # 购买资产明细
     bg_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))               # 所属法人ID
     bg = db.relationship('BizCompany', back_populates='buy_bills')                  # 所属法人
+    apply_items = db.relationship('BizAssetItem', secondary='rel_asset_buy_item', back_populates='buy_bills')  # 申请明细
+
 '''
 入库登记表--资产审批
 '''
@@ -540,6 +601,49 @@ class BizAssetClass(BaseModel, db.Model):
     def get_child_class(self):
         return RelAssetClass.query.filter_by(parent_class_id=self.id).order_by(RelAssetClass.createtime_loc.desc()).all()
 '''
+标准型号
+'''
+class BizStandardModel(BaseModel, db.Model):
+    name = db.Column(db.String(128))            # 标准型号名称
+    code = db.Column(db.String(32))             # 标准型号代码
+    class2_id = db.Column(db.String(32))        # 资产分类
+    class3_id = db.Column(db.String(32))        # 资产名称
+    brand_id = db.Column(db.String(32))         # 品牌
+    model_id = db.Column(db.String(32))         # 型号
+    amount = db.Column(db.Float)                # 金额
+    cpu = db.Column(db.String(32))              # CPU
+    memory = db.Column(db.String(32))           # 内存
+    disk = db.Column(db.String(32))             # 硬盘
+    screen_ratio = db.Column(db.String(32))     # 显示器分辨率
+    screen_size = db.Column(db.String(32))      # 显示器尺寸
+    inf = db.Column(db.String(32))              # 接口
+    system_os = db.Column(db.String(32))        # 操作系统
+    battery = db.Column(db.String(32))          # 电池
+    power = db.Column(db.String(32))            # 功率
+    remark = db.Column(db.String(32))           # 备注
+    vendor_id = db.Column(db.String(32))        # 供应商
+    warranty = db.Column(db.Integer)            # 保修期（天）
+    # 资产分类
+    @property
+    def class2(self):
+        return BizAssetClass.query.get(self.class2_id) if self.class2_id else None
+    # 资产名称
+    @property
+    def class3(self):
+        return BizAssetClass.query.get(self.class3_id) if self.class3_id else None
+    # 品牌
+    @property
+    def brand(self):
+        return BizBrandMaster.query.get(self.brand_id) if self.brand_id else None
+    # 型号
+    @property
+    def model(self):
+        return BizBrandModel.query.get(self.model_id) if self.model_id else None
+    @property
+    def vendor(self):
+        return BizVendorMaster.query.get(self.vendor_id) if self.vendor_id else None
+
+'''
 资产附属关系:某个资产附属于另一个资产;应用场景->为了某个资产而购买的资产/耗材,比如笔记本电脑购买内存条
 '''
 class RelAssetMaster(BaseModel, db.Model):
@@ -592,6 +696,7 @@ class BizAssetMaster(BaseModel, db.Model):
     vendor = db.relationship('BizVendorMaster', back_populates='assets')                                            # 供应商
     store = db.relationship('BizStoreMaster', back_populates='assets')                                              # 存放仓库
     properties = db.relationship('BizAssetProperty', uselist=False, back_populates='asset_master')                  # 资产属性(耗材无)
+    procedures = db.relationship('BizAssetProcedure', uselist=False, back_populates='asset_master')                  # 资产属性(耗材无)
     maintains = db.relationship('BizAssetMaint', back_populates='master')                                           # 资产保修信息
     status = db.relationship('SysEnum', back_populates='asset_status', lazy=True, foreign_keys=[status_id])         # 资产状态
     out_bills = db.relationship('BizStockOut', secondary='rel_asset_out_item', back_populates='assets')             # 出库单
@@ -660,6 +765,29 @@ class BizAssetProperty(BaseModel, db.Model):
     remark = db.Column(db.String(32))           # 备注
     asset_master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))   # 资产主数据ID
     asset_master = db.relationship('BizAssetMaster', back_populates='properties')      # 资产主数据
+'''
+结算BG基础信息
+'''
+class BizPaymentBgMaster(BaseModel, db.Model):
+    bg_code = db.Column(db.String(12))      # 结算BG代码
+    bg_order = db.Column(db.String(24))     # 结算BG Order号
+    bg_year = db.Column(db.String(4))       # 结算BG年份
+    company_id = db.Column(db.String(32), db.ForeignKey('biz_company.id'))
+    company = db.relationship('BizCompany', back_populates='payment_bgs')
+'''
+资产结算信息表
+'''
+class BizAssetProcedure(BaseModel, db.Model):
+    payment_dt = db.Column(db.Date())                       # 结算日期
+    payment_bg_id = db.Column(db.String(32))                # 结算BG
+    payment_invoice = db.Column(db.Boolean, default=False)  # 结算发票
+    payment_check = db.Column(db.Boolean, default=False)    # 结算验收证表
+    payment_signet = db.Column(db.Boolean, default=False)   # 结算验收单章
+    asset_master_id = db.Column(db.String(32), db.ForeignKey('biz_asset_master.id'))    # 资产主数据ID
+    asset_master = db.relationship('BizAssetMaster', back_populates='procedures')       # 资产主数据
+    @property
+    def payment_bg(self):
+        return BizPaymentBgMaster.query.get(self.payment_bg_id) if self.payment_bg_id else None
 '''
 维保信息
 '''

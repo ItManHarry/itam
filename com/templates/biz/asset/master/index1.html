@@ -89,7 +89,7 @@
     </div>
     <div class="col-md-3 text-end">
         <button class="btn btn-outline-info" onclick="reload_data()"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
-        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=1)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=1, page=pagination.page)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>&nbsp;&nbsp;
         <button id="excel" onclick="transport()" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel"></i>&nbsp;Excel导入</button>
     </div>
 </div>
@@ -135,7 +135,7 @@
                       <ul class="dropdown-menu" aria-labelledby="actions">
                           <li>
                               <div class="btn-group dropdown-item">
-                                  <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('master.edit', id=asset.id, class1=1)}}" class="btn btn-link text-info {%if asset.status.item in ['8','9','10']%}disabled{%endif%}"><i class="bi bi-pencil-square"></i></a>
+                                  <a data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑" href="{{url_for('master.edit', id=asset.id, class1=1, page=pagination.page)}}" class="btn btn-link text-info {%if asset.status.item in ['8','9','10']%}disabled{%endif%}"><i class="bi bi-pencil-square"></i></a>
                                   <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="条码" class="btn btn-link text-success" onclick="bar('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-upc-scan"></i></button>
                                   <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="续保" class="btn btn-link text-success" onclick="reinsurance('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-bootstrap-reboot"></i></button>
                                   <button data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="变更" class="btn btn-link text-warning" onclick="change_user('{{asset.id}}')" {%if asset.status.item in ['8','9','10']%}disabled{%endif%}><i class="bi bi-people"></i></button>

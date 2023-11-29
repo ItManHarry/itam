@@ -10,6 +10,7 @@
 {{current_location('添加')}}
 <form method="post" enctype="multipart/form-data">
     {{form.csrf_token}}
+    {{form.items_tmp_id}}
     {{form.company_id}}
     {{form.department}}
     {{form.applicant}}
@@ -18,61 +19,37 @@
     {{form.brand_id}}
     {{form.model_id}}
     <div class="row">
-        <div class="col-md-6">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">主信息</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-3">
             {{form.apply_no.label}}
             {{form.apply_no(class='form-control', placeholder='申请编号,系统自动生成', readonly=True)}}
             {% for message in form.apply_no.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             {{form.draft_no.label}}
             {{form.draft_no(class='form-control')}}
             {% for message in form.draft_no.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
-    </div><br>
-    <div class="row">
-        <div class="col-md-6">
-            {{form.applicant_slt.label}}
-            <div class="input-group">
-                {{form.applicant_slt(class='form-control', disabled=True)}}
-                <div class="input-group-prepend">
-                    <span onclick="select_employee()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
-                </div>
-            </div>
-            {% for message in form.applicant.errors %}
-                <small class="text-danger">{{message}}</small>
-            {% endfor %}
-        </div>
-        <div class="col-md-6">
-            {{form.applicant_pos.label}}
-            {{form.applicant_pos(class='form-control')}}
-            {% for message in form.applicant_pos.errors %}
-                <small class="text-danger">{{message}}</small>
-            {% endfor %}
-        </div>
-    </div><br>
-    <div class="row">
-        <div class="col-md-6">
-             {{form.company.label}}
-             {{form.company(class='form-control', disabled=True)}}
-        </div>
-        <div class="col-md-6">
-            {{form.department_slt.label}}
-            {{form.department_slt(class='form-control', disabled=True)}}
-        </div>
-    </div><br>
-    <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             {{form.amount.label}}
-            {{form.amount(class='form-control')}}
+            {{form.amount(class='form-control', readonly=True)}}
             {% for message in form.amount.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             {{form.receive_date.label}}
             {{form.receive_date(class='form-control')}}
             {% for message in form.receive_date.errors %}
@@ -82,32 +59,31 @@
     </div><br>
     <div class="row">
         <div class="col-md-3">
-            {{form.class2_slt.label}}
-            {{form.class2_slt(class='form-control')}}
-            {% for message in form.class2_id.errors %}
+            {{form.applicant_slt.label}}
+            <div class="input-group">
+                {{form.applicant_slt(class='form-control', disabled=True)}}
+                <div class="input-group-prepend">
+                    <span onclick="select_applicant()" class="btn btn-secondary"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+            {% for message in form.applicant.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
         <div class="col-md-3">
-            <label for="class3_slt">资产名称</label>
-            <select class="form-control" id="class3_slt" name="class3_slt"></select>
-            {% for message in form.class3_id.errors %}
+            {{form.applicant_pos.label}}
+            {{form.applicant_pos(class='form-control')}}
+            {% for message in form.applicant_pos.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
         </div>
         <div class="col-md-3">
-            {{form.brand_slt.label}}
-            {{form.brand_slt(class='form-control')}}
-            {% for message in form.brand_id.errors %}
-                <small class="text-danger">{{message}}</small>
-            {% endfor %}
+             {{form.company.label}}
+             {{form.company(class='form-control', disabled=True)}}
         </div>
         <div class="col-md-3">
-            <label for="model_slt">型号</label>
-            <select class="form-control" id="model_slt" name="model_slt"></select>
-            {% for message in form.model_id.errors %}
-                <small class="text-danger">{{message}}</small>
-            {% endfor %}
+            {{form.department_slt.label}}
+            {{form.department_slt(class='form-control', disabled=True)}}
         </div>
     </div><br>
     <div class="row">
@@ -117,6 +93,96 @@
             {% for message in form.summary.errors %}
                 <small class="text-danger">{{message}}</small>
             {% endfor %}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">申请明细</span>
+              </li>
+            </ul>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="row" id="normal_select">
+                <div class="col-md-2">
+                    {{form.class2_slt.label}}
+                    {{form.class2_slt(class='form-control form-control-sm')}}
+                </div>
+                <div class="col-md-2">
+                    <label for="class3_slt">资产名称</label>
+                    <select class="form-control form-control-sm" id="class3_slt" name="class3_slt"></select>
+                </div>
+                <div class="col-md-2">
+                    {{form.brand_slt.label}}
+                    {{form.brand_slt(class='form-control form-control-sm')}}
+                </div>
+                <div class="col-md-2">
+                    <label for="model_slt">型号</label>
+                    <select class="form-control form-control-sm" id="model_slt" name="model_slt"></select>
+                </div>
+                <div class="col-md-2">
+                    <label for="apply_amount">申请数量</label>
+                    <input type="number" class="form-control form-control-sm" id="apply_amount" name="apply_amount" value="1">
+                </div>
+                <div class="col-md-2">
+                    <label for="asset_user">使用人</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" readonly id="asset_user" name="asset_user">
+                        <input type="hidden" id="asset_user_id">
+                        <div class="input-group-prepend">
+                            <span onclick="select_user('asset_user', 'asset_user_id')" class="btn btn-secondary btn-sm"><i class="bi bi-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1 text-center">
+            <br><button class="btn btn-outline-primary btn-sm" type="button" id="asset_add"><i class="bi bi-plus"></i>&nbsp;添加</button>
+        </div>
+    </div><hr>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>资产分类</th>
+                        <th>资产名称</th>
+                        <th>品牌</th>
+                        <th>型号</th>
+                        <th>申请数量</th>
+                        <th>使用人</th>
+                    </tr>
+                </thead>
+                <tbody id="items">
+                {%if items%}
+                {%include 'biz/asset/apply/_items.html'%}
+                {%endif%}
+                </tbody>
+                {%if form.items_tmp_id.errors%}
+                <tfoot id="items_error">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            {% for message in form.items_tmp_id.errors %}
+                                <small class="text-danger">{{message}}</small>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tfoot>
+                {%endif%}
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <span class="nav-link active text-primary">附件信息</span>
+              </li>
+            </ul>
         </div>
     </div><br>
     <div class="row">
@@ -214,9 +280,60 @@
         $('#model_slt').change(function(){
             $('#model_id').val($(this).val())
         })
+        // 添加资产明细
+        $('#asset_add').click(function(){
+            $('#items_error').remove()
+            var apply_amount = parseInt($('#apply_amount').val())
+            if($('#class2_slt').val() == '00000000')
+                sys_alert('请选择资产分类！')
+            else if($('#brand_slt').val() == '00000000')
+                sys_alert('请选择资品牌！')
+            else if(apply_amount <= 0)
+                sys_alert('申请数量要大于0！')
+            else if($('#asset_user_id').val() == '')
+                sys_alert('请指定使用人！')
+            else{
+                var params = {
+                    tmp_id: $('#items_tmp_id').val(),
+                    class2_id:$('#class2_id').val(),
+                    class3_id:$('#class3_id').val(),
+                    brand_id:$('#brand_id').val(),
+                    model_id:$('#model_id').val(),
+                    user_id:$('#asset_user_id').val(),
+                    amount:apply_amount
+                }
+                $.ajax({
+                    url:'{{url_for('apply.item_add')}}',
+                    type:'post',
+                    data:JSON.stringify(params),
+                    contentType:"application/json; charset=utf-8",
+                    dateType:'html',
+                    success:function(data){
+                        $('#items').html(data)
+                        $('#amount').val(($('#total_amount').val()))
+                    },
+                    error:function(){
+                        alert('Error occurred!')
+                    }
+                })
+            }
+        })
     })
-    function select_employee(){
+    //选择申请人
+    function select_applicant(){
         e_id = 'applicant_slt'
         $('#employeeModal').modal('show')
+    }
+    //选择使用人
+    function select_user(view_id, save_id){
+        e_name = view_id
+        e_id = save_id
+        $('#employeeModal').modal('show')
+    }
+    function remove(item_id){
+        $.post('/apply/item/remove/'+item_id, function(data){
+            $('#items').html(data)
+            $('#amount').val(($('#total_amount').val()))
+        }, 'html')
     }
 {% endblock %}

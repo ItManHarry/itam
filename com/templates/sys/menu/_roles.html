@@ -1,0 +1,16 @@
+{%if roles%}
+  {%for role in roles%}
+  <li class="list-group-item list-group-item-action">
+    <div class="row">
+      <div class="col-9">{{role.name}}</div>
+      <div class="col-3">
+        <button onclick="unlink_role('{{role.id}}')" class="btn btn-sm btn-outline-danger">断开&nbsp;<i class="bi bi-dash-circle"></i></button>
+      </div>
+    </div>
+  </li>
+  {%endfor%}
+{%else%}
+  <li class="list-group-item list-group-item-action text-danger">
+    只有超级管理员具有该菜单权限！
+  </li>
+{%endif%}

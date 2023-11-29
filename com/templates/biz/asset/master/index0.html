@@ -58,7 +58,7 @@
         </div>
     <div class="col-3 text-end">
         <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
-        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=0)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+        <a class="btn btn-outline-primary {%if current_user.is_admin%}disabled{%endif%}" href="{{url_for('master.add', class1=0, page=pagination.page)}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
     </div>
   </div>
 </form>
@@ -91,7 +91,7 @@
                 <td class="align-middle">{{asset.status.display}}</td>
                 <td class="align-middle">{%if asset.is_out%}<span class="text-info">已出库</span>{%else%}<span class="text-info">在库</span>{%endif%}</td>
                 <td class="text-center align-middle">
-                    <a href="{{url_for('master.edit', id=asset.id, class1=0)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                    <a href="{{url_for('master.edit', id=asset.id, class1=0, page=pagination.page)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
                     <button class="btn btn-link text-secondary" onclick="restore('{{asset.id}}', '{{asset.code}}')" {%if not asset.is_out%}disabled{%endif%} data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="返还" ><i class="bi bi-box-arrow-in-down-left"></i></button>&nbsp;
                 </td>
             </tr>

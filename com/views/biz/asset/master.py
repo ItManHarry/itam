@@ -156,10 +156,10 @@ def index():
                            scrap_states=scrap_states, vendors=vendors, companies=companies)
     else:
         return render_template('biz/asset/master/index0.html', form=form, pagination=pagination, assets=assets)
-@bp_master.route('/add/<int:class1>', methods=['GET', 'POST'])
+@bp_master.route('/add/<int:class1>/<int:page>', methods=['GET', 'POST'])
 @login_required
 @log_record('新增资产主信息')
-def add(class1):
+def add(class1, page):
     form = AssetForm()
     form.class1.data = class1
     # 资产类别一级大类代码必须是'01':资产'02':耗材
@@ -375,8 +375,8 @@ def add(class1):
                 print('Send mail to : ', to)
                 send_mail(subject='资产登记审批提醒', to=to, cc=[], template='emails/asset_approve_remind', asset=master)
         flash('资产信息新增成功！')
-        return redirect(url_for('.index', class1=class1))
-    return render_template('biz/asset/master/add.html', form=form, companies=companies)
+        return redirect(url_for('.index', class1=class1, page=page))
+    return render_template('biz/asset/master/add.html', form=form, companies=companies, page=page)
 @bp_master.route('/generate_bar/<id>', methods=['POST'])
 @login_required
 @log_record('重新生成条码')
@@ -395,10 +395,10 @@ def generate_bar(id):
     asset.updatetime_loc = datetime.fromtimestamp(time.time())
     db.session.commit()
     return jsonify(code=asset.code, message='重新生成条码成功！')
-@bp_master.route('/edit/<id>/<int:class1>', methods=['GET', 'POST'])
+@bp_master.route('/edit/<id>/<int:class1>/<int:page>', methods=['GET', 'POST'])
 @login_required
 @log_record('修改资产主数据信息')
-def edit(id, class1):
+def edit(id, class1, page):
     asset = BizAssetMaster.query.get(id)
     maintain = BizAssetMaint.query.with_parent(asset).order_by(BizAssetMaint.createtime_loc.desc()).first()
     form = AssetForm()
@@ -581,8 +581,8 @@ def edit(id, class1):
         db.session.commit()
         flash('资产信息修改成功！')
         # return redirect(url_for('.index', class1=class1))
-        return redirect(url_for('.edit', id=id, class1=class1))
-    return render_template('biz/asset/master/edit.html', form=form, companies=companies)
+        return redirect(url_for('.edit', id=id, class1=class1, page=page))
+    return render_template('biz/asset/master/edit.html', form=form, companies=companies, page=page)
 @bp_master.route('/repair', methods=['POST'])
 @login_required
 @log_record('资产维修申请')
@@ -859,7 +859,7 @@ def restore(asset_id):
     asset.status_id = e.id              # 资产状态设置为在库
     asset.store_id = store              # 设置仓库
     # 清空使用人信息
-    if asset.is_asset:
+    if asset.is_asset and asset.company_id:
         company = BizCompany.query.get(asset.company_id)
         department = BizDepartment.query.get(asset.department_id)
         user = BizEmployee.query.get(asset.user_id)
@@ -1022,7 +1022,7 @@ def transport():
                 check_result.append('品牌代码不存在')
             if item.brand_cd.strip()+'-'+(str(int(item.model_cd)).strip() if isinstance(item.model_cd, float) else item.model_cd) not in models:
                 check_result.append('型号代码不存在')
-            if item.user_cd and item.user_cd.strip().lower() not in employees:
+            if item.user_cd and str(item.user_cd).strip().lower() not in employees:
                 check_result.append('使用者职号不存在')
             if item.store_cd.strip() not in stores:
                 check_result.append('仓库代码不存在')
@@ -1090,8 +1090,9 @@ def transport():
                 master.is_out = True
             # 设置使用人
             if item.user_cd:
-                master.user_id = employees[item.user_cd.strip().lower()]
-                used_by = BizEmployee.query.get(employees[item.user_cd.strip().lower()])
+                user_cd = str(item.user_cd)
+                master.user_id = employees[user_cd.strip().lower()]
+                used_by = BizEmployee.query.get(employees[user_cd.strip().lower()])
                 master.department_id = used_by.department_id
                 master.company_id = used_by.company_id
             '''

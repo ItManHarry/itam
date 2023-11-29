@@ -211,6 +211,8 @@ def save_rels(form):
         if e:
             asset.status_id = e.id
         # 领用发放->更新资产使用者没有使用者时新增变更履历
+        '''
+        此逻辑与实际业务逻辑不符 -> 领用人不等同于使用人，故屏蔽
         if stock_type.item == 'T003':
             if not asset.user:
                 change = BizAssetChange(
@@ -226,6 +228,7 @@ def save_rels(form):
             asset.department_id = used_by.department_id
             asset.company_id = used_by.company_id
             db.session.commit()
+        '''
         amount = int(amount_dict[asset.id])
         rel = RelAssetOutItem(
             id=uuid.uuid4().hex,

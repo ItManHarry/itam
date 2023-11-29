@@ -161,7 +161,7 @@ def index():
     #     print(item)
     # Excel导出
     session['asset_export_all'] = search_all
-    session['asset_export_per'] = [[asset.company.name if asset.company else '', asset.department.name if asset.department else '', asset.class3.name, asset.code, asset.sap_code, asset.brand.name, asset.model.name, asset.buy_date.strftime('%Y-%m-%d'), asset.vendor.name, asset.user.name if asset.user else '', asset.status.display, '已出库' if asset.is_out else '在库', asset.store.name] for asset in assets]     # 导出当前
+    session['asset_export_per'] = [[asset.company.name if asset.company else '', asset.department.name if asset.department else '', asset.class3.name, asset.code, asset.sap_code, asset.brand.name, asset.model.name, asset.buy_date.strftime('%Y-%m-%d'), asset.vendor.name, asset.user.name if asset.user else '', asset.user.code if asset.user else '', asset.status.display, '已出库' if asset.is_out else '在库', asset.store.name] for asset in assets]     # 导出当前
     return render_template('biz/report/asset_rpt/index.html', form=form, assets=assets, pagination=pagination, asset_bar=json.dumps(asset_bar), asset_pie=json.dumps(asset_pie))
 @bp_asset_rpt.route('/export/<int:sign>')
 @login_required
@@ -174,12 +174,12 @@ def export(sign):
     '''
     excel.init_excel(current_app)
     page = session['asset_report_current_page']
-    data_header = [['所属法人', '所属部门', '资产名称', '资产编号', 'SAP资产编号', '品牌', '型号', '采购日期', '供应商', '使用者', '资产状态', '库存状态', '仓库所属']]
+    data_header = [['所属法人', '所属部门', '资产名称', '资产编号', 'SAP资产编号', '品牌', '型号', '采购日期', '供应商', '使用者姓名', '使用者职号', '资产状态', '库存状态', '仓库所属']]
     if sign == 0:
         search_all = session['asset_export_all']
         conditions = get_condition_set(search_all)
         asset_all = BizAssetMaster.query.filter(*conditions).order_by(BizAssetMaster.code).all()
-        data_body = [[asset.company.name if asset.company else '', asset.department.name if asset.department else '', asset.class3.name, asset.code, asset.sap_code, asset.brand.name, asset.model.name, asset.buy_date.strftime('%Y-%m-%d'), asset.vendor.name, asset.user.name if asset.user else '', asset.status.display, '已出库' if asset.is_out else '在库', asset.store.name] for asset in asset_all]
+        data_body = [[asset.company.name if asset.company else '', asset.department.name if asset.department else '', asset.class3.name, asset.code, asset.sap_code, asset.brand.name, asset.model.name, asset.buy_date.strftime('%Y-%m-%d'), asset.vendor.name, asset.user.name if asset.user else '', asset.user.code if asset.user else '', asset.status.display, '已出库' if asset.is_out else '在库', asset.store.name] for asset in asset_all]
     else:
         data_body = session['asset_export_per']
     data = data_header + data_body

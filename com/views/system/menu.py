@@ -3,7 +3,7 @@
 '''
 from flask import Blueprint, render_template, request, current_app, flash, redirect, url_for, jsonify, session
 from flask_login import login_required, current_user
-from com.models import SysMenu, SysModule
+from com.models import SysMenu, SysModule, SysRole
 from com.plugins import db
 from com.decorators import log_record
 from com.forms.sys.menu import MenuForm, MenuSearchForm
@@ -104,3 +104,24 @@ def get_modules():
     for module in SysModule.query.order_by(SysModule.name.desc()).all():
         modules.append((module.id, module.name))
     return modules
+@bp_menu.route('/roles/<id>', methods=['POST'])
+@login_required
+def get_roles(id):
+    menu = SysMenu.query.get_or_404(id)
+    print('Menu id is : ', id, ', menu name is : ', menu.name)
+    print('Roles are : ', len(menu.roles))
+    print('Current user company id is : ', current_user.company_id)
+    roles = [role for role in menu.roles if role.company_id == current_user.company_id]
+    print('Roles are : ', len(roles))
+    return render_template('sys/menu/_roles.html', roles=roles)
+    # return jsonify(code=1, roles=[])
+@bp_menu.route('/roles/unlink/<role_id>/<menu_id>', methods=['POST'])
+@login_required
+def unlink_role(role_id, menu_id):
+    role = SysRole.query.get_or_404(role_id)
+    menu = SysMenu.query.get_or_404(menu_id)
+    # print('Role id is : ', role_id, ', role name is : ', role.name)
+    # print('Menu id is : ', menu_id, ', menu name is : ', menu.name)
+    role.menus.remove(menu)
+    db.session.commit()
+    return jsonify(code=1, message='角色权限已断开！')

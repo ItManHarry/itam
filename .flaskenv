@@ -1,1 +1,1 @@
-FLASK_ENV=product
+FLASK_ENV=development

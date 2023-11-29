@@ -1,6 +1,6 @@
 <!-- 雇员选择窗体 -->
 <div class="modal fade" id="employeeModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="employeeModalTitle">选择人员</h5>
@@ -51,7 +51,7 @@
                 if(employees.length > 0){
                     $('#message').text('')
                     for(var i = 0; i < employees.length; i++){
-                        $('#employees').append("<button onclick='set_employee(this)' data-name='"+employees[i][1]+"' data-code='"+employees[i][2]+"' data-email='"+employees[i][3]+"' id='"+employees[i][0]+"' class='list-group-item list-group-item-action'><span class='text-success'><i class='bi bi-check2-circle'></i>&nbsp;&nbsp;</span>"+employees[i][1]+"("+employees[i][2]+")</button>")
+                        $('#employees').append("<button onclick='set_employee(this)' data-name='"+employees[i][1]+"' data-code='"+employees[i][2]+"' data-email='"+employees[i][3]+"' id='"+employees[i][0]+"' class='list-group-item list-group-item-action'><span class='text-success'><i class='bi bi-check2-circle'></i>&nbsp;&nbsp;</span>"+employees[i][1]+"("+employees[i][2]+")-"+employees[i][4]+"</button>")
                     }
                 }else{
                     $('#message').text('人员信息不存在！！！')

@@ -1,7 +1,7 @@
 from flask import Blueprint, send_from_directory, render_template, flash, redirect, url_for, request,current_app,session, jsonify
 from flask_login import login_required, current_user
 from com.forms.biz.asset.apply import ApplySearchForm, ApplyForm
-from com.models import BizAssetApply, BizCompany, BizDepartment, BizEmployee, BizAssetClass, BizBrandMaster
+from com.models import BizAssetApply, BizCompany, BizDepartment, BizEmployee, BizAssetClass, BizBrandMaster, BizAssetItem
 from com.plugins import db
 from com.decorators import log_record
 import uuid, time
@@ -64,13 +64,16 @@ def index():
 @log_record('新增资产登记信息')###记录操作日志
 def add():
     form = ApplyForm()
+    if request.method == 'GET':
+        # 执行清理临时申请记录
+        clean_apply_items()
+        form.items_tmp_id.data = uuid.uuid4().hex
     form.company.choices = [('00000000', '申请法人')]+[(company.id, company.name) for company in BizCompany.query.all()]
     form.department_slt.choices = [('00000000', '申请部门')] + [(department.id, department.name) for department in BizDepartment.query.all()]
     form.applicant_slt.choices = [('00000000', '申请人')] + [(employee.id, employee.name) for employee in BizEmployee.query.all()]
     form.class2_slt.choices = [('00000000', '资产类别-ALL')] + [(clazz.id, clazz.name) for clazz in BizAssetClass.query.filter_by(grade=2).order_by(BizAssetClass.code).all()]
     form.brand_slt.choices = [('00000000', '品牌-ALL')] + [(brand.id, brand.name) for brand in BizBrandMaster.query.order_by(BizBrandMaster.name).all()]
     if form.validate_on_submit():
-
         apply = BizAssetApply(id=uuid.uuid4().hex,
             apply_no=gen_bill_no('AY'),
             draft_no=form.draft_no.data,
@@ -79,10 +82,6 @@ def add():
             applicant_id=form.applicant.data,
             amount=form.amount.data,
             applicant_pos=form.applicant_pos.data,
-            class2_id=form.class2_id.data,
-            class3_id=form.class3_id.data,
-            brand_id=form.brand_id.data,
-            model_id=form.model_id.data,
             receive_date=datetime.strptime(form.receive_date.data, '%Y-%m-%d'),
             summary=form.summary.data,
             bg_id=current_user.company_id,
@@ -92,6 +91,11 @@ def add():
             file_name = form.file.data.filename
             form.file.data.save(current_app.config['ASSET_APPLY_FILE_PATH']+'\\'+file_name)
             apply.file_path = file_name
+        # 关联明细
+        tmp_id = form.items_tmp_id.data
+        items = BizAssetItem.query.filter_by(tmp_id=tmp_id).order_by(BizAssetItem.createtime_loc.desc()).all()
+        for item in items:
+            apply.items.append(item)
         db.session.add(apply)
         db.session.commit()
         flash('资产申请添加成功！')
@@ -112,6 +116,8 @@ def edit(id):
     apply = BizAssetApply.query.get_or_404(id)
     file_name = apply.file_path
     if request.method == 'GET':
+        # 执行清理临时申请记录
+        clean_apply_items()
         form.id.data = apply.id
         form.apply_no.data = apply.apply_no
         form.draft_no.data = apply.draft_no
@@ -153,6 +159,40 @@ def edit(id):
         flash('资产申请更新成功！')
         return redirect(url_for('.index'))
     return render_template('biz/asset/apply/edit.html', form=form, file_name=file_name)
+@bp_apply.route('/item/add', methods=['POST'])
+@login_required 
+@log_record('新增申请资产')
+def item_add():
+    data = request.get_json()
+    tmp_id = data['tmp_id']
+    item = BizAssetItem(id=uuid.uuid4().hex,
+                        tmp_id=tmp_id,
+                        class2_id=data['class2_id'],
+                        class3_id=data['class3_id'],
+                        brand_id=data['brand_id'],
+                        model_id=data['model_id'],
+                        user_id=data['user_id'],
+                        amount=data['amount'])
+    db.session.add(item)
+    db.session.commit()
+    items = BizAssetItem.query.filter_by(tmp_id=tmp_id).order_by(BizAssetItem.createtime_loc.desc()).all()
+    total_amount = 0
+    for item in items:
+        total_amount += item.amount
+    return render_template('biz/asset/apply/_items.html', items=items, total_amount=total_amount)
+@bp_apply.route('/item/remove/<id>', methods=['POST'])
+@login_required 
+@log_record('移除申请资产')
+def item_remove(id):
+    item = BizAssetItem.query.get(id)
+    tmp_id = item.tmp_id
+    db.session.delete(item)
+    db.session.commit()
+    items = BizAssetItem.query.filter_by(tmp_id=tmp_id).order_by(BizAssetItem.createtime_loc.desc()).all()
+    total_amount = 0
+    for item in items:
+        total_amount += item.amount
+    return render_template('biz/asset/apply/_items.html', items=items, total_amount=total_amount)
 @bp_apply.route('/get_file/<path:file_name>')
 def get_file(file_name):
     return send_from_directory(current_app.config['ASSET_APPLY_FILE_PATH'], file_name)
@@ -179,3 +219,15 @@ def get_employees(department_id):
     department = BizDepartment.query.get(department_id)#获取部门信息
     return jsonify(employees=[(employee.id, employee.name) for employee in
                                 BizEmployee.query.with_parent(department).order_by().all()])
+def clean_apply_items():
+    '''
+    清理临时申请记录：申请ID为空的记录
+    :return:
+    '''
+    items = BizAssetItem.query.filter(BizAssetItem.apply_id==None).all()
+    if items:
+        for item in items:
+            db.session.delete(item)
+        db.session.commit()
+    else:
+        print('No item data to clean!')

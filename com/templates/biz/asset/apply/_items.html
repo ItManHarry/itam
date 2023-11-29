@@ -1,0 +1,13 @@
+{%for item in items%}
+<tr>
+    <td>{{loop.index}}</td>
+    <td>{{item.class2.name}}</td>
+    <td>{{item.class3.name}}</td>
+    <td>{{item.brand.name}}</td>
+    <td>{{item.model.name}}</td>
+    <td>{{item.amount}}</td>
+    <td>{{item.user.name}}</td>
+    <td><button onclick="remove('{{item.id}}')" type="button" class="btn btn-link btn-sm text-danger"><i class="bi bi-trash3"></i></button></td>
+</tr>
+{%endfor%}
+<input type="hidden" value="{{total_amount}}" id="total_amount">

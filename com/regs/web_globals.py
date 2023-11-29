@@ -19,7 +19,7 @@ def reg_web_global_path(app):
         ajax_request = True if request.headers.get('x-requested-with') is not None and request.headers.get('x-requested-with') == 'XMLHttpRequest' else False
         exclude_urls = [url_for('index'), url_for('auth.login'), url_for('auth.logout')]
         exclude = False
-        if request_path in exclude_urls or 'static' in request_path:
+        if request_path in exclude_urls or 'static' in request_path or '/master/sign' in request_path:
             exclude = True
         # print('请求地址 : ', request_path, '是否属于非检查URL : ', exclude)
         response = make_response()

@@ -74,11 +74,12 @@ function init_date(id){
     $('#'+id).datepicker({
         weekStart: 1,
         autoclose: true,
+        todayBtn: "linked", // 点击可以回到今天
         daysOfWeekHighlighted: "0,6",
         format: "yyyy-mm-dd",
         language: "zh-CN",
         todayHighlight: true
-    })
+    }).datepicker("setDate",'now')
 }
 function init_date_year(id){
     $('#'+id).datepicker({
@@ -88,7 +89,14 @@ function init_date_year(id){
       autoclose: true,
       format: "yyyy",
       language: "zh-CN"
-    })
+    }).datepicker("setDate",'now')
+}
+function sys_alert(content){
+  $.alert({
+      type:'red',
+      title: '',
+      content: content
+  })
 }
 {% endblock %}
 </script>

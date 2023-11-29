@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/forms/biz/asset/master.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/forms/biz/asset/master.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/templates/biz/asset/master/index1.html" beforeDir="false" afterPath="$PROJECT_DIR$/com/templates/biz/asset/master/index1.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/views/biz/asset/master.py" beforeDir="false" afterPath="$PROJECT_DIR$/com/views/biz/asset/master.py" afterDir="false" />
-    </list>
+    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,13 +10,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -37,29 +29,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "full.screen.before.presentation.mode": "false",
-    "last_opened_file_path": "D:/Development/Python/github/itam/com/views/biz/asset",
-    "settings.editor.selected.configurable": "terminal"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Development/Python/workplaces/itam/com/views/biz/asset&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="itam" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="itam" />
+      </console-settings>
+    </option>
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Development\Python\github\itam\com\views\biz\asset" />
-      <recent name="D:\Development\Python\github\itam\com\templates\biz\asset\master" />
-      <recent name="D:\Development\Python\github\itam\com\forms\biz\asset" />
-      <recent name="D:\Development\Python\github\itam\printer" />
-      <recent name="D:\Development\Python\github\itam\com" />
+      <recent name="D:\Development\Python\workplaces\itam\com\views\biz\asset" />
+      <recent name="D:\Development\Python\workplaces\itam\printer" />
+      <recent name="D:\Development\Python\workplaces\itam\com\templates\biz\asset\master" />
+      <recent name="D:\Development\Python\workplaces\itam" />
+      <recent name="D:\Development\Python\workplaces\itam\com\templates\comm" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Development\Python\workplaces\itam\com\templates\biz" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests in D:/Development/Python/workplaces/itam/com/test_table_inrowsplit.py">
+  <component name="RunManager" selected="Python.manual_opt">
+    <configuration name="manual_opt" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="itam" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/com" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/com/manual_opt.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="itam" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -97,6 +118,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.manual_opt" />
         <item itemvalue="Python tests.Python tests in D:/Development/Python/workplaces/itam/com/test_table_inrowsplit.py" />
         <item itemvalue="Python.utils" />
       </list>
@@ -107,6 +129,24 @@
     <configuration>C:\Users\20112004\AppData\Roaming\Subversion</configuration>
     <supportedVersion>125</supportedVersion>
   </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Development\Python\workplaces\itam" />
+          <option name="myCopyRoot" value="D:\Development\Python\workplaces\itam" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Development\Python\workplaces\itam" />
+          <option name="myCopyRoot" value="D:\Development\Python\workplaces\itam" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="" />
@@ -114,202 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00400" summary="repair view and report change">
-      <created>1671696425932</created>
-      <option name="number" value="00400" />
-      <option name="presentableId" value="LOCAL-00400" />
-      <option name="project" value="LOCAL" />
-      <updated>1671696425932</updated>
-    </task>
-    <task id="LOCAL-00401" summary="repair view and report change">
-      <created>1672298646238</created>
-      <option name="number" value="00401" />
-      <option name="presentableId" value="LOCAL-00401" />
-      <option name="project" value="LOCAL" />
-      <updated>1672298646239</updated>
-    </task>
-    <task id="LOCAL-00402" summary="repair view and report change">
-      <created>1672310525445</created>
-      <option name="number" value="00402" />
-      <option name="presentableId" value="LOCAL-00402" />
-      <option name="project" value="LOCAL" />
-      <updated>1672310525447</updated>
-    </task>
-    <task id="LOCAL-00403" summary="repair view and report change">
-      <created>1672390116769</created>
-      <option name="number" value="00403" />
-      <option name="presentableId" value="LOCAL-00403" />
-      <option name="project" value="LOCAL" />
-      <updated>1672390116770</updated>
-    </task>
-    <task id="LOCAL-00404" summary="repair view and report change">
-      <created>1672713033293</created>
-      <option name="number" value="00404" />
-      <option name="presentableId" value="LOCAL-00404" />
-      <option name="project" value="LOCAL" />
-      <updated>1672713033294</updated>
-    </task>
-    <task id="LOCAL-00405" summary="repair view and report change">
-      <created>1672725678368</created>
-      <option name="number" value="00405" />
-      <option name="presentableId" value="LOCAL-00405" />
-      <option name="project" value="LOCAL" />
-      <updated>1672725678368</updated>
-    </task>
-    <task id="LOCAL-00406" summary="repair view and report change">
-      <created>1672726427315</created>
-      <option name="number" value="00406" />
-      <option name="presentableId" value="LOCAL-00406" />
-      <option name="project" value="LOCAL" />
-      <updated>1672726427315</updated>
-    </task>
-    <task id="LOCAL-00407" summary="repair view and report change">
-      <created>1672794862082</created>
-      <option name="number" value="00407" />
-      <option name="presentableId" value="LOCAL-00407" />
-      <option name="project" value="LOCAL" />
-      <updated>1672794862083</updated>
-    </task>
-    <task id="LOCAL-00408" summary="repair view and report change">
-      <created>1672811038836</created>
-      <option name="number" value="00408" />
-      <option name="presentableId" value="LOCAL-00408" />
-      <option name="project" value="LOCAL" />
-      <updated>1672811038836</updated>
-    </task>
-    <task id="LOCAL-00409" summary="repair view and report change">
-      <created>1672814233643</created>
-      <option name="number" value="00409" />
-      <option name="presentableId" value="LOCAL-00409" />
-      <option name="project" value="LOCAL" />
-      <updated>1672814233643</updated>
-    </task>
-    <task id="LOCAL-00410" summary="repair view and report change">
-      <created>1672817808953</created>
-      <option name="number" value="00410" />
-      <option name="presentableId" value="LOCAL-00410" />
-      <option name="project" value="LOCAL" />
-      <updated>1672817808953</updated>
-    </task>
-    <task id="LOCAL-00411" summary="repair view and report change">
-      <created>1672818111933</created>
-      <option name="number" value="00411" />
-      <option name="presentableId" value="LOCAL-00411" />
-      <option name="project" value="LOCAL" />
-      <updated>1672818111933</updated>
-    </task>
-    <task id="LOCAL-00412" summary="repair view and report change">
-      <created>1672818952721</created>
-      <option name="number" value="00412" />
-      <option name="presentableId" value="LOCAL-00412" />
-      <option name="project" value="LOCAL" />
-      <updated>1672818952721</updated>
-    </task>
-    <task id="LOCAL-00413" summary="repair view and report change">
-      <created>1672818974731</created>
-      <option name="number" value="00413" />
-      <option name="presentableId" value="LOCAL-00413" />
-      <option name="project" value="LOCAL" />
-      <updated>1672818974731</updated>
-    </task>
-    <task id="LOCAL-00414" summary="repair view and report change">
-      <created>1672820864428</created>
-      <option name="number" value="00414" />
-      <option name="presentableId" value="LOCAL-00414" />
-      <option name="project" value="LOCAL" />
-      <updated>1672820864428</updated>
-    </task>
-    <task id="LOCAL-00415" summary="repair view and report change">
-      <created>1672821105990</created>
-      <option name="number" value="00415" />
-      <option name="presentableId" value="LOCAL-00415" />
-      <option name="project" value="LOCAL" />
-      <updated>1672821105990</updated>
-    </task>
-    <task id="LOCAL-00416" summary="repair view and report change">
-      <created>1673597691102</created>
-      <option name="number" value="00416" />
-      <option name="presentableId" value="LOCAL-00416" />
-      <option name="project" value="LOCAL" />
-      <updated>1673597691102</updated>
-    </task>
-    <task id="LOCAL-00417" summary="repair view and report change">
-      <created>1673761233403</created>
-      <option name="number" value="00417" />
-      <option name="presentableId" value="LOCAL-00417" />
-      <option name="project" value="LOCAL" />
-      <updated>1673761233404</updated>
-    </task>
-    <task id="LOCAL-00418" summary="repair view and report change">
-      <created>1673827549696</created>
-      <option name="number" value="00418" />
-      <option name="presentableId" value="LOCAL-00418" />
-      <option name="project" value="LOCAL" />
-      <updated>1673827549696</updated>
-    </task>
-    <task id="LOCAL-00419" summary="repair view and report change">
-      <created>1673827606783</created>
-      <option name="number" value="00419" />
-      <option name="presentableId" value="LOCAL-00419" />
-      <option name="project" value="LOCAL" />
-      <updated>1673827606787</updated>
-    </task>
-    <task id="LOCAL-00420" summary="repair view and report change">
-      <created>1675145768913</created>
-      <option name="number" value="00420" />
-      <option name="presentableId" value="LOCAL-00420" />
-      <option name="project" value="LOCAL" />
-      <updated>1675145768914</updated>
-    </task>
-    <task id="LOCAL-00421" summary="repair view and report change">
-      <created>1676340006591</created>
-      <option name="number" value="00421" />
-      <option name="presentableId" value="LOCAL-00421" />
-      <option name="project" value="LOCAL" />
-      <updated>1676340006591</updated>
-    </task>
-    <task id="LOCAL-00422" summary="repair view and report change">
-      <created>1677546882221</created>
-      <option name="number" value="00422" />
-      <option name="presentableId" value="LOCAL-00422" />
-      <option name="project" value="LOCAL" />
-      <updated>1677546882221</updated>
-    </task>
-    <task id="LOCAL-00423" summary="repair view and report change">
-      <created>1678175455992</created>
-      <option name="number" value="00423" />
-      <option name="presentableId" value="LOCAL-00423" />
-      <option name="project" value="LOCAL" />
-      <updated>1678175455993</updated>
-    </task>
-    <task id="LOCAL-00424" summary="repair view and report change">
-      <created>1678861858101</created>
-      <option name="number" value="00424" />
-      <option name="presentableId" value="LOCAL-00424" />
-      <option name="project" value="LOCAL" />
-      <updated>1678861858101</updated>
-    </task>
-    <task id="LOCAL-00425" summary="repair view and report change">
-      <created>1679645983229</created>
-      <option name="number" value="00425" />
-      <option name="presentableId" value="LOCAL-00425" />
-      <option name="project" value="LOCAL" />
-      <updated>1679645983229</updated>
-    </task>
-    <task id="LOCAL-00426" summary="repair view and report change">
-      <created>1679648104857</created>
-      <option name="number" value="00426" />
-      <option name="presentableId" value="LOCAL-00426" />
-      <option name="project" value="LOCAL" />
-      <updated>1679648104857</updated>
-    </task>
-    <task id="LOCAL-00427" summary="repair view and report change">
-      <created>1679881264745</created>
-      <option name="number" value="00427" />
-      <option name="presentableId" value="LOCAL-00427" />
-      <option name="project" value="LOCAL" />
-      <updated>1679881264745</updated>
     </task>
     <task id="LOCAL-00428" summary="repair view and report change">
       <created>1679887639045</created>
@@ -409,62 +253,255 @@
       <option name="project" value="LOCAL" />
       <updated>1681269193651</updated>
     </task>
-    <task id="LOCAL-00442" summary="asset apply draft no 'None'">
-      <created>1681801023356</created>
+    <task id="LOCAL-00442" summary="add session time out check">
+      <created>1681803055322</created>
       <option name="number" value="00442" />
       <option name="presentableId" value="LOCAL-00442" />
       <option name="project" value="LOCAL" />
-      <updated>1681801023356</updated>
+      <updated>1681803055322</updated>
     </task>
-    <task id="LOCAL-00443" summary="asset apply draft no 'None'">
-      <created>1681801088866</created>
+    <task id="LOCAL-00443" summary="add session time out check">
+      <created>1681868215907</created>
       <option name="number" value="00443" />
       <option name="presentableId" value="LOCAL-00443" />
       <option name="project" value="LOCAL" />
-      <updated>1681801088866</updated>
+      <updated>1681868215907</updated>
     </task>
     <task id="LOCAL-00444" summary="add session time out check">
-      <created>1681868089537</created>
+      <created>1681869559986</created>
       <option name="number" value="00444" />
       <option name="presentableId" value="LOCAL-00444" />
       <option name="project" value="LOCAL" />
-      <updated>1681868089537</updated>
+      <updated>1681869559986</updated>
     </task>
     <task id="LOCAL-00445" summary="add session time out check">
-      <created>1681869975700</created>
+      <created>1681869788153</created>
       <option name="number" value="00445" />
       <option name="presentableId" value="LOCAL-00445" />
       <option name="project" value="LOCAL" />
-      <updated>1681869975700</updated>
+      <updated>1681869788153</updated>
     </task>
     <task id="LOCAL-00446" summary="add session time out check">
-      <created>1681870732500</created>
+      <created>1681870040011</created>
       <option name="number" value="00446" />
       <option name="presentableId" value="LOCAL-00446" />
       <option name="project" value="LOCAL" />
-      <updated>1681870732500</updated>
+      <updated>1681870040011</updated>
     </task>
     <task id="LOCAL-00447" summary="add session time out check">
-      <created>1681870937416</created>
+      <created>1681870248130</created>
       <option name="number" value="00447" />
       <option name="presentableId" value="LOCAL-00447" />
       <option name="project" value="LOCAL" />
-      <updated>1681870937416</updated>
+      <updated>1681870248130</updated>
     </task>
-    <task id="LOCAL-00448" summary="latest code">
-      <created>1683619224801</created>
+    <task id="LOCAL-00448" summary="add session time out check">
+      <created>1681870869221</created>
       <option name="number" value="00448" />
       <option name="presentableId" value="LOCAL-00448" />
       <option name="project" value="LOCAL" />
-      <updated>1683619224802</updated>
+      <updated>1681870869221</updated>
     </task>
-    <option name="localTasksCounter" value="449" />
+    <task id="LOCAL-00449" summary="add session time out check">
+      <created>1681960897506</created>
+      <option name="number" value="00449" />
+      <option name="presentableId" value="LOCAL-00449" />
+      <option name="project" value="LOCAL" />
+      <updated>1681960897507</updated>
+    </task>
+    <task id="LOCAL-00450" summary="add session time out check">
+      <created>1681976219119</created>
+      <option name="number" value="00450" />
+      <option name="presentableId" value="LOCAL-00450" />
+      <option name="project" value="LOCAL" />
+      <updated>1681976219119</updated>
+    </task>
+    <task id="LOCAL-00451" summary="asset report add search conditions : asset status / store status">
+      <created>1682322677326</created>
+      <option name="number" value="00451" />
+      <option name="presentableId" value="LOCAL-00451" />
+      <option name="project" value="LOCAL" />
+      <updated>1682322677326</updated>
+    </task>
+    <task id="LOCAL-00452" summary="HR组织人员信息同步接口调整：增加HR人员组织信息变更后，联动资产调整资产法人部门所属">
+      <created>1682558988269</created>
+      <option name="number" value="00452" />
+      <option name="presentableId" value="LOCAL-00452" />
+      <option name="project" value="LOCAL" />
+      <updated>1682558988269</updated>
+    </task>
+    <task id="LOCAL-00453" summary="资产管理增加状态过滤">
+      <created>1683679645667</created>
+      <option name="number" value="00453" />
+      <option name="presentableId" value="LOCAL-00453" />
+      <option name="project" value="LOCAL" />
+      <updated>1683679645667</updated>
+    </task>
+    <task id="LOCAL-00454" summary="资产管理增加状态过滤">
+      <created>1685345425986</created>
+      <option name="number" value="00454" />
+      <option name="presentableId" value="LOCAL-00454" />
+      <option name="project" value="LOCAL" />
+      <updated>1685345425986</updated>
+    </task>
+    <task id="LOCAL-00455" summary="资产管理增加状态过滤">
+      <created>1686209468623</created>
+      <option name="number" value="00455" />
+      <option name="presentableId" value="LOCAL-00455" />
+      <option name="project" value="LOCAL" />
+      <updated>1686209468623</updated>
+    </task>
+    <task id="LOCAL-00456" summary="资产管理增加状态过滤">
+      <created>1689316989777</created>
+      <option name="number" value="00456" />
+      <option name="presentableId" value="LOCAL-00456" />
+      <option name="project" value="LOCAL" />
+      <updated>1689316989778</updated>
+    </task>
+    <task id="LOCAL-00457" summary="资产管理增加状态过滤">
+      <created>1692154417835</created>
+      <option name="number" value="00457" />
+      <option name="presentableId" value="LOCAL-00457" />
+      <option name="project" value="LOCAL" />
+      <updated>1692154417835</updated>
+    </task>
+    <task id="LOCAL-00458" summary="编辑返回后搜索条件不变">
+      <created>1692170111921</created>
+      <option name="number" value="00458" />
+      <option name="presentableId" value="LOCAL-00458" />
+      <option name="project" value="LOCAL" />
+      <updated>1692170111921</updated>
+    </task>
+    <task id="LOCAL-00459" summary="资产确认链接session例外处理">
+      <created>1694140014730</created>
+      <option name="number" value="00459" />
+      <option name="presentableId" value="LOCAL-00459" />
+      <option name="project" value="LOCAL" />
+      <updated>1694140014730</updated>
+    </task>
+    <task id="LOCAL-00460" summary="资产确认链接session例外处理">
+      <created>1694140158521</created>
+      <option name="number" value="00460" />
+      <option name="presentableId" value="LOCAL-00460" />
+      <option name="project" value="LOCAL" />
+      <updated>1694140158521</updated>
+    </task>
+    <task id="LOCAL-00461" summary="资产确认链接session例外处理">
+      <created>1694140442574</created>
+      <option name="number" value="00461" />
+      <option name="presentableId" value="LOCAL-00461" />
+      <option name="project" value="LOCAL" />
+      <updated>1694140442574</updated>
+    </task>
+    <task id="LOCAL-00462" summary="资产确认链接session例外处理">
+      <created>1694140588481</created>
+      <option name="number" value="00462" />
+      <option name="presentableId" value="LOCAL-00462" />
+      <option name="project" value="LOCAL" />
+      <updated>1694140588481</updated>
+    </task>
+    <task id="LOCAL-00463" summary="资产确认链接session例外处理">
+      <created>1694140726625</created>
+      <option name="number" value="00463" />
+      <option name="presentableId" value="LOCAL-00463" />
+      <option name="project" value="LOCAL" />
+      <updated>1694140726625</updated>
+    </task>
+    <task id="LOCAL-00464" summary="资产确认链接session例外处理">
+      <created>1695792010114</created>
+      <option name="number" value="00464" />
+      <option name="presentableId" value="LOCAL-00464" />
+      <option name="project" value="LOCAL" />
+      <updated>1695792010114</updated>
+    </task>
+    <task id="LOCAL-00465" summary="资产确认链接session例外处理">
+      <created>1697617826745</created>
+      <option name="number" value="00465" />
+      <option name="presentableId" value="LOCAL-00465" />
+      <option name="project" value="LOCAL" />
+      <updated>1697617826745</updated>
+    </task>
+    <task id="LOCAL-00466" summary="菜单断开角色链接功能新增">
+      <created>1697618236578</created>
+      <option name="number" value="00466" />
+      <option name="presentableId" value="LOCAL-00466" />
+      <option name="project" value="LOCAL" />
+      <updated>1697618236578</updated>
+    </task>
+    <task id="LOCAL-00467" summary="菜单断开角色链接功能新增">
+      <created>1697678537421</created>
+      <option name="number" value="00467" />
+      <option name="presentableId" value="LOCAL-00467" />
+      <option name="project" value="LOCAL" />
+      <updated>1697678537421</updated>
+    </task>
+    <task id="LOCAL-00468" summary="领用发放时取消更新资产使用人为领用人">
+      <created>1698194200652</created>
+      <option name="number" value="00468" />
+      <option name="presentableId" value="LOCAL-00468" />
+      <option name="project" value="LOCAL" />
+      <updated>1698194200652</updated>
+    </task>
+    <task id="LOCAL-00469" summary="领用发放时取消更新资产使用人为领用人">
+      <created>1700211039855</created>
+      <option name="number" value="00469" />
+      <option name="presentableId" value="LOCAL-00469" />
+      <option name="project" value="LOCAL" />
+      <updated>1700211039856</updated>
+    </task>
+    <task id="LOCAL-00470" summary="领用发放时取消更新资产使用人为领用人">
+      <created>1701068520394</created>
+      <option name="number" value="00470" />
+      <option name="presentableId" value="LOCAL-00470" />
+      <option name="project" value="LOCAL" />
+      <updated>1701068520394</updated>
+    </task>
+    <task id="LOCAL-00471" summary="23年升级表调整">
+      <created>1701071098069</created>
+      <option name="number" value="00471" />
+      <option name="presentableId" value="LOCAL-00471" />
+      <option name="project" value="LOCAL" />
+      <updated>1701071098069</updated>
+    </task>
+    <task id="LOCAL-00472" summary="时间控件默认显示当天/当前年份">
+      <created>1701134943048</created>
+      <option name="number" value="00472" />
+      <option name="presentableId" value="LOCAL-00472" />
+      <option name="project" value="LOCAL" />
+      <updated>1701134943048</updated>
+    </task>
+    <task id="LOCAL-00473" summary="时间控件默认显示当天/当前年份">
+      <created>1701158548894</created>
+      <option name="number" value="00473" />
+      <option name="presentableId" value="LOCAL-00473" />
+      <option name="project" value="LOCAL" />
+      <updated>1701158548894</updated>
+    </task>
+    <task id="LOCAL-00474" summary="apply add items">
+      <created>1701160763194</created>
+      <option name="number" value="00474" />
+      <option name="presentableId" value="LOCAL-00474" />
+      <option name="project" value="LOCAL" />
+      <updated>1701160763194</updated>
+    </task>
+    <task id="LOCAL-00475" summary="apply add items">
+      <created>1701245658846</created>
+      <option name="number" value="00475" />
+      <option name="presentableId" value="LOCAL-00475" />
+      <option name="project" value="LOCAL" />
+      <updated>1701245658847</updated>
+    </task>
+    <task id="LOCAL-00476" summary="apply add items">
+      <created>1701246970534</created>
+      <option name="number" value="00476" />
+      <option name="presentableId" value="LOCAL-00476" />
+      <option name="project" value="LOCAL" />
+      <updated>1701246970534</updated>
+    </task>
+    <option name="localTasksCounter" value="477" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="it assets management" />
-    <MESSAGE value="alert added shadow class" />
-    <MESSAGE value="change file upload path" />
     <MESSAGE value="add tables" />
     <MESSAGE value="add tables of assets" />
     <MESSAGE value="brand" />
@@ -480,7 +517,16 @@
     <MESSAGE value="remove the company name from printer page" />
     <MESSAGE value="asset apply draft no 'None'" />
     <MESSAGE value="add session time out check" />
-    <MESSAGE value="latest code" />
-    <option name="LAST_COMMIT_MESSAGE" value="latest code" />
+    <MESSAGE value="asset report add search conditions : asset status / store status" />
+    <MESSAGE value="HR组织人员信息同步接口调整：增加HR人员组织信息变更后，联动资产调整资产法人部门所属" />
+    <MESSAGE value="资产管理增加状态过滤" />
+    <MESSAGE value="编辑返回后搜索条件不变" />
+    <MESSAGE value="资产确认链接session例外处理" />
+    <MESSAGE value="菜单断开角色链接功能新增" />
+    <MESSAGE value="领用发放时取消更新资产使用人为领用人" />
+    <MESSAGE value="23年升级表调整" />
+    <MESSAGE value="时间控件默认显示当天/当前年份" />
+    <MESSAGE value="apply add items" />
+    <option name="LAST_COMMIT_MESSAGE" value="apply add items" />
   </component>
 </project>

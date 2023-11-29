@@ -7,11 +7,11 @@
   <div class="row">
     <div class="col-3 offset-6 text-end">
         {{form.csrf_token}}
-        {{form.name(class='form-control', placeholder='菜单名称')}}
+        {{form.name(class='form-control form-control-sm', placeholder='菜单名称')}}
     </div>
     <div class="col-3 text-end">
-        <button class="btn btn-outline-info" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
-        <a class="btn btn-outline-primary" href="{{url_for('menu.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
+        <button class="btn btn-outline-info btn-sm" type="submit"><i class="bi bi-search"></i>&nbsp;查找</button>&nbsp;&nbsp;
+        <a class="btn btn-outline-primary btn-sm" href="{{url_for('menu.add')}}"><i class="bi bi-plus"></i>&nbsp;新增</a>
     </div>
   </div>
 </form>
@@ -42,10 +42,7 @@
                 <td class="align-middle">{%if menu.active%}<span class="text-success">在用</span>{%else%}<span class="text-danger">停用</span>{%endif%}</td>
                 <td class="text-center align-middle">
                     <a href="{{url_for('menu.edit', id=menu.id)}}" class="btn btn-link text-info" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="编辑"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                    {#
-                    <button class="btn btn-link text-danger {%if not menu.active%}disabled{%endif%}" title="停用" onclick="status('{{menu.id}}', 0)"><i class="bi bi-x-circle"></i></button>&nbsp;
-                    <button class="btn btn-link text-success {%if menu.active%}disabled{%endif%}" title="启用" onclick="status('{{menu.id}}', 1)"><i class="bi bi-check-circle"></i></button>
-                    #}
+                    <button class="btn btn-link text-success" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="角色清单" onclick="get_roles('{{menu.id}}', false)"><i class="bi bi-mortarboard"></i></button>
                 </td>
             </tr>
         {%endfor%}
@@ -57,9 +54,27 @@
   </tbody>
 </table>
 {{render_pagination(pagination, align='right')}}
+<!-- Modal -->
+<div class="modal fade" id="roleModal" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="roleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">所属角色</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <ul class="list-group" id="roles"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block script %}
     {{ super() }}
+    var menu_id = ''
     function status(id, status){
         $.ajax({
             type:'post',
@@ -81,5 +96,35 @@
                })
             }
         })
+    }
+    function get_roles(id, showed){
+        menu_id = id
+        // alert('Menu id is : ' + menu_id)
+        $.post('/menu/roles/'+menu_id, function(html){
+            $('#roles').html(html)
+            // 重新注册popover, 否则不起作用
+            /* var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            popoverTriggerList.map(function (popoverTriggerEl) {
+              return new bootstrap.Popover(popoverTriggerEl)
+            })*/
+            if(!showed)
+                $('#roleModal').modal('show')
+        }, 'html')
+    }
+    function unlink_role(role_id){
+        // alert('Menu id : ' + menu_id)
+        // alert('Role id : ' + role_id)
+        $.post('/menu/roles/unlink/'+role_id+'/'+menu_id, function(data){
+            // $('#roleModal').modal('hide', true)
+            get_roles(menu_id)
+            /*$.alert({
+               type:'green',
+               title:'系统提示',
+               content: data.message,
+               onClose:function(){
+                    $('#roleModal').modal('hide')
+               }
+           })*/
+        }, 'json')
     }
 {% endblock %}

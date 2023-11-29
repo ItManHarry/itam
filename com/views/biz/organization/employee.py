@@ -169,7 +169,7 @@ def get_assets(employee_id, asset_id):
 def get_employees():
     data = request.get_json()
     name = data['name']
-    return jsonify(employees=[(employee.id, employee.name, employee.code, employee.email) for employee in BizEmployee.query.filter(BizEmployee.name.like('%'+name+'%')).order_by(BizEmployee.name).all()])
+    return jsonify(employees=[(employee.id, employee.name, employee.code, employee.email, employee.department.name) for employee in BizEmployee.query.filter(BizEmployee.name.like('%'+name+'%')).order_by(BizEmployee.name).all()])
 @bp_employee.route('/get_employee_org/<id>', methods=['POST'])
 @login_required
 @log_record('获取雇员的组织信息')
