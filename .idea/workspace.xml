@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="" />
+    <list default="true" id="b3536565-7dae-4c87-9fac-2bc0491fb664" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -154,27 +156,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1653275991176</updated>
-    </task>
-    <task id="LOCAL-00428" summary="repair view and report change">
-      <created>1679887639045</created>
-      <option name="number" value="00428" />
-      <option name="presentableId" value="LOCAL-00428" />
-      <option name="project" value="LOCAL" />
-      <updated>1679887639045</updated>
-    </task>
-    <task id="LOCAL-00429" summary="repair view and report change">
-      <created>1679899919041</created>
-      <option name="number" value="00429" />
-      <option name="presentableId" value="LOCAL-00429" />
-      <option name="project" value="LOCAL" />
-      <updated>1679899919041</updated>
-    </task>
-    <task id="LOCAL-00430" summary="repair view and report change">
-      <created>1679899949892</created>
-      <option name="number" value="00430" />
-      <option name="presentableId" value="LOCAL-00430" />
-      <option name="project" value="LOCAL" />
-      <updated>1679899949892</updated>
     </task>
     <task id="LOCAL-00431" summary="remove the company name from printer page">
       <created>1680769219524</created>
@@ -498,11 +479,31 @@
       <option name="project" value="LOCAL" />
       <updated>1701246970534</updated>
     </task>
-    <option name="localTasksCounter" value="477" />
+    <task id="LOCAL-00477" summary="apply add items">
+      <created>1701247566909</created>
+      <option name="number" value="00477" />
+      <option name="presentableId" value="LOCAL-00477" />
+      <option name="project" value="LOCAL" />
+      <updated>1701247566909</updated>
+    </task>
+    <task id="LOCAL-00478" summary="apply add items">
+      <created>1701311769610</created>
+      <option name="number" value="00478" />
+      <option name="presentableId" value="LOCAL-00478" />
+      <option name="project" value="LOCAL" />
+      <updated>1701311769610</updated>
+    </task>
+    <task id="LOCAL-00479" summary="apply add items finished">
+      <created>1701330148225</created>
+      <option name="number" value="00479" />
+      <option name="presentableId" value="LOCAL-00479" />
+      <option name="project" value="LOCAL" />
+      <updated>1701330148225</updated>
+    </task>
+    <option name="localTasksCounter" value="480" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add tables" />
     <MESSAGE value="add tables of assets" />
     <MESSAGE value="brand" />
     <MESSAGE value="change audit table name to audit_instance" />
@@ -527,6 +528,7 @@
     <MESSAGE value="23年升级表调整" />
     <MESSAGE value="时间控件默认显示当天/当前年份" />
     <MESSAGE value="apply add items" />
-    <option name="LAST_COMMIT_MESSAGE" value="apply add items" />
+    <MESSAGE value="apply add items finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="apply add items finished" />
   </component>
 </project>

@@ -440,7 +440,7 @@ class BizAssetItem(BaseModel, db.Model):
     model_id = db.Column(db.String(32))         # 型号
     user_id = db.Column(db.String(32))          # 使用人-对应雇员信息
     amount = db.Column(db.Integer, default=1)   # 申请数量-默认为1
-    std_model = db.Column(db.String(32))        # 标准型号-对应标准型号
+    std_model_id = db.Column(db.String(32))     # 标准型号-对应标准型号ID
     is_bought = db.Column(db.Boolean, default=False)    # 已购买（默认否）
     is_stored = db.Column(db.Boolean, default=False)    # 已入库（默认否）
     apply_id = db.Column(db.String(32), db.ForeignKey('biz_asset_apply.id'))    # 申请单ID
@@ -453,7 +453,7 @@ class BizAssetItem(BaseModel, db.Model):
     # 标准型号
     @property
     def standard_model(self):
-        return BizStandardModel.query.get(self.std_model) if self.std_model else None
+        return BizStandardModel.query.get(self.std_model_id) if self.std_model_id else None
     # 资产分类
     @property
     def class2(self):

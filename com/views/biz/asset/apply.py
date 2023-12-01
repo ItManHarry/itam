@@ -1,7 +1,7 @@
 from flask import Blueprint, send_from_directory, render_template, flash, redirect, url_for, request,current_app,session, jsonify
 from flask_login import login_required, current_user
 from com.forms.biz.asset.apply import ApplySearchForm, ApplyForm
-from com.models import BizAssetApply, BizCompany, BizDepartment, BizEmployee, BizAssetClass, BizBrandMaster, BizAssetItem
+from com.models import BizAssetApply, BizCompany, BizDepartment, BizEmployee, BizAssetClass, BizBrandMaster, BizAssetItem, BizStandardModel
 from com.plugins import db
 from com.decorators import log_record
 import uuid, time
@@ -102,7 +102,8 @@ def add():
         return redirect(url_for('.index'))
     else:
         print('Validation not passed!!!')
-    return render_template('biz/asset/apply/add.html', form=form)
+    standard_models = BizStandardModel.query.order_by(BizStandardModel.name).all()
+    return render_template('biz/asset/apply/add.html', form=form, standard_models=standard_models)
 @bp_apply.route('/edit/<id>', methods=['GET', 'POST'])
 @login_required ###必须登录画面
 @log_record('修改资产申请信息')###记录操作日志
@@ -171,6 +172,30 @@ def item_add():
                         class3_id=data['class3_id'],
                         brand_id=data['brand_id'],
                         model_id=data['model_id'],
+                        user_id=data['user_id'],
+                        amount=data['amount'])
+    db.session.add(item)
+    db.session.commit()
+    items = BizAssetItem.query.filter_by(tmp_id=tmp_id).order_by(BizAssetItem.createtime_loc.desc()).all()
+    total_amount = 0
+    for item in items:
+        total_amount += item.amount
+    return render_template('biz/asset/apply/_items.html', items=items, total_amount=total_amount)
+@bp_apply.route('/item/std/add', methods=['POST'])
+@login_required
+@log_record('新增申请资产-标准型号')
+def item_std_add():
+    data = request.get_json()
+    tmp_id = data['tmp_id']
+    std_model_id = data['std_model_id']
+    std_model = BizStandardModel.query.get(std_model_id)
+    item = BizAssetItem(id=uuid.uuid4().hex,
+                        tmp_id=tmp_id,
+                        std_model_id=std_model_id,
+                        class2_id=std_model.class2_id,
+                        class3_id=std_model.class3_id,
+                        brand_id=std_model.brand_id,
+                        model_id=std_model.model_id,
                         user_id=data['user_id'],
                         amount=data['amount'])
     db.session.add(item)

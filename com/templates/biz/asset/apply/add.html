@@ -105,23 +105,44 @@
         </div>
     </div><br>
     <div class="row">
-        <div class="col-md-11">
-            <div class="row" id="normal_select">
-                <div class="col-md-2">
-                    {{form.class2_slt.label}}
-                    {{form.class2_slt(class='form-control form-control-sm')}}
-                </div>
-                <div class="col-md-2">
-                    <label for="class3_slt">资产名称</label>
-                    <select class="form-control form-control-sm" id="class3_slt" name="class3_slt"></select>
-                </div>
-                <div class="col-md-2">
-                    {{form.brand_slt.label}}
-                    {{form.brand_slt(class='form-control form-control-sm')}}
-                </div>
-                <div class="col-md-2">
-                    <label for="model_slt">型号</label>
-                    <select class="form-control form-control-sm" id="model_slt" name="model_slt"></select>
+        <div class="col-md-1"><br>
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="stdSelect">标准型号</label>
+                <input class="form-check-input" type="checkbox" role="switch" id="stdSelect">
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row" id="standard_select">
+                        <div class="col-md-12">
+                            <label for="do_std_select">标准型号</label>
+                            <select id="do_std_select" class="form-select form-select-sm">
+                                <option value="00000000">---标准型号-All---</option>
+                                {%for standard_model in standard_models%}
+                                    <option value="{{standard_model.id}}">{{standard_model.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" id="normal_select">
+                        <div class="col-md-3">
+                            {{form.class2_slt.label}}
+                            {{form.class2_slt(class='form-control form-control-sm')}}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="class3_slt">资产名称</label>
+                            <select class="form-control form-control-sm" id="class3_slt" name="class3_slt"></select>
+                        </div>
+                        <div class="col-md-3">
+                            {{form.brand_slt.label}}
+                            {{form.brand_slt(class='form-control form-control-sm')}}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="model_slt">型号</label>
+                            <select class="form-control form-control-sm" id="model_slt" name="model_slt"></select>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-2">
                     <label for="apply_amount">申请数量</label>
@@ -139,8 +160,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-1 text-center">
-            <br><button class="btn btn-outline-primary btn-sm" type="button" id="asset_add"><i class="bi bi-plus"></i>&nbsp;添加</button>
+        <div class="col-md-2 text-center">
+            <br><button class="btn btn-outline-primary btn-sm" type="button" id="asset_add"><i class="bi bi-plus"></i>&nbsp;添加</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn btn-outline-info btn-sm" type="button" id="asset_import"><i class="bi bi-file-earmark-excel"></i>&nbsp;Excel</button>
         </div>
     </div><hr>
     <div class="row">
@@ -208,6 +230,16 @@
         //初始化时间控件
         $("#receive_date").each(function(){
             init_date($(this).attr('id'))
+        })
+        $('#standard_select').hide()
+        $('#stdSelect').change(function(){
+            if($(this).is(':checked')){
+                $('#normal_select').hide()
+                $('#standard_select').show()
+            }else{
+                $('#normal_select').show()
+                $('#standard_select').hide()
+            }
         })
         $('#applicant_slt').change(function(){
             //alert('ID is : ' + $(this).val())
@@ -284,38 +316,71 @@
         $('#asset_add').click(function(){
             $('#items_error').remove()
             var apply_amount = parseInt($('#apply_amount').val())
-            if($('#class2_slt').val() == '00000000')
-                sys_alert('请选择资产分类！')
-            else if($('#brand_slt').val() == '00000000')
-                sys_alert('请选择资品牌！')
-            else if(apply_amount <= 0)
-                sys_alert('申请数量要大于0！')
-            else if($('#asset_user_id').val() == '')
-                sys_alert('请指定使用人！')
-            else{
-                var params = {
-                    tmp_id: $('#items_tmp_id').val(),
-                    class2_id:$('#class2_id').val(),
-                    class3_id:$('#class3_id').val(),
-                    brand_id:$('#brand_id').val(),
-                    model_id:$('#model_id').val(),
-                    user_id:$('#asset_user_id').val(),
-                    amount:apply_amount
-                }
-                $.ajax({
-                    url:'{{url_for('apply.item_add')}}',
-                    type:'post',
-                    data:JSON.stringify(params),
-                    contentType:"application/json; charset=utf-8",
-                    dateType:'html',
-                    success:function(data){
-                        $('#items').html(data)
-                        $('#amount').val(($('#total_amount').val()))
-                    },
-                    error:function(){
-                        alert('Error occurred!')
+            if($('#stdSelect').is(':checked')){
+                //标准型号选择
+                if($('#do_std_select').val() == '00000000')
+                    sys_alert('请选择标准型号！')
+                else if(apply_amount <= 0)
+                    sys_alert('申请数量要大于0！')
+                else if($('#asset_user_id').val() == '')
+                    sys_alert('请指定使用人！')
+                else{
+                    var params = {
+                        tmp_id: $('#items_tmp_id').val(),
+                        std_model_id:$('#do_std_select').val(),
+                        user_id:$('#asset_user_id').val(),
+                        amount:apply_amount
                     }
-                })
+                    $.ajax({
+                        url:'{{url_for('apply.item_std_add')}}',
+                        type:'post',
+                        data:JSON.stringify(params),
+                        contentType:"application/json; charset=utf-8",
+                        dateType:'html',
+                        success:function(data){
+                            $('#items').html(data)
+                            $('#amount').val(($('#total_amount').val()))
+                        },
+                        error:function(){
+                            alert('Error occurred!')
+                        }
+                    })
+                }
+            }else{
+                //普通选择
+                if($('#class2_slt').val() == '00000000')
+                    sys_alert('请选择资产分类！')
+                else if($('#brand_slt').val() == '00000000')
+                    sys_alert('请选择资品牌！')
+                else if(apply_amount <= 0)
+                    sys_alert('申请数量要大于0！')
+                else if($('#asset_user_id').val() == '')
+                    sys_alert('请指定使用人！')
+                else{
+                    var params = {
+                        tmp_id: $('#items_tmp_id').val(),
+                        class2_id:$('#class2_id').val(),
+                        class3_id:$('#class3_id').val(),
+                        brand_id:$('#brand_id').val(),
+                        model_id:$('#model_id').val(),
+                        user_id:$('#asset_user_id').val(),
+                        amount:apply_amount
+                    }
+                    $.ajax({
+                        url:'{{url_for('apply.item_add')}}',
+                        type:'post',
+                        data:JSON.stringify(params),
+                        contentType:"application/json; charset=utf-8",
+                        dateType:'html',
+                        success:function(data){
+                            $('#items').html(data)
+                            $('#amount').val(($('#total_amount').val()))
+                        },
+                        error:function(){
+                            alert('Error occurred!')
+                        }
+                    })
+                }
             }
         })
     })
